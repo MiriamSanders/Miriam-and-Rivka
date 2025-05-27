@@ -1,0 +1,118 @@
+/* Global Layout */
+.recipe-container {
+  max-width: 800px;
+  margin: 40px auto;
+  right:30%;
+  padding: 24px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Headings */
+.recipe-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: #444;
+}
+
+/* Recipe Image */
+.recipe-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+/* Description */
+.recipe-description {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* Lists */
+.ingredients-list,
+.instructions-list {
+  padding-left: 24px;
+  margin-bottom: 24px;
+}
+
+.ingredients-list li,
+.instructions-list li {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Discussion Section */
+.discussion-container {
+  margin-top: 48px;
+  border-top: 1px solid #eee;
+  padding-top: 24px;
+}
+
+/* Comments */
+.comments-list {
+  margin-bottom: 20px;
+}
+
+.comment {
+  background-color: #f1f1f1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.comment strong {
+  color: #222;
+}
+
+.comment span {
+  color: #444;
+}
+
+/* Input Area */
+.comment-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.comment-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.comment-button {
+  padding: 10px 18px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.comment-button:hover {
+  background-color: #0056b3;
+}
