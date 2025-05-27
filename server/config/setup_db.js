@@ -10,7 +10,7 @@ const createTables = async () => {
     });
 
     const queries = [
-
+//add role table
         // 1. Users
         `CREATE TABLE IF NOT EXISTS Users (
       UserID INT AUTO_INCREMENT PRIMARY KEY,
@@ -22,6 +22,7 @@ const createTables = async () => {
         // 2. Chefs
         `CREATE TABLE IF NOT EXISTS Chefs (
       ChefID INT PRIMARY KEY,
+      ImageURL VARCHAR(255),
       Education VARCHAR(100),
       ExperienceYears INT,
       Style VARCHAR(100),
@@ -51,12 +52,15 @@ const createTables = async () => {
     )`,
 
         // 5. Ingredients
+        //add more 
         `CREATE TABLE IF NOT EXISTS Ingredients (
       IngredientID INT AUTO_INCREMENT PRIMARY KEY,
       Name VARCHAR(100) NOT NULL
+    
     )`,
 
         // 6. RecipeIngredients
+        //add an order field
         `CREATE TABLE IF NOT EXISTS RecipeIngredients (
       RecipeID INT,
       IngredientID INT,
@@ -99,6 +103,7 @@ const createTables = async () => {
     )`,
 
         // 10. Preferences
+        //prefrence tag
         `CREATE TABLE IF NOT EXISTS Preferences (
       PreferenceID INT AUTO_INCREMENT PRIMARY KEY,
       UserID INT NOT NULL,
@@ -117,6 +122,7 @@ const createTables = async () => {
     )`,
 
         // 12. RecipeRatings
+        //save raters?
         `CREATE TABLE IF NOT EXISTS RecipeRatings (
       RecipeID INT PRIMARY KEY,
       RatersCount INT DEFAULT 0,
@@ -125,6 +131,7 @@ const createTables = async () => {
     )`,
 
         // 13. DailyMenus
+        //add userID
         `CREATE TABLE IF NOT EXISTS DailyMenus (
       MenuID INT AUTO_INCREMENT PRIMARY KEY,
       MenuDate DATE NOT NULL UNIQUE
