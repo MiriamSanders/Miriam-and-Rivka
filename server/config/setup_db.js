@@ -14,8 +14,9 @@ const createTables = async () => {
         // 1. Users
         `CREATE TABLE IF NOT EXISTS Users (
       UserID INT AUTO_INCREMENT PRIMARY KEY,
-      UserName VARCHAR(50) NOT NULL,
-      UserType ENUM('Regular', 'Chef') NOT NULL
+      UserName VARCHAR(50) UNIQUE NOT NULL,
+      UserType ENUM('Regular', 'Chef') NOT NULL,
+      email VARCHAR(50) NOT NULL
     )`,
 
         // 2. Chefs
@@ -137,7 +138,7 @@ const createTables = async () => {
       FOREIGN KEY (MenuID) REFERENCES DailyMenus(MenuID),
       FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID)
     )`,
-        //15. types of tags - mexican, vegen 
+        //15. types of tags - mexican, vegen etc
         `CREATE TABLE IF NOT EXISTS Tags (
   TagID INT AUTO_INCREMENT PRIMARY KEY,
   Name VARCHAR(50) UNIQUE NOT NULL)`,
