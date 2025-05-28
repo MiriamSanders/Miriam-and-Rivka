@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-const dbPromise = require("../dbConnection");
+const dbPromise = require("./dbConnection");
 
 async function GenericGet(table, fieldName, fieldValue, limit, offset) {
     try {
