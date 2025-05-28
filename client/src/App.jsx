@@ -1,11 +1,29 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
+import Home from './components/Home'
+import Login from './components/Login'
+import Signup from './components/Signup'
+import RecipesLayout from './components/RecipesLayout'
+import Recipes from './components/Recipes'
+import RecipeDetail from './components/RecipeDetail'
+import ArticlesLayout  from './components/ArticlesLayout'
+import Articles from './components/Articles'
+import ArticleDetail from './components/ArticleDetail'
+import PersonalAreaLayout  from './components/PersonalAreaLayout'
+import PersonalArea from './components/PersonalArea'
+import Menus from './components/Menus'
+import MenuDetail from './components/MenuDetail'
+import ChefAreaLayout from './components/ChefAreaLayout'
+import ChefArea from './components/ChefArea'
+import AddRecipe from './components/AddRecipe'
+import AddArticle from './components/AddArticle'
+import './styles/App.css'
 
 function App() {
   return (
     <>
     <Navigation userType="chef" />
-    <Router>
+    
       <Routes>
 
         <Route path="/" element={<Home />} />
@@ -40,7 +58,7 @@ function App() {
         </Route>
 
       </Routes>
-    </Router>
     </>
   );
 }
+export default App
