@@ -33,13 +33,11 @@ function App() {
 
         {/* Recipes */}
         <Route path="recipes" element={<Recipes />}>
-          <Route index element={<Recipes />} />
           <Route path=":id" element={<RecipeDetail />} />
         </Route>
 
         {/* Articles */}
-        <Route path="articles" element={<ArticlesLayout />}>
-          <Route index element={<Articles />} />
+        <Route path="articles" element={<Articles />}>
           <Route path=":id" element={<ArticleDetail />} />
         </Route>
 
