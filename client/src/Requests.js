@@ -11,8 +11,10 @@ export async function getRequest(currentUrl) {
     return { succeeded: false, error: error.message || "Unknown error" };
   }
 }
- export async function postRequest(currentUrl, data) {
+export async function postRequest(currentUrl, data) {
   try {
+    console.log("Sending POST request to:", currentUrl, "with data:", data);
+    
     const response = await fetch(`http://localhost:3001/${currentUrl}`, {
       method: 'POST',
       headers: {

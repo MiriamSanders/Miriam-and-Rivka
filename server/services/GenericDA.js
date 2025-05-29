@@ -61,15 +61,15 @@ async function GenericPost(table, data) {
         const db = await dbPromise;
         const insertQuery = mysql.format(`INSERT INTO ?? SET ?`, [table, data]);
         const [insertResult] = await db.execute(insertQuery);
+        console.log(data);
 
         let id = insertResult.insertId;
-
         if (id) {
-            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE id = ?`, [table, id]);
+            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE UserID = ?`, [table, id]);
             const [rows] = await db.execute(selectQuery);
             return rows[0] || null;
-        } else if (data.userId) {
-            const idQuery = mysql.format(`SELECT * FROM ?? WHERE userId = ?`, [table, data.userId]);
+        } else if (data.UserID) {
+            const idQuery = mysql.format(`SELECT * FROM ?? WHERE UserID = ?`, [table, data.UserID]);
             const [rows] = await db.execute(idQuery);
             if (rows.length === 0) throw new Error('No record found for the given userID');
             return rows[0];
@@ -143,4 +143,6 @@ async function writeToLog(data) {
     const logQuery = mysql.format(`INSERT INTO logs SET ?`, [data]);
     await db.execute(logQuery);
 }
-module.exports = { GenericGet,GenericGetAll,GenericPost, GenericPut, GenericDelete, CascadeDelete, writeToLog };
+
+
+module.exports = { GenericGet, GenericGetAll, GenericPost, GenericPut, GenericDelete, CascadeDelete, writeToLog};

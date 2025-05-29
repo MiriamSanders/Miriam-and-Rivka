@@ -4,7 +4,7 @@ import { postRequest } from "../Requests";
 
 function Signup() {
     const [form, setForm] = useState({
-        userName: "",
+        username: "",
         email: "",
         password: ""
     });
@@ -13,9 +13,9 @@ function Signup() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit =async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-      const requestResult =  await postRequest("auth/register", form);
+        const requestResult = await postRequest("auth/register", form);
         if (requestResult.succeeded) {
             alert("Account created successfully!");
             // Optionally redirect to login or home page
@@ -32,8 +32,8 @@ function Signup() {
                 <label>User Name</label>
                 <input
                     type="text"
-                    name="userName"
-                    value={form.userName}
+                    name="username"
+                    value={form.username}
                     onChange={handleChange}
                     required
                 />

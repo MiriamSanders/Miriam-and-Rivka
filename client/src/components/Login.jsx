@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "../styles/Signup.css"; // Reusing the same CSS as Signup
+import { postRequest } from "../Requests"; 
 
 function Login() {
     const [form, setForm] = useState({
-        userName: "",
+        username: "",
         password: ""
     });
 
@@ -11,8 +12,15 @@ function Login() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const requestResult = await postRequest("auth/login", form);
+        if (requestResult.succeeded) {
+            alert("login successfull!");
+            // Optionally redirect to login or home page
+        } else {
+            alert("Error loging into the account account: " + requestResult.error);
+        }
         console.log(form);
     };
 
@@ -23,8 +31,8 @@ function Login() {
                 <label>User Name</label>
                 <input
                     type="text"
-                    name="userName"
-                    value={form.userName}
+                    name="username"
+                    value={form.username}
                     onChange={handleChange}
                     required
                 />
