@@ -28,26 +28,34 @@ async function GenericGet(table, fieldName, fieldValue, limit, offset) {
         throw error;
     }
 }
-async function GenericGetAll(table, limit, offset) {
-    try {
-        const db = await dbPromise;
-        let query = `SELECT * FROM ??  `;
-        const params = [table];
-        if (limit) {
-            query += ` LIMIT ?`;
-            params.push(limit);
-        }
-        if (offset) {
-            query += ` OFFSET ?`;
-            params.push(offset);
-        }
-        const [rows] = await db.execute(mysql.format(query, params));
-        return rows;
-    } catch (error) {
-        console.error('Error fetching all data:', error);
-        throw error;
+async function GenericGetAll(table, limit, offset, columns = []) {
+  try {
+    const db = await dbPromise;
+
+    const columnsPart = (Array.isArray(columns) && columns.length > 0)
+      ? columns.map(col => `\`${col}\``).join(', ')
+      : '*';
+
+    let query = `SELECT ${columnsPart} FROM ??`;
+    const params = [table];
+
+    if (limit) {
+      query += ` LIMIT ?`;
+      params.push(limit);
     }
+    if (offset) {
+      query += ` OFFSET ?`;
+      params.push(offset);
+    }
+    const [rows] = await db.execute(mysql.format(query, params));
+  
+    return rows;
+  } catch (error) {
+    console.error('Error fetching all data:', error);
+    throw error;
+  }
 }
+
 async function GenericPost(table, data) {
     try {
         const db = await dbPromise;
