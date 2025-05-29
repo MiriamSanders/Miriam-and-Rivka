@@ -22,7 +22,7 @@ import './styles/App.css'
 function App() {
   return (
     <>
-    <Navigation userType="chef" />
+    <Navigation />
     
       <Routes>
 

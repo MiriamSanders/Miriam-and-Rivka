@@ -28,6 +28,26 @@ async function GenericGet(table, fieldName, fieldValue, limit, offset) {
         throw error;
     }
 }
+async function GenericGetAll(table, limit, offset) {
+    try {
+        const db = await dbPromise;
+        let query = `SELECT * FROM ?? WHERE is_deleted = 0`;
+        const params = [table];
+        if (limit) {
+            query += ` LIMIT ?`;
+            params.push(limit);
+        }
+        if (offset) {
+            query += ` OFFSET ?`;
+            params.push(offset);
+        }
+        const [rows] = await db.execute(mysql.format(query, params));
+        return rows;
+    } catch (error) {
+        console.error('Error fetching all data:', error);
+        throw error;
+    }
+}
 async function GenericPost(table, data) {
     try {
         const db = await dbPromise;
@@ -115,4 +135,4 @@ async function writeToLog(data) {
     const logQuery = mysql.format(`INSERT INTO logs SET ?`, [data]);
     await db.execute(logQuery);
 }
-module.exports = { GenericGet, GenericPost, GenericPut, GenericDelete, CascadeDelete, writeToLog };
+module.exports = { GenericGet,GenericGetAll,GenericPost, GenericPut, GenericDelete, CascadeDelete, writeToLog };

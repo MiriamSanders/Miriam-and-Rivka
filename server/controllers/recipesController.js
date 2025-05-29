@@ -5,7 +5,7 @@ exports.getAllRecipes = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10; 
     const offset = parseInt(req.query.offset) || 0;
 
-    const recipes = await GenericDA.GenericGet('recipes', '1', '1', limit, offset);
+    const recipes = await GenericDA.GenericGetAll('recipes',  limit, offset);
 
     res.json(recipes);
   } catch (error) {
