@@ -5,23 +5,22 @@ function Recipes() {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1); 
   const [hasMore, setHasMore] = useState(true);
-
-  const getRecipes = async (pageNumber) => {
-    const pageSize = 10;
-    const requestResult = await getRequest(url);
+const limit=10;
+  const getRecipes = async () => {
+    const requestResult = await getRequest(`recipes?limit=${limit}&offset=${page}`);
     if (requestResult.succeeded) {
       const newRecipes = requestResult.data;
-      if (newRecipes.length < pageSize) {
-        setHasMore(false); // אין יותר מתכונים לטעון
+      if (newRecipes.length < limit) {
+        setHasMore(false);
       }
-      setRecipes((prev) => [...prev, ...newRecipes]); // מוסיפים מתכונים לרשימה הקיימת
+      setRecipes((prev) => [...prev, ...newRecipes]); 
     } else {
       console.log(requestResult.error);
     }
   };
 
   useEffect(() => {
-    getRecipes(page);
+    getRecipes();
   }, [page]);
 
   const loadMore = () => {
@@ -29,24 +28,33 @@ function Recipes() {
   };
 
   return (
-    <div className="recipes-container">
-      <h1>Recipes</h1>
-      <div className="recipes-list">
-        {recipes.map((recipe) => (
+  <div className="recipes-container">
+    <h1>Recipes</h1>
+
+    <div className="recipes-list">
+      {recipes.length === 0 ? (
+        <p style={{ fontStyle: 'italic', color: 'gray' }}>
+         No recipes found available
+        </p>
+      ) : (
+        recipes.map((recipe) => (
           <div key={recipe.id} className="recipe-card">
             <img src={recipe.image} alt={recipe.title} />
             <h2>{recipe.title}</h2>
             <p>{recipe.description}</p>
           </div>
-        ))}
-      </div>
-      {hasMore && (
-        <button onClick={loadMore} className="load-more-button">
-          load more
-        </button>
+        ))
       )}
     </div>
-  );
+
+    {hasMore && recipes.length > 0 && (
+      <button onClick={loadMore} className="load-more-button">
+        load more
+      </button>
+    )}
+  </div>
+);
+
 }
 
 export default Recipes;

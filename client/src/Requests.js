@@ -1,6 +1,6 @@
-export async function getRequest(url) {
+export async function getRequest(currentUrl) {
   try {
-    const response = await fetch(url);
+    const response = await fetch(`http://localhost:3001/${currentUrl}`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }

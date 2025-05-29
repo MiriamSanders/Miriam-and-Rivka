@@ -32,7 +32,7 @@ function App() {
         <Route path="signup" element={<Signup />} />
 
         {/* Recipes */}
-        <Route path="recipes" element={<RecipesLayout />}>
+        <Route path="recipes" element={<Recipes />}>
           <Route index element={<Recipes />} />
           <Route path=":id" element={<RecipeDetail />} />
         </Route>
