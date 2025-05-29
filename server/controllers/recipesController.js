@@ -1,5 +1,6 @@
+const e = require('express');
 const GenericDA = require('../services/GenericDA');
-
+const RecipeDA = require('../services/recipeDA');
 exports.getAllRecipes = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10; 
@@ -12,3 +13,22 @@ exports.getAllRecipes = async (req, res) => {
     res.status(500).json({ error: 'somthing went wrong' });
   }
 };
+
+exports.getRecipeById = async (req, res) => { 
+  const recipeId = parseInt(req.params.id);
+  if (isNaN(recipeId)) {
+    return res.status(400).json({ error: 'Invalid recipe ID' });
+  }
+
+  try {
+    console.log('Fetching recipe with ID:', recipeId);
+    const recipe = await RecipeDA.getRecipeById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+    res.json(recipe);
+  } catch (error) {
+    console.error('Error fetching recipe:', error);
+    res.status(500).json({ error: 'somthing went wrong' });
+  }
+}

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getRequest } from '../Requests';
 import '../styles/Recipes.css';
+import { useNavigate } from 'react-router-dom';
 
 function Recipes() {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1); 
   const [hasMore, setHasMore] = useState(true);
+   const navigate = useNavigate();
   const limit = 10;
 
   const getRecipes = async () => {
@@ -20,7 +22,10 @@ function Recipes() {
       console.log(requestResult.error);
     }
   };
-
+ const openRecipePage = (e) => {
+    const recipeId = e.currentTarget.getAttribute('name');
+  navigate(`/recipes/${recipeId}`);
+  }
   useEffect(() => {
     getRecipes();
   }, [page]);
@@ -38,7 +43,7 @@ function Recipes() {
           <p className="no-recipes">No recipes found available</p>
         ) : (
           recipes.map((recipe) => (
-            <div key={recipe.RecipeID} className="recipe-card">
+            <div key={recipe.RecipeID} name={recipe.RecipeID} className="recipe-card" onClick={openRecipePage}>
               <div className="recipe-image" style={{ backgroundImage: `url(${recipe.ImageURL})` }}>
                 <div className="recipe-overlay">
                   <h2>{recipe.Title}</h2>

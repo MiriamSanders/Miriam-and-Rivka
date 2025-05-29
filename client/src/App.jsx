@@ -5,11 +5,11 @@ import Login from './components/Login'
 import Signup from './components/Signup'
 import RecipesLayout from './components/RecipesLayout'
 import Recipes from './components/Recipes'
-import RecipeDetail from './components/RecipeDetail'
-import ArticlesLayout  from './components/ArticlesLayout'
+import RecipePage from './components/RecipePage'
+import ArticlesLayout from './components/ArticlesLayout'
 import Articles from './components/Articles'
 import ArticleDetail from './components/ArticleDetail'
-import PersonalAreaLayout  from './components/PersonalAreaLayout'
+import PersonalAreaLayout from './components/PersonalAreaLayout'
 import PersonalArea from './components/PersonalArea'
 import Menus from './components/Menus'
 import MenuDetail from './components/MenuDetail'
@@ -22,8 +22,8 @@ import './styles/App.css'
 function App() {
   return (
     <>
-    <Navigation />
-    
+      <Navigation />
+
       <Routes>
 
         <Route path="/" element={<Home />} />
@@ -32,9 +32,9 @@ function App() {
         <Route path="signup" element={<Signup />} />
 
         {/* Recipes */}
-        <Route path="recipes" element={<Recipes />}>
-          <Route path=":id" element={<RecipeDetail />} />
-        </Route>
+        <Route path="recipes" element={<Recipes />} />
+        <Route path="recipes/:id" element={<RecipePage />} />
+
 
         {/* Articles */}
         <Route path="articles" element={<Articles />}>
