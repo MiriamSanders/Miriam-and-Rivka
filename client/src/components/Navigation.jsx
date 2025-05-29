@@ -30,16 +30,21 @@ function Navigation({ userType = "guest" }) {
     links = links.concat(navOptions.chef);
   }
 
-  return (
-    <nav>
-      <ul>
-        {links.map(({ path, label }) => (
-          <li key={path}>
-            <NavLink to={path}>{label}</NavLink>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
+ return (
+  <nav>
+    <ul>
+      {links.map(({ path, label }) => (
+        <li key={path}>
+          <NavLink
+            to={path}
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
+            {label}
+          </NavLink>
+        </li>
+      ))}
+    </ul>
+  </nav>
+);
 }
 export default Navigation;

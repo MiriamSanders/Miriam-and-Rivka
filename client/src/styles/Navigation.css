@@ -15,6 +15,7 @@ nav ul {
   margin: 0;
   padding: 0;
   align-items: center;
+  justify-content: center;
 }
 
 nav li {
@@ -35,7 +36,7 @@ nav a:hover {
 }
 
 nav a.active {
-  background-color: #007bff;
+  background-color: #262c33;
   color: #fff;
 }
 

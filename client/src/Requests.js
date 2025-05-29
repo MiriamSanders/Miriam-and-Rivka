@@ -11,3 +11,22 @@ export async function getRequest(currentUrl) {
     return { succeeded: false, error: error.message || "Unknown error" };
   }
 }
+ export async function postRequest(currentUrl, data) {
+  try {
+    const response = await fetch(`http://localhost:3001/${currentUrl}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const responseData = await response.json();
+    return { succeeded: true, data: responseData };
+  } catch (error) {
+    console.error("Error in postRequest:", error);
+    return { succeeded: false, error: error.message || "Unknown error" };
+  }
+}

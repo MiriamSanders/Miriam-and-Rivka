@@ -8,7 +8,7 @@ async function GenericGet(table, fieldName, fieldValue, limit, offset) {
         let query = `
             SELECT * 
             FROM ??
-            WHERE ?? = ? AND is_deleted = 0
+            WHERE ?? = ? 
         `;
         if (limit) {
             query += ` LIMIT ?`;
@@ -31,7 +31,7 @@ async function GenericGet(table, fieldName, fieldValue, limit, offset) {
 async function GenericGetAll(table, limit, offset) {
     try {
         const db = await dbPromise;
-        let query = `SELECT * FROM ?? WHERE is_deleted = 0`;
+        let query = `SELECT * FROM ??  `;
         const params = [table];
         if (limit) {
             query += ` LIMIT ?`;

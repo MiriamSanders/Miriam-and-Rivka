@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Signup.css"; // Assuming you have a CSS file for styling
+import { postRequest } from "../Requests";
 
 function Signup() {
     const [form, setForm] = useState({
@@ -12,8 +13,15 @@ function Signup() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit =async (e) => {
         e.preventDefault();
+      const requestResult =  await postRequest("auth/register", form);
+        if (requestResult.succeeded) {
+            alert("Account created successfully!");
+            // Optionally redirect to login or home page
+        } else {
+            alert("Error creating account: " + requestResult.error);
+        }
         console.log(form);
     };
 

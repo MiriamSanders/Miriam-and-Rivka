@@ -13,6 +13,8 @@ const limit=10;
       if (newRecipes.length < limit) {
         setHasMore(false);
       }
+      console.log(newRecipes);
+      
       setRecipes((prev) => [...prev, ...newRecipes]); 
     } else {
       console.log(requestResult.error);
