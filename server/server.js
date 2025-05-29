@@ -11,12 +11,13 @@ app.use(cors({
 }));
 
 const recipesRouter = require('./routes/recipesRoutes');
-
+const articlesRouter = require('./routes/articlesRoutes');
 
 app.use(express.json());
 app.use(AuthMiddlewere);
 app.use('/auth', registrationRouter);
 app.use('/',recipesRouter);
+app.use('/',articlesRouter);
 app.listen(PORT, () => {
   console.log('http://localhost:3001');
 });
