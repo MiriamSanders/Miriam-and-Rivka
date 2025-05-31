@@ -34,3 +34,21 @@ authors.forEach(author => {
   }
 };
 
+exports.getArticleById = async (req, res) => {
+  const articleId = parseInt(req.params.id);
+  if (isNaN(articleId)) {
+    return res.status(400).json({ error: 'Invalid article ID' });
+  }
+
+  try {
+    const article = await GenericDA.GenericGet('articles', 'ArticleID', articleId, 1, 0);
+    if (!article || article.length === 0) {
+      return res.status(404).json({ error: 'Article not found' });
+    }
+    res.json(article[0]);
+  } catch (error) {
+    console.error('Error fetching article:', error);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+};
+

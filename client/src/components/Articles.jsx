@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getRequest } from '../Requests';
 import '../styles/Articles.css';
 
@@ -6,6 +7,7 @@ function Articles() {
   const [articles, setArticles] = useState([]);
   const [page, setPage] = useState(1); 
   const [hasMore, setHasMore] = useState(true);
+  const navigate = useNavigate();
   const limit = 6;
 
   const getArticles = async () => {
@@ -28,7 +30,15 @@ function Articles() {
   const loadMore = () => {
     setPage((prev) => prev + 1);
   };
+const openArticle = (e) => {
+  const articleId = e.currentTarget.getAttribute('data-article-id');
+  if (articleId) {
+    navigate(`/articles/${articleId}`);
+  } else {
+    console.error('Article ID not found');
+  }
 
+}
   return (
     <div className="articlesrecipes-container">
       <h1>Articles</h1>
@@ -38,7 +48,7 @@ function Articles() {
           <p className="no-articles">No articles found available</p>
         ) : (
           articles.map((article) => (
-            <div key={article.ArticleID} className="article-card">
+            <div key={article.ArticleID} className="article-card" data-article-id={article.ArticleID} onClick={openArticle}>
                 <div className="article-overlay">
                   <h2>{article.Title}</h2>
                   <p>Written by:{article. AuthorName}</p>

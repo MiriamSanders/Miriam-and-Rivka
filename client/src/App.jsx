@@ -9,7 +9,7 @@ import Recipes from './components/Recipes'
 import RecipePage from './components/RecipePage'
 import ArticlesLayout from './components/ArticlesLayout'
 import Articles from './components/Articles'
-import ArticleDetail from './components/ArticleDetail'
+import ArticlePage from './components/ArticlePage'
 import PersonalAreaLayout from './components/PersonalAreaLayout'
 import PersonalArea from './components/PersonalArea'
 import Menus from './components/Menus'
@@ -24,14 +24,14 @@ function App() {
   const [userType, setUserType] = useState("guest"); // Default user type
   return (
     <>
-      <Navigation userType={userType}/>
+      <Navigation userType={userType} />
 
       <Routes>
 
         <Route path="/" element={<Home />} />
 
-        <Route path="login" element={<Login setUserType={setUserType}/>} />
-        <Route path="signup" element={<Signup setUserType={setUserType}/>} />
+        <Route path="login" element={<Login setUserType={setUserType} />} />
+        <Route path="signup" element={<Signup setUserType={setUserType} />} />
 
         {/* Recipes */}
         <Route path="recipes" element={<Recipes />} />
@@ -39,9 +39,8 @@ function App() {
 
 
         {/* Articles */}
-        <Route path="articles" element={<Articles />}>
-          <Route path=":id" element={<ArticleDetail />} />
-        </Route>
+        <Route path="articles" element={<Articles />} />
+        <Route path="articles/:id" element={<ArticlePage />} />
 
         {/* Personal Area */}
         <Route path="personal-area" element={<PersonalAreaLayout />}>
