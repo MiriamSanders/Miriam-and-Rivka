@@ -30,14 +30,14 @@ function ArticlePage() {
   if (error) return <div className="article-error">Error: {error}</div>;
   if (!articleData) return <div>No article found.</div>;
 
-  const { Title, AuthorID, CreatedAt, Content } = articleData;
+  const { Title, AuthorID, CreatedAt, Content,AuthorName } = articleData;
   const formattedDate = new Date(CreatedAt).toLocaleDateString();
 
   return (
     <div className="article-container">
       <h1 className="article-title">{Title}</h1>
       <div className="article-meta">
-        <span>By Author #{AuthorID}</span>
+        <span>By {AuthorName}</span>
         <span> | </span>
         <span>{formattedDate}</span>
       </div>

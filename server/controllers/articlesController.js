@@ -1,4 +1,5 @@
 const GenericDA = require('../services/GenericDA');
+const articleDA = require('../services/articleDA');
 
 exports.getAllArticles = async (req, res) => {
   try {
@@ -41,11 +42,11 @@ exports.getArticleById = async (req, res) => {
   }
 
   try {
-    const article = await GenericDA.GenericGet('articles', 'ArticleID', articleId, 1, 0);
+    const article = await articleDA.getArticleById(articleId);
     if (!article || article.length === 0) {
       return res.status(404).json({ error: 'Article not found' });
     }
-    res.json(article[0]);
+    res.json(article);
   } catch (error) {
     console.error('Error fetching article:', error);
     res.status(500).json({ error: 'something went wrong' });
