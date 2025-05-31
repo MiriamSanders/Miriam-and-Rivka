@@ -4,7 +4,7 @@ async function getUserWithPasswordByUserName(username) {
     try {
         const db = await dbPromise;
         const query = `
-            SELECT u.UserName, p.* 
+            SELECT u.UserName,u.UserType, p.* 
             FROM users u
             JOIN passwords p ON u.UserID = p.UserID
             WHERE u.UserName = ?

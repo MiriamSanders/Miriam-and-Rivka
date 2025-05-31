@@ -1,13 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Signup.css"; // Reusing the same CSS as Signup
 import { postRequest } from "../Requests"; 
 
-function Login() {
+function Login({setUserType}) {
     const [form, setForm] = useState({
         username: "",
         password: ""
     });
-
+    const navigate= useNavigate();
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -17,6 +18,10 @@ function Login() {
         const requestResult = await postRequest("auth/login", form);
         if (requestResult.succeeded) {
             alert("login successfull!");
+            console.log(requestResult.data)
+            
+            setUserType(requestResult.data.userType);// Assuming the user type is "user" after login
+            navigate("/");
             // Optionally redirect to login or home page
         } else {
             alert("Error loging into the account account: " + requestResult.error);

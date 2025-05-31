@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import "../styles/Signup.css"; // Assuming you have a CSS file for styling
 import { postRequest } from "../Requests";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
-function Signup() {
+function Signup({ setUserType }) {
     const [form, setForm] = useState({
         username: "",
         email: "",
         password: ""
     });
-
+    const navigate = useNavigate(); // Initialize useNavigate
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -18,6 +19,9 @@ function Signup() {
         const requestResult = await postRequest("auth/register", form);
         if (requestResult.succeeded) {
             alert("Account created successfully!");
+             setUserType(requestResult.data.userType);
+            // Assuming the user type is "user" after signup
+            navigate("/"); // Redirect to login page after successful signup
             // Optionally redirect to login or home page
         } else {
             alert("Error creating account: " + requestResult.error);

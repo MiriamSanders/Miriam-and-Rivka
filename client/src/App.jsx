@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState } from 'react';
 import Navigation from './components/Navigation';
 import Home from './components/Home'
 import Login from './components/Login'
@@ -20,16 +21,17 @@ import AddArticle from './components/AddArticle'
 import './styles/App.css'
 
 function App() {
+  const [userType, setUserType] = useState("guest"); // Default user type
   return (
     <>
-      <Navigation />
+      <Navigation userType={userType}/>
 
       <Routes>
 
         <Route path="/" element={<Home />} />
 
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<Signup />} />
+        <Route path="login" element={<Login setUserType={setUserType}/>} />
+        <Route path="signup" element={<Signup setUserType={setUserType}/>} />
 
         {/* Recipes */}
         <Route path="recipes" element={<Recipes />} />

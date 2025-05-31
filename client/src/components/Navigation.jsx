@@ -9,11 +9,11 @@ const navOptions = {
     { path: "/recipes", label: "Recipes" },
     { path: "/articles", label: "Articles" },
   ],
-  user: [
+  Regular: [
     { path: "/personal-area", label: "Personal Area" },
     { path: "/personal-area/menus", label: "My Menus" },
   ],
-  chef: [
+  Chef: [
     { path: "/chef-area", label: "Chef Area" },
     { path: "/chef-area/add-recipe", label: "Add Recipe" },
     { path: "/chef-area/add-article", label: "Add Article" },
@@ -23,11 +23,11 @@ const navOptions = {
 function Navigation({ userType = "guest" }) {
   // Build the hierarchy
   let links = [...navOptions.guest];
-  if (userType === "user" || userType === "chef") {
-    links = links.concat(navOptions.user);
+  if (userType === "Regular" || userType === "chef") {
+    links = links.concat(navOptions.Regular);
   }
   if (userType === "chef") {
-    links = links.concat(navOptions.chef);
+    links = links.concat(navOptions.Chef);
   }
 
  return (
