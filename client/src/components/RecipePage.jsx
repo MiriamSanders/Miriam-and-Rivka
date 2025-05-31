@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import RatingCard from "./RatingCard";
 import "../styles/RecipePage.css"; 
 
 const RecipePage = () => {
@@ -49,7 +50,7 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
           </div>
         </div>
       )}
-
+      <RatingCard  />
       <div className="recipe-content">
         <section>
           <h2 className="section-title">Description</h2>
