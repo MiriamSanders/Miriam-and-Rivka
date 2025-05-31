@@ -19,7 +19,7 @@ function Signup({ setUserType }) {
         const requestResult = await postRequest("auth/register", form);
         if (requestResult.succeeded) {
             alert("Account created successfully!");
-             setUserType(requestResult.data.userType);
+             setUserType(requestResult.data.UserType);
             // Assuming the user type is "user" after signup
             navigate("/"); // Redirect to login page after successful signup
             // Optionally redirect to login or home page
