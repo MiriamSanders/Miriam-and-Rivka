@@ -25,50 +25,67 @@ const RecipePage = () => {
 
   if (loading) return <div className="center-text">Loading...</div>;
   if (!recipeData) return <div className="center-text">Recipe not found.</div>;
-
-  const { recipe, ingredients, tags } = recipeData;
-
+ const { Title, Subtitle, ChefName, PrepTimeMinutes, Difficulty, Category, Description, Instructions, ImageURL,ingredientsList } = recipeData.recipe || {};
+  const ingredients = recipeData.ingredients || [];
+  const tags = recipeData.Tags || [];
+console.log("Recipe Data:", recipeData); // Debugging line to check the fetched data
   return (
     <div className="recipe-container">
-      <h1 className="recipe-title">{recipe.Title}</h1>
-      <p className="recipe-subtext">By: {recipe.ChefName}</p>
+      <h1 className="recipe-title">{Title}</h1>
+      <h2 className="recipe-subtitle">{Subtitle}</h2>
+      <p className="recipe-subtext">By: {ChefName}</p>
       <p className="recipe-subtext">
-        Prep Time: {recipe.PrepTimeMinutes} min · Difficulty: {recipe.Difficulty} · Category: {recipe.Category}
+        Prep Time: {PrepTimeMinutes} min · Difficulty: {Difficulty} · Category: {Category}
       </p>
 
-      {recipe.ImageURL && (
-        <img src={recipe.ImageURL} alt={recipe.Title} className="recipe-image" />
+      {ImageURL ? (
+        <img src={ImageURL} alt={Title} className="recipe-image-style" />
+      ) : (
+        <div className="image-placeholder">
+          <div className="shapes">
+            <div className="shape square" />
+            <div className="shape circle" />
+            <div className="shape triangle" />
+          </div>
+        </div>
       )}
 
-      <section>
-        <h2 className="section-title">Description</h2>
-        <p>{recipe.Description}</p>
-      </section>
+      <div className="recipe-content">
+        <section>
+          <h2 className="section-title">Description</h2>
+          <p>{Description}</p>
+        </section>
 
-      <section>
-        <h2 className="section-title">Instructions</h2>
-        <p className="instructions">{recipe.Instructions}</p>
-      </section>
+           <section>
+          <h2 className="section-title">Ingredients</h2>
+          <ul className="ingredients-list">
+            {Array.isArray(ingredients) ? (
+              ingredients.map((item, idx) => (
+                <li key={idx}>
+                  {item.Quantity} {item.Name}
+                </li>
+              ))
+            ) : (
+              ingredientsList.map((item, idx) => (
+                <li key={idx}>{item.trim()}</li>
+              ))
+            )}
+          </ul>
+        </section>
+          <section>
+          <h2 className="section-title">Instructions</h2>
+          <p className="instructions">{Instructions}</p>
+        </section>
 
-      <section>
-        <h2 className="section-title">Ingredients</h2>
-        <ul className="ingredients-list">
-          {ingredients.map((item, idx) => (
-            <li key={idx}>
-              {item.Quantity} {item.Name}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h2 className="section-title">Tags</h2>
-        <div className="tags-container">
-          {tags.map((tag, idx) => (
-            <span key={idx} className="tag-badge">#{tag}</span>
-          ))}
-        </div>
-      </section>
+        <section>
+          <h2 className="section-title">Tags</h2>
+          <div className="tags-container">
+            {tags.map((tag, idx) => (
+              <span key={idx} className="tag">#{tag}</span>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
