@@ -23,10 +23,10 @@ const navOptions = {
 function Navigation({ userType = "guest" }) {
   // Build the hierarchy
   let links = [...navOptions.guest];
-  if (userType === "Regular" || userType === "chef") {
+  if (userType === "Regular" || userType === "Chef") {
     links = links.concat(navOptions.Regular);
   }
-  if (userType === "chef") {
+  if (userType === "Chef") {
     links = links.concat(navOptions.Chef);
   }
 

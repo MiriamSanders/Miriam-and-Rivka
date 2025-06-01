@@ -49,11 +49,10 @@ function App() {
           {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
         
         {/* Chef Area */}
-        <Route path="chef-area" element={<ChefAreaLayout />}>
-          <Route index element={<ChefArea />} />
-          <Route path="add-recipe" element={<AddRecipe />} />
-          <Route path="add-article" element={<AddArticle />} />
-        </Route>
+          <Route path="/chef-area" element={<ChefArea />} />
+          <Route path="/chef-area/add-recipe" element={<AddRecipe />} />
+          <Route path="/chef-area/add-article" element={<AddArticle />} />
+       
 
       </Routes>
     </>
