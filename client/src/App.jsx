@@ -12,8 +12,7 @@ import Articles from './components/Articles'
 import ArticlePage from './components/ArticlePage'
 import PersonalAreaLayout from './components/PersonalAreaLayout'
 import PersonalArea from './components/PersonalArea'
-import Menus from './components/Menus'
-import MenuDetail from './components/MenuDetail'
+import MenuManager from './components/MenuManager'
 import ChefAreaLayout from './components/ChefAreaLayout'
 import ChefArea from './components/ChefArea'
 import AddRecipe from './components/AddRecipe'
@@ -43,12 +42,11 @@ function App() {
         <Route path="articles/:id" element={<ArticlePage />} />
 
         {/* Personal Area */}
-        <Route path="personal-area" element={<PersonalAreaLayout />}>
-          <Route index element={<PersonalArea />} />
-          <Route path="menus" element={<Menus />} />
-          <Route path="menus/:id" element={<MenuDetail />} />
-        </Route>
-
+        
+          <Route path="personal-area" element={<PersonalArea />} />
+          <Route path="personal-area/menus" element={<MenuManager />} />
+          {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
+        
         {/* Chef Area */}
         <Route path="chef-area" element={<ChefAreaLayout />}>
           <Route index element={<ChefArea />} />

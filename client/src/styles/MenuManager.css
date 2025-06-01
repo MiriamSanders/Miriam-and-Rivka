@@ -1,0 +1,425 @@
+/* Menu Manager Styles */
+.menu-container {
+ margin-top: 10px;
+    min-height: 100vh;
+  background-color: #f9fafb;
+  color: #111827;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Header */
+.menu-header {
+    margin-top: 5%;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: white;
+}
+
+.menu-header-content {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.menu-title {
+  font-size: 2.25rem;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.5rem;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.menu-subtitle {
+  color: #4b5563;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* Main Content */
+.menu-main {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+/* Create Button */
+.create-button-container {
+  margin-bottom: 3rem;
+}
+
+.create-button {
+  position: relative;
+  overflow: hidden;
+  background-color: #111827;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 1.125rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.create-button:hover {
+  background-color: #1f2937;
+  transform: scale(1.05);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.create-button-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.create-button:hover .create-button-icon {
+  transform: rotate(90deg);
+}
+
+/* Form Styles */
+.menu-form {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+}
+
+.form-title {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1rem;
+  color: #111827;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  border-color: #111827;
+}
+
+/* Menu Items */
+.menu-items-container {
+  margin-bottom: 1.5rem;
+}
+
+.menu-item-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.menu-item-input {
+  flex: 1;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1rem;
+  color: #111827;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.menu-item-input:focus {
+  border-color: #111827;
+}
+
+.remove-item-button {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  background-color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-item-button:hover {
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+.remove-item-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.add-item-button {
+  margin-top: 0.5rem;
+  color: #6b7280;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+.add-item-button:hover {
+  color: #111827;
+}
+
+.add-item-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Form Buttons */
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.primary-button {
+  background-color: #111827;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.primary-button:hover {
+  background-color: #1f2937;
+}
+
+.secondary-button {
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1.5rem;
+  color: #374151;
+  background-color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.secondary-button:hover {
+  color: #111827;
+  border-color: #9ca3af;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 1.875rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #111827;
+  margin-top: 0;
+}
+
+.section-title-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 0;
+  color: #6b7280;
+}
+
+.empty-state-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+/* Menus Grid */
+.menus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Menu Card */
+.menu-card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.menu-card:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+}
+
+.menu-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.menu-card-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #111827;
+  margin: 0;
+  flex: 1;
+}
+
+.delete-button {
+  opacity: 0;
+  color: #9ca3af;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-card:hover .delete-button {
+  opacity: 1;
+}
+
+.delete-button:hover {
+  color: #ef4444;
+}
+
+.delete-button-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.menu-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.menu-date-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-item {
+  color: #374151;
+  font-size: 0.875rem;
+  padding: 0.25rem 0;
+  border-left: 2px solid #d1d5db;
+  padding-left: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.menu-card:hover .menu-item {
+  border-color: #6b7280;
+}
+
+.menu-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.menu-footer-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .menu-header-content,
+  .menu-main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .menus-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .menu-title {
+    font-size: 1.875rem;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+  
+  .form-buttons button {
+    width: 100%;
+  }
+}
