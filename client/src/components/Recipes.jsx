@@ -3,7 +3,7 @@ import { getRequest } from '../Requests';
 import '../styles/Recipes.css';
 import { useNavigate } from 'react-router-dom';
 
-function Recipes() {
+function Recipes({createMenu}) {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1); 
   const [hasMore, setHasMore] = useState(true);
@@ -46,6 +46,13 @@ function Recipes() {
             <div key={recipe.RecipeID} name={recipe.RecipeID} className="recipe-card" onClick={openRecipePage}>
               <div className="recipe-image" style={{ backgroundImage: `url(${recipe.ImageURL})` }}>
                 <div className="recipe-overlay">
+                  {createMenu && (
+                    <button className="add-to-menu-button" onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the recipe click
+                    }}>
+                      Add to Menu
+                    </button>
+                  )}
                   <h2>{recipe.Title}</h2>
                   <p>{recipe.Description}</p>
                 </div>

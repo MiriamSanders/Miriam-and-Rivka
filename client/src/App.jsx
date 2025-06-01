@@ -21,6 +21,7 @@ import './styles/App.css'
 
 function App() {
   const [userType, setUserType] = useState("guest"); // Default user type
+  const [createMenu, setCreateMenu] = useState(false);
   return (
     <>
       <Navigation userType={userType} />
@@ -33,7 +34,7 @@ function App() {
         <Route path="signup" element={<Signup setUserType={setUserType} />} />
 
         {/* Recipes */}
-        <Route path="recipes" element={<Recipes />} />
+        <Route path="recipes" element={<Recipes createMenu={createMenu}/>} />
         <Route path="recipes/:id" element={<RecipePage />} />
 
 
@@ -44,7 +45,7 @@ function App() {
         {/* Personal Area */}
         
           <Route path="personal-area" element={<PersonalArea />} />
-          <Route path="personal-area/menus" element={<MenuManager />} />
+          <Route path="personal-area/menus" element={<MenuManager setCreateMenu={setCreateMenu}/>} />
           {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
         
         {/* Chef Area */}

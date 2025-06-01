@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Plus, Calendar, Clock, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/MenuManager.css'; // Import your CSS styles
 
 
-const MenuManager = () => {
+const MenuManager = ({setCreateMenu}) => {
   const [menus, setMenus] = useState([
     {
       id: 1,
@@ -27,7 +28,7 @@ const MenuManager = () => {
     date: '',
     items: ['']
   });
-
+    const navigate = useNavigate();
   const handleCreateMenu = () => {
     if (newMenu.name && newMenu.date && newMenu.items.filter(item => item.trim()).length > 0) {
       const menu = {
@@ -85,10 +86,19 @@ const MenuManager = () => {
         <div className="create-button-container">
           <button
             className="create-button"
-            onClick={() => setShowCreateForm(!showCreateForm)}
+            onClick={() => {setShowCreateForm(!showCreateForm)}}
           >
             <Plus className="create-button-icon" />
             Create New Menu
+          </button>
+        </div>
+          <div className="create-button-container">
+          <button
+            className="create-button"
+            onClick={() => {navigate('/recipes') ; setCreateMenu(true)}}
+          >
+            <Plus className="create-button-icon" />
+            Create New  Weekly Menu
           </button>
         </div>
 
