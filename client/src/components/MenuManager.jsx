@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/MenuManager.css'; // Import your CSS styles
 
 
-const MenuManager = ({setCreateMenu}) => {
+const MenuManager = ({ setCreateMenu }) => {
+  //example initial menus
   const [menus, setMenus] = useState([
     {
       id: 1,
@@ -28,7 +29,7 @@ const MenuManager = ({setCreateMenu}) => {
     date: '',
     items: ['']
   });
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const handleCreateMenu = () => {
     if (newMenu.name && newMenu.date && newMenu.items.filter(item => item.trim()).length > 0) {
       const menu = {
@@ -82,101 +83,16 @@ const MenuManager = ({setCreateMenu}) => {
       </div>
 
       <div className="menu-main">
-        {/* Create Menu Button */}
+  
         <div className="create-button-container">
           <button
             className="create-button"
-            onClick={() => {setShowCreateForm(!showCreateForm)}}
-          >
-            <Plus className="create-button-icon" />
-            Create New Menu
-          </button>
-        </div>
-          <div className="create-button-container">
-          <button
-            className="create-button"
-            onClick={() => {navigate('/recipes') ; setCreateMenu(true)}}
+            onClick={() => { navigate('/recipes'); setCreateMenu(true) }}
           >
             <Plus className="create-button-icon" />
             Create New  Weekly Menu
           </button>
         </div>
-
-        {/* Create Menu Form */}
-        {showCreateForm && (
-          <div className="menu-form">
-            <h2 className="form-title">Create New Menu</h2>
-            
-            <div className="form-grid">
-              <div className="form-group">
-                <label className="form-label">Menu Name</label>
-                <input
-                  type="text"
-                  value={newMenu.name}
-                  onChange={(e) => setNewMenu({ ...newMenu, name: e.target.value })}
-                  className="form-input"
-                  placeholder="e.g., Mediterranean Monday"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label className="form-label">Date</label>
-                <input
-                  type="date"
-                  value={newMenu.date}
-                  onChange={(e) => setNewMenu({ ...newMenu, date: e.target.value })}
-                  className="form-input"
-                />
-              </div>
-            </div>
-
-            <div className="menu-items-container">
-              <label className="form-label">Menu Items</label>
-              {newMenu.items.map((item, index) => (
-                <div key={index} className="menu-item-row">
-                  <input
-                    type="text"
-                    value={item}
-                    onChange={(e) => updateMenuItem(index, e.target.value)}
-                    className="menu-item-input"
-                    placeholder="Enter menu item"
-                  />
-                  {newMenu.items.length > 1 && (
-                    <button
-                      onClick={() => removeMenuItem(index)}
-                      className="remove-item-button"
-                    >
-                      <Trash2 className="remove-item-icon" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              
-              <button
-                onClick={addMenuItem}
-                className="add-item-button"
-              >
-                <Plus className="add-item-icon" />
-                Add Item
-              </button>
-            </div>
-
-            <div className="form-buttons">
-              <button
-                onClick={handleCreateMenu}
-                className="primary-button"
-              >
-                Create Menu
-              </button>
-              <button
-                onClick={() => setShowCreateForm(false)}
-                className="secondary-button"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Menus List */}
         <div>
@@ -184,7 +100,7 @@ const MenuManager = ({setCreateMenu}) => {
             <Calendar className="section-title-icon" />
             This Week's Menus
           </h2>
-          
+
           {menus.length === 0 ? (
             <div className="empty-state">
               <Calendar className="empty-state-icon" />
@@ -204,12 +120,12 @@ const MenuManager = ({setCreateMenu}) => {
                       <Trash2 className="delete-button-icon" />
                     </button>
                   </div>
-                  
+
                   <div className="menu-date">
                     <Clock className="menu-date-icon" />
                     <span>{formatDate(menu.date)}</span>
                   </div>
-                  
+
                   <div className="menu-items">
                     {menu.items.map((item, index) => (
                       <div key={index} className="menu-item">
@@ -217,7 +133,7 @@ const MenuManager = ({setCreateMenu}) => {
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="menu-footer">
                     <span className="menu-footer-text">
                       Created {new Date(menu.createdAt).toLocaleDateString()}

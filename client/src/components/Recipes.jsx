@@ -45,14 +45,14 @@ function Recipes({createMenu}) {
           recipes.map((recipe) => (
             <div key={recipe.RecipeID} name={recipe.RecipeID} className="recipe-card" onClick={openRecipePage}>
               <div className="recipe-image" style={{ backgroundImage: `url(${recipe.ImageURL})` }}>
-                <div className="recipe-overlay">
-                  {createMenu && (
+                 {createMenu && (
                     <button className="add-to-menu-button" onClick={(e) => {
                       e.stopPropagation(); // Prevent triggering the recipe click
                     }}>
                       Add to Menu
                     </button>
                   )}
+                <div className="recipe-overlay">
                   <h2>{recipe.Title}</h2>
                   <p>{recipe.Description}</p>
                 </div>
