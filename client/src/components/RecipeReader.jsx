@@ -99,7 +99,7 @@ const RecipeReader = ({ recipeData }) => {
           </>
         ) : (
           <>
-            <Volume2 size={16} />
+            <Volume2 size={16} color='black' />
             Read Aloud
           </>
         )}

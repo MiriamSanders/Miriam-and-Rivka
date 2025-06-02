@@ -7,10 +7,10 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  border: 2px solid #ea580c;
+  border: 2px solid #141312;
   border-radius: 8px;
   background-color: white;
-  color: #ea580c;
+  color: #121211;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -18,26 +18,26 @@
 }
 
 .read-aloud-btn:hover {
-  background-color: #ea580c;
+  background-color: #4d4c4c;
   color: white;
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(234, 88, 12, 0.2);
+  box-shadow: 0 4px 8px rgba(35, 34, 34, 0.2);
 }
 
 .read-aloud-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.2);
+  box-shadow: 0 2px 4px rgba(20, 20, 20, 0.2);
 }
 
 .read-aloud-btn.reading {
-  background-color: #dc2626;
-  border-color: #dc2626;
+  background-color: #343232;
+  border-color: #181818;
   color: white;
 }
 
 .read-aloud-btn.reading:hover {
-  background-color: #b91c1c;
-  border-color: #b91c1c;
+  background-color: #212121;
+  border-color: #1d1c1c;
 }
 
 .read-aloud-btn:disabled {
@@ -48,7 +48,7 @@
 
 .read-aloud-btn:disabled:hover {
   background-color: white;
-  color: #ea580c;
+  color: #0a0a0a;
   transform: none;
   box-shadow: none;
 }
