@@ -1,0 +1,54 @@
+.recipe-reader {
+  margin-bottom: 20px;
+}
+
+.read-aloud-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 2px solid #ea580c;
+  border-radius: 8px;
+  background-color: white;
+  color: #ea580c;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.read-aloud-btn:hover {
+  background-color: #ea580c;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(234, 88, 12, 0.2);
+}
+
+.read-aloud-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.2);
+}
+
+.read-aloud-btn.reading {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.read-aloud-btn.reading:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.read-aloud-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.read-aloud-btn:disabled:hover {
+  background-color: white;
+  color: #ea580c;
+  transform: none;
+  box-shadow: none;
+}

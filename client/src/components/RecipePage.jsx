@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import RatingCard from "./RatingCard";
+import RecipeReader from "./RecipeReader";
 import "../styles/RecipePage.css"; 
 
 const RecipePage = () => {
@@ -38,7 +39,7 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
       <p className="recipe-subtext">
         Prep Time: {PrepTimeMinutes} min · Difficulty: {Difficulty} · Category: {Category}
       </p>
-
+<RecipeReader recipeData={recipeData} />
       {ImageURL ? (
         <img src={ImageURL} alt={Title} className="recipe-image-style" />
       ) : (
