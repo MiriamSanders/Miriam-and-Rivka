@@ -9,7 +9,6 @@ const RecipeReader = ({ recipeData }) => {
   // Extract recipe data
   const {
     Title = '',
-    Subtitle = '',
     ChefName = '',
     PrepTimeMinutes = '',
     Difficulty = '',

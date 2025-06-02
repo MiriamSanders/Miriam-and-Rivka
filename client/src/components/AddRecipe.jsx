@@ -2,6 +2,34 @@ import React, { useState } from 'react';
 import { parseRecipeDocument, readRecipeFile } from '../RecipeParser';
 import { Upload, Plus, Minus, Clock, Star, Tag } from 'lucide-react';
 
+// Move ArrayInput outside the component to prevent re-creation
+const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addArrayItem, removeArrayItem }) => (
+  <div className="array-section">
+    <label className="label">{label}:</label>
+    {recipe[field].map((item, index) => (
+      <div key={index} className="array-input-group">
+        <input
+          type="text" 
+          value={item}
+          onChange={(e) => handleArrayChange(field, index, e.target.value)}
+          placeholder={placeholder} 
+          className="input"
+        />
+        <button
+          onClick={() => removeArrayItem(field, index)}
+          disabled={recipe[field].length === 1}
+          className="button remove-button"
+        ><Minus size={16} color='black' /></button>
+        {index === recipe[field].length - 1 && (
+          <button onClick={() => addArrayItem(field)} className="button add-button">
+            <Plus size={16} color='black'  />
+          </button>
+        )}
+      </div>
+    ))}
+  </div>
+);
+
 const AddRecipe = ({ onRecipeSaved }) => {
   const [recipe, setRecipe] = useState({
     name: '', chef: '', description: '', image: '', prepTime: '',
@@ -70,30 +98,7 @@ const AddRecipe = ({ onRecipeSaved }) => {
     alert('Recipe saved successfully!');
   };
 
-  const ArrayInput = ({ field, label, placeholder }) => (
-    <div className="array-section">
-      <label className="label">{label}:</label>
-      {recipe[field].map((item, index) => (
-        <div key={index} className="array-input-group">
-          <input
-            type="text" value={item}
-            onChange={(e) => handleArrayChange(field, index, e.target.value)}
-            placeholder={placeholder} className="input"
-          />
-          <button
-            onClick={() => removeArrayItem(field, index)}
-            disabled={recipe[field].length === 1}
-            className="button remove-button"
-          ><Minus size={16} color='black' /></button>
-          {index === recipe[field].length - 1 && (
-            <button onClick={() => addArrayItem(field)} className="button add-button">
-              <Plus size={16} color='black'  />
-            </button>
-          )}
-        </div>
-      ))}
-    </div>
-  );
+
 
   return (
     <div>
@@ -217,7 +222,15 @@ const AddRecipe = ({ onRecipeSaved }) => {
         </div>
       </div>
 
-      <ArrayInput field="ingredients" label="Ingredients" placeholder="e.g., 2 salmon fillets" />
+      <ArrayInput 
+        field="ingredients" 
+        label="Ingredients" 
+        placeholder="e.g., 2 salmon fillets" 
+        recipe={recipe}
+        handleArrayChange={handleArrayChange}
+        addArrayItem={addArrayItem}
+        removeArrayItem={removeArrayItem}
+      />
       
       <div className="form-section">
         <h3 className="section-title">Instructions</h3>
@@ -232,7 +245,15 @@ const AddRecipe = ({ onRecipeSaved }) => {
         </div>
       </div>
 
-      <ArrayInput field="tags" label="Tags" placeholder="e.g., Japanese, Dinner, Fish" />
+      <ArrayInput 
+        field="tags" 
+        label="Tags" 
+        placeholder="e.g., Japanese, Dinner, Fish" 
+        recipe={recipe}
+        handleArrayChange={handleArrayChange}
+        addArrayItem={addArrayItem}
+        removeArrayItem={removeArrayItem}
+      />
 
       <div className="save-button-container">
         <button onClick={saveRecipe} className="save-button">Save Recipe</button>

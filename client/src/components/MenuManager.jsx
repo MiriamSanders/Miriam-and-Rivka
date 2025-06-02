@@ -22,48 +22,11 @@ const MenuManager = ({ setCreateMenu }) => {
       createdAt: new Date().toISOString()
     }
   ]);
-
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newMenu, setNewMenu] = useState({
-    name: '',
-    date: '',
-    items: ['']
-  });
   const navigate = useNavigate();
-  const handleCreateMenu = () => {
-    if (newMenu.name && newMenu.date && newMenu.items.filter(item => item.trim()).length > 0) {
-      const menu = {
-        id: Date.now(),
-        name: newMenu.name,
-        date: newMenu.date,
-        items: newMenu.items.filter(item => item.trim()),
-        createdAt: new Date().toISOString()
-      };
-      setMenus([...menus, menu]);
-      setNewMenu({ name: '', date: '', items: [''] });
-      setShowCreateForm(false);
-    }
-  };
 
   const handleDeleteMenu = (id) => {
     setMenus(menus.filter(menu => menu.id !== id));
   };
-
-  const addMenuItem = () => {
-    setNewMenu({ ...newMenu, items: [...newMenu.items, ''] });
-  };
-
-  const updateMenuItem = (index, value) => {
-    const updatedItems = [...newMenu.items];
-    updatedItems[index] = value;
-    setNewMenu({ ...newMenu, items: updatedItems });
-  };
-
-  const removeMenuItem = (index) => {
-    const updatedItems = newMenu.items.filter((_, i) => i !== index);
-    setNewMenu({ ...newMenu, items: updatedItems });
-  };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       weekday: 'long',
@@ -83,7 +46,7 @@ const MenuManager = ({ setCreateMenu }) => {
       </div>
 
       <div className="menu-main">
-  
+
         <div className="create-button-container">
           <button
             className="create-button"

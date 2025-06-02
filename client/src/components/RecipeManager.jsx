@@ -17,7 +17,7 @@ const RecipeManager = () => {
     <div className="container">
       <div className="header">
         <h1 className="title">
-          <ChefHat color="#ea580c" style={{ marginRight: '8px' }}/>
+          <ChefHat color="black" style={{ marginRight: '8px' }}/>
           Recipe Manager
         </h1>
         <p className="subtitle">Create recipes manually or import from documents</p>
