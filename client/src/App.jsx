@@ -18,7 +18,8 @@ import ChefArea from './components/ChefArea'
 import AddRecipe from './components/AddRecipe'
 import RecipeManager from './components/RecipeManager';
 import RecipeLibrary from './components/RecipeLibrary';
-import AddArticle from './components/AddArticle'
+import AddArticle from './components/AddArticle';
+import ArticleManager from './components/ArticleManager';
 import './styles/App.css'
 
 function App() {
@@ -53,7 +54,7 @@ function App() {
         {/* Chef Area */}
           <Route path="/chef-area" element={<ChefArea />} />
           <Route path="/chef-area/recipe-manager" element={<RecipeManager/>} />
-          <Route path="/chef-area/add-article" element={<AddArticle />} />
+          <Route path="/chef-area/article-manager" element={<ArticleManager />} />
        
 
       </Routes>

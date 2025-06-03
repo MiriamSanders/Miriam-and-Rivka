@@ -16,7 +16,7 @@ const navOptions = {
   Chef: [
     { path: "/chef-area", label: "Chef Area" },
     { path: "/chef-area/recipe-manager", label: "Recipe Manager" },
-    { path: "/chef-area/add-article", label: "Add Article" },
+    { path: "/chef-area/article-manager", label: "Article Manager" },
   ],
 };
 
