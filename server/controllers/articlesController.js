@@ -1,34 +1,18 @@
 const GenericDA = require('../services/GenericDA');
-const articleDA = require('../services/articleDA');
+const articlesDA = require('../services/articlesDA');
 
 exports.getAllArticles = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const articles = await GenericDA.GenericGetAll('articles', limit, 0, ["ArticleID", "AuthorID","Title"]);
+    const articles = await articlesDA.articleGetAll(limit, 0);
 console.log(articles);
 
     if (!articles || articles.length === 0) {
       return res.json([]);
     }
-
-    const authorIds = [...new Set(articles.map(article => article.AuthorID))];
-
-const authors = await GenericDA.GenericGetIn('users', 'UserID', authorIds, ['UserID', 'UserName']);
-
-
-const authorMap = {};
-authors.forEach(author => {
-  authorMap[author.UserID] = author.UserName;
-});
-
-
-    const enrichedArticles = articles.map(article => ({
-      ...article,
-      AuthorName: authorMap[article.AuthorID] || 'Unknown'
-    }));
-    res.json(enrichedArticles);
+    res.json(articles);
   } catch (error) {
     console.error('Error fetching articles:', error);
     res.status(500).json({ error: 'something went wrong' });
@@ -42,7 +26,7 @@ exports.getArticleById = async (req, res) => {
   }
 
   try {
-    const article = await articleDA.getArticleById(articleId);
+    const article = await articlesDA.getArticleById(articleId);
     if (!article || article.length === 0) {
       return res.status(404).json({ error: 'Article not found' });
     }
