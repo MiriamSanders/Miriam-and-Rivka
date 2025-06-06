@@ -67,7 +67,7 @@ const handleFileUpload = async (event) => {
                 <Upload size={48} color="#9ca3af" />
                 <div>
                   <label htmlFor="file-upload" className="upload-text" style={{cursor: 'pointer'}}>
-                    Upload a recipe document
+                    Upload a article document
                   </label>
                   <div className="upload-subtext">
                     Supports .docx, .txt files

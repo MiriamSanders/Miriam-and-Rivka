@@ -21,7 +21,7 @@ exports.getRecipeById = async (req, res) => {
   }
 
   try {
-    console.log('Fetching recipe with ID:', recipeId);
+    console.log('Fetching recipe with ID:', recipeId)
     const recipe = await RecipeDA.getRecipeById(recipeId);
     if (!recipe) {
       return res.status(404).json({ error: 'Recipe not found' });

@@ -7,6 +7,7 @@ const RatingCard = ({ initialRating = 3.5 }) => {
   const [showModal, setShowModal] = useState(false);
 
   const handleClick = (newRating) => {
+    
     setRating(newRating);
     setShowModal(false);
   };
