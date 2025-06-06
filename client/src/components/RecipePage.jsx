@@ -51,7 +51,7 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
           </div>
         </div>
       )}
-      <RatingCard  />
+      <RatingCard recipeId={id} />
       <div className="recipe-content">
         <section>
           <h2 className="section-title">Description</h2>

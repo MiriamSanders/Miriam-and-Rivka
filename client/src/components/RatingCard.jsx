@@ -1,13 +1,26 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import "../styles/RatingCard.css"; // Assuming you have a CSS file for styling
+import { postRequest } from "../Requests";
 
-const RatingCard = ({ initialRating = 3.5 }) => {
-  const [rating, setRating] = useState(initialRating);
+const RatingCard = ({ recipeId }) => {
+  const [rating, setRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/ratings/${recipeId}`);
+        const data = await response.json(); // Debugging line to check the fetched data
+        setRating(data.averageRating|| 0); // Set initial rating or default to 0
+      } catch (err) {
+        console.error("Error loading recipe:", err);
+      }
+    };
+    fetchRating();
+  }, []);
 
   const handleClick = (newRating) => {
-    
+    //postRequest(`ratings`, { userId: ,recipreId:recipeId, rating: newRating })
     setRating(newRating);
     setShowModal(false);
   };
