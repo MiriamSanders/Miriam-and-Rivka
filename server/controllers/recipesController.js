@@ -32,3 +32,24 @@ exports.getRecipeById = async (req, res) => {
     res.status(500).json({ error: 'somthing went wrong' });
   }
 }
+exports.createRecipe = async (req, res) => {
+  const { ChefID, Title, ImageURL, Category, Description ,} = req.body;
+
+  if (!ChefID || !Title || !ImageURL || !Category || !Description) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    const newRecipe = await GenericDA.GenericPost({
+      ChefID,
+      Title,
+      ImageURL,
+      Category,
+      Description
+    });
+    res.status(201).json(newRecipe);
+  } catch (error) {
+    console.error('Error creating recipe:', error);
+    res.status(500).json({ error: 'somthing went wrong' });
+  }
+}

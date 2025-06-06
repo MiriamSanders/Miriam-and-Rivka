@@ -29,58 +29,58 @@ async function GenericGet(table, fieldName, fieldValue, limit, offset) {
     }
 }
 async function GenericGetIn(table, fieldName, fieldValues, fields = ['*']) {
-  try {
-    if (!Array.isArray(fieldValues) || fieldValues.length === 0) {
-      return [];
-    }
+    try {
+        if (!Array.isArray(fieldValues) || fieldValues.length === 0) {
+            return [];
+        }
 
-    const db = await dbPromise;
+        const db = await dbPromise;
 
-    const query = `
+        const query = `
       SELECT ${fields.map(() => '??').join(', ')}
       FROM ??
       WHERE ?? IN (${fieldValues.map(() => '?').join(', ')})
     `;
 
-    const params = [...fields, table, fieldName, ...fieldValues];
-    const [rows] = await db.execute(mysql.format(query, params));
+        const params = [...fields, table, fieldName, ...fieldValues];
+        const [rows] = await db.execute(mysql.format(query, params));
 
-    return rows;
-  } catch (error) {
-    console.error('Error fetching data with IN:', error);
-    throw error;
-  }
+        return rows;
+    } catch (error) {
+        console.error('Error fetching data with IN:', error);
+        throw error;
+    }
 }
 
 async function GenericGetAll(table, limit, offset, columns = []) {
-  try {
-    const db = await dbPromise;
+    try {
+        const db = await dbPromise;
 
-    const columnsPart = (Array.isArray(columns) && columns.length > 0)
-      ? columns.map(col => `\`${col}\``).join(', ')
-      : '*';
+        const columnsPart = (Array.isArray(columns) && columns.length > 0)
+            ? columns.map(col => `\`${col}\``).join(', ')
+            : '*';
 
-    let query = `SELECT ${columnsPart} FROM ??`;
-    const params = [table];
+        let query = `SELECT ${columnsPart} FROM ??`;
+        const params = [table];
 
-    if (limit) {
-      query += ` LIMIT ?`;
-      params.push(limit);
+        if (limit) {
+            query += ` LIMIT ?`;
+            params.push(limit);
+        }
+        if (offset) {
+            query += ` OFFSET ?`;
+            params.push(offset);
+        }
+        const [rows] = await db.execute(mysql.format(query, params));
+
+        return rows;
+    } catch (error) {
+        console.error('Error fetching all data:', error);
+        throw error;
     }
-    if (offset) {
-      query += ` OFFSET ?`;
-      params.push(offset);
-    }
-    const [rows] = await db.execute(mysql.format(query, params));
-  
-    return rows;
-  } catch (error) {
-    console.error('Error fetching all data:', error);
-    throw error;
-  }
 }
 
-async function GenericPost(table, data) {
+async function GenericPost(table, data, returnId = "UserID") {
     try {
         const db = await dbPromise;
         const insertQuery = mysql.format(`INSERT INTO ?? SET ?`, [table, data]);
@@ -92,10 +92,10 @@ async function GenericPost(table, data) {
             const selectQuery = mysql.format(`SELECT * FROM ?? WHERE UserID = ?`, [table, id]);
             const [rows] = await db.execute(selectQuery);
             return rows[0] || null;
-        } else if (data.UserID) {
-            const idQuery = mysql.format(`SELECT * FROM ?? WHERE UserID = ?`, [table, data.UserID]);
+        } else if (data[returnId]) {
+            const idQuery = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [table, returnId, data[returnId]]);
             const [rows] = await db.execute(idQuery);
-            if (rows.length === 0) throw new Error('No record found for the given userID');
+            if (rows.length === 0) throw new Error('No record found for the given ID');
             return rows[0];
         } else {
             throw new Error('Insert did not return an ID, and userID was not provided.');
@@ -167,4 +167,4 @@ async function writeToLog(data) {
     const logQuery = mysql.format(`INSERT INTO logs SET ?`, [data]);
     await db.execute(logQuery);
 }
-module.exports = { GenericGet,GenericGetIn,GenericGetAll,GenericPost, GenericPut, GenericDelete, CascadeDelete, writeToLog };
+module.exports = { GenericGet, GenericGetIn, GenericGetAll, GenericPost, GenericPut, GenericDelete, CascadeDelete, writeToLog };
