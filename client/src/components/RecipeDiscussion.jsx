@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
 
 const RecipeDiscussion = ({ recipeId }) => {
   const [comments, setComments] = useState([]);
