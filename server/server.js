@@ -12,7 +12,8 @@ app.use(cors({
 
 const recipesRouter = require('./routes/recipesRoutes');
 const articlesRouter = require('./routes/articlesRoutes');
-const ratingRouter = require('./routes/ratingRoutes');const commentsRouter = require('./routes/commentsRoutes');
+const ratingRouter = require('./routes/ratingRoutes');
+const commentsRouter = require('./routes/commentsRoutes');
 
 app.use(express.json());
 app.use(AuthMiddlewere);

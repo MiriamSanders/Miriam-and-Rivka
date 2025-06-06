@@ -20,7 +20,10 @@ const RatingCard = ({ recipeId }) => {
   }, []);
 
   const handleClick = (newRating) => {
-    //postRequest(`ratings`, { userId: ,recipreId:recipeId, rating: newRating })
+    const currentUser= JSON.parse(localStorage.getItem("CurrentUser"));
+    const postData= { userId:currentUser.id ,recipeId:recipeId, rating: newRating }// Assuming userId is stored in localStorage
+    console.log("Post Data:", postData); // Debugging line to check the data being sent
+    postRequest(`ratings`,postData )
     setRating(newRating);
     setShowModal(false);
   };
