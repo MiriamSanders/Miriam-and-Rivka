@@ -181,12 +181,59 @@ const queries = [
             await connection.execute(queries[i]);
             console.log(`Query #${i + 1} executed successfully`);
         }
+        try {
+    // Insert users (chefs + regular)
+    await connection.execute(`
+        INSERT INTO Users (UserName, UserType, Email)
+        VALUES 
+        ('JohnDoe', 'Chef', 'john.doe@example.com'),
+        ('SarahBaker', 'Chef', 'sarah.baker@example.com'),
+        ('MikeSmith', 'Chef', 'mike.smith@example.com'),
+        ('EmmaFoodie', 'Regular', 'emma.foodie@example.com'),
+        ('AlexCook', 'Regular', 'alex.cook@example.com')
+    `);
+
+    // Insert chefs (Chefs match UserID)
+    await connection.execute(`
+        INSERT INTO Chefs (ChefID, ImageURL, Education, ExperienceYears, Style)
+        VALUES 
+        (1, 'https://example.com/images/chef-john.jpg', 'Le Cordon Bleu', 10, 'French Cuisine'),
+        (2, 'https://example.com/images/chef-sarah.jpg', 'CIA New York', 8, 'Pastry & Desserts'),
+        (3, 'https://example.com/images/chef-mike.jpg', 'Italian Culinary Institute', 12, 'Italian Cuisine')
+    `);
+
+    // Insert articles
+    await connection.execute(`
+        INSERT INTO Articles (AuthorID, Title, Content)
+        VALUES 
+        (1, 'The Art of French Cooking', 'Explore classic French techniques and recipes from Chef John Doe.'),
+        (2, 'Baking 101: Sweet Secrets', 'Chef Sarah shares her secrets to the perfect cake.'),
+        (3, 'Mastering Italian Pasta', 'Chef Mike reveals how to make authentic Italian pasta from scratch.')
+    `);
+
+    // Insert recipes
+    await connection.execute(`
+        INSERT INTO Recipes (ChefID, Title, Description, ImageURL, Instructions, PrepTimeMinutes, Difficulty, Category, DishType)
+        VALUES 
+        (1, 'Coq au Vin', 'Classic French chicken stew with wine.', 'https://example.com/images/coq-au-vin.jpg', 'Marinate chicken, cook with wine and mushrooms, serve hot.', 120, 'Hard', 'Meat', 'Main Course'),
+        (2, 'Chocolate Lava Cake', 'Decadent molten chocolate dessert.', 'https://example.com/images/lava-cake.jpg', 'Prepare batter, bake, serve warm with ice cream.', 45, 'Medium', 'Dairy', 'Dessert'),
+        (3, 'Homemade Fettuccine', 'Fresh pasta with creamy Alfredo sauce.', 'https://example.com/images/fettuccine.jpg', 'Mix dough, roll pasta, cook, prepare sauce.', 60, 'Medium', 'Dairy', 'Pasta'),
+        (1, 'French Onion Soup', 'Rich and flavorful soup with caramelized onions.', 'https://example.com/images/french-onion-soup.jpg', 'Caramelize onions, add broth, simmer, top with cheese.', 90, 'Medium', 'Dairy', 'Soup'),
+        (3, 'Margherita Pizza', 'Classic Italian pizza with fresh basil and mozzarella.', 'https://example.com/images/margherita-pizza.jpg', 'Prepare dough, add toppings, bake at high temperature.', 70, 'Easy', 'Dairy', 'Pizza')
+    `);
+
+    console.log("Default data inserted successfully!");
+
+} catch (err) {
+    console.error("Error inserting default data:", err.message);
+}
     } catch (err) {
         console.error(" Error running queries:", err.message);
     } finally {
         await connection.end();
         console.log("Connection closed.");
     }
-};
 
-createTables();
+
+}
+createTables();0

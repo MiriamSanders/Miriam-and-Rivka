@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import RatingCard from "./RatingCard";
 import RecipeReader from "./RecipeReader";
+import RecipeDiscussion from "./RecipeDiscussion";
 import "../styles/RecipePage.css"; 
 
 const RecipePage = () => {
   const { id } = useParams();
   const [recipeData, setRecipeData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
@@ -88,6 +89,7 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
           </div>
         </section>
       </div>
+      <RecipeDiscussion recipeId={id}/>
     </div>
   );
 };
