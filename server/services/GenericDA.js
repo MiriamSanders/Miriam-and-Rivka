@@ -89,7 +89,7 @@ async function GenericPost(table, data, returnId = "UserID") {
 
         let id = insertResult.insertId;
         if (id) {
-            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE UserID = ?`, [table, id]);
+            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [table,returnId, id]);
             const [rows] = await db.execute(selectQuery);
             return rows[0] || null;
         } else if (data[returnId]) {
