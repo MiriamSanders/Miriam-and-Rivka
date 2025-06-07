@@ -3,19 +3,11 @@ const GenericDA = require('../services/GenericDA');
 const RecipeDA = require('../services/recipeDA');
 exports.getAllRecipes = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const limit = parseInt(req.query.limit) || 10; 
-    const offset = parseInt(req.query.page) || 0;
-
-    const recipes = await GenericDA.GenericGetAll('recipes',  limit, offset,["RecipeID","ChefID","Title","ImageURL","Category","Description"]);
-=======
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 0;
     console.log(limit, page);
-    
     const offset = page * limit-limit;
     const recipes = await GenericDA.GenericGetAll('recipes', limit, offset, ["RecipeID", "ChefID", "Title", "ImageURL", "Category", "Description"]);
->>>>>>> 690d23bd7408d7c88deed240b729b7ebe9c007ed
     res.json(recipes);
   } catch (error) {
     console.error('Error fetching recipes:', error);
