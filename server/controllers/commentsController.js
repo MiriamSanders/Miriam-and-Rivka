@@ -6,7 +6,8 @@ exports.getRecipeComments = async (req, res) => {
   try {
       const recipeId = parseInt(req.params.id);
     const limit = parseInt(req.query.limit) || 10; 
-    const offset = parseInt(req.query.page) || 0;
+    const page= parseInt(req.query.page) || 0;
+        const offset = page * limit-limit;
     const comments = await commentsDA.GetComments(recipeId, limit, offset);
     res.json(comments);
   } catch (error) {

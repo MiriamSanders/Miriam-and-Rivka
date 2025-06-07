@@ -8,3 +8,4 @@ router.post('/ratings',async (req, res) => {
   }
 Controller.postRatings(req,res);
 });
+module.exports = router;
