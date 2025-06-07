@@ -21,7 +21,32 @@ async function GetComments(recipeId, limit, offset) {
     throw error;
   }
 }
+async function postComments(recipeId, userID, commentText) {
+    try {
+        const db = await dbPromise;
+
+        const insertQuery = `
+            INSERT INTO Comments (RecipeID, UserID, CommentText)
+            VALUES (?, ?, ?)
+        `;
+        const [insertResult] = await db.execute(insertQuery, [recipeId, userID, commentText]);
+
+        const insertedId = insertResult.insertId;
+
+        if (!insertedId) {
+            throw new Error('Comment insertion failed.');
+        }
+
+
+        return insertedId;
+    } catch (error) {
+        console.error('Comment insertion failed.', error);
+        throw error;
+    }
+}
+
 
 module.exports = {
- GetComments
+ GetComments,
+ postComments
 };

@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cookieParser = require("cookie-parser");
 const PORT = 3001;
 const cors=require('cors');
 
@@ -15,6 +16,7 @@ const articlesRouter = require('./routes/articlesRoutes');
 const commentsRouter = require('./routes/commentsRoutes');
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(AuthMiddlewere);
 app.use('/auth', registrationRouter);
 app.use('/',recipesRouter);

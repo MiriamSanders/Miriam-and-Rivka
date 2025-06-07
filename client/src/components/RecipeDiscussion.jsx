@@ -81,11 +81,13 @@ const RecipeDiscussion = ({ recipeId }) => {
 
   const handleAddComment = async () => {
     if (newComment.trim() === "") return;
-    const currentUser = localStorage.getItem("CurrentUser")
+    const currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
     if (currentUser) {
       try {
+        
         const response = await fetch(`http://localhost:3001/comments`, {
           method: "POST",
+           credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -96,12 +98,16 @@ const RecipeDiscussion = ({ recipeId }) => {
           }),
         });
         const data = await response.json();
+        if(response.ok){
         setComments([...comments, {
-          CommentID: data.CommentID, CommentText: newComment,
-          UserName: currentUser.UserName
-        }]);
+          CommentID: data, CommentText: newComment,
+          UserName: currentUser.username
+        }])}
+        else{
+          throw new Error("Error add comments:")
+        };
       } catch (err) {
-        console.error("Error loading comments:", err);
+        console.error("Error add comments:", err);
       } finally {
         setNewComment("");
       }

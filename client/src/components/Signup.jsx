@@ -20,6 +20,7 @@ function Signup({ setUserType }) {
         if (requestResult.succeeded) {
             alert("Account created successfully!");
              setUserType(requestResult.data.UserType);
+             localStorage.setItem("CurrentUser", JSON.stringify(requestResult.data))
             // Assuming the user type is "user" after signup
             navigate("/"); // Redirect to login page after successful signup
             // Optionally redirect to login or home page

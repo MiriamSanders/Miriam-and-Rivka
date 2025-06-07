@@ -17,6 +17,7 @@ export async function postRequest(currentUrl, data) {
     
     const response = await fetch(`http://localhost:3001/${currentUrl}`, {
       method: 'POST',
+        credentials: "include",
       headers: {
         'Content-Type': 'application/json',
       },

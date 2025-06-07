@@ -9,7 +9,6 @@ exports.registerUser = async (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
     }
-
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const userData = { UserName: username, Email: email, UserType: 'Regular' };
@@ -20,7 +19,21 @@ exports.registerUser = async (req, res) => {
         }
         // Store the hashed password in the database
         await GenericDA.GenericPost('passwords', { UserID: newUser.UserID, PasswordHash: hashedPassword });
-        res.status(201).json(newUser);
+        // צור טוקן JWT
+        const token = jwt.sign(
+            { id: newUser.UserID, username: newUser.UserName, userType: newUser.UserType },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        // שלח אותו בקוקי
+        res.cookie("authToken", token, {
+            httpOnly: true,
+            secure: false, // true בפרודקשן
+            sameSite: "Lax",
+            maxAge: 1000 * 60 * 60
+        });
+        res.status(201).json({ id: newUser.UserID, username: newUser.UserName, userType: newUser.UserType });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -46,9 +59,22 @@ exports.loginUser = async (req, res) => {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
 
-     //   const token = jwt.sign({ id: user.UserID }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(
+            { id: user.UserID, username: user.UserName, userType: user.UserType },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-        res.json({id:user.UserID, username: user.UserName,userType: user.UserType });
+        res.cookie("authToken", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "Lax",
+            maxAge: 1000 * 60 * 60 // שעה
+        });
+
+        res.status(201).json({ id: user.UserID, username: user.UserName, userType: user.UserType });
+
+
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ error: 'Internal server error' });
