@@ -59,7 +59,6 @@ async function GenericGetAll(table, limit, offset, columns = []) {
         const columnsPart = (Array.isArray(columns) && columns.length > 0)
             ? columns.map(col => `\`${col}\``).join(', ')
             : '*';
-
         let query = `SELECT ${columnsPart} FROM ??`;
         const params = [table];
 
@@ -67,10 +66,13 @@ async function GenericGetAll(table, limit, offset, columns = []) {
             query += ` LIMIT ?`;
             params.push(limit);
         }
+
         if (offset) {
             query += ` OFFSET ?`;
             params.push(offset);
         }
+        console.log(query, params);
+
         const [rows] = await db.execute(mysql.format(query, params));
 
         return rows;
@@ -89,7 +91,7 @@ async function GenericPost(table, data, returnId = "UserID") {
 
         let id = insertResult.insertId;
         if (id) {
-            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [table,returnId, id]);
+            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [table, returnId, id]);
             const [rows] = await db.execute(selectQuery);
             return rows[0] || null;
         } else if (data[returnId]) {
