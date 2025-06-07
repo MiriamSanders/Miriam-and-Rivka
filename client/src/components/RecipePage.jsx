@@ -30,7 +30,7 @@ const RecipePage = () => {
   if (!recipeData) return <div className="center-text">Recipe not found.</div>;
  const { Title, Subtitle, ChefName, PrepTimeMinutes, Difficulty, Category, Description, Instructions, ImageURL,ingredientsList } = recipeData.recipe || {};
   const ingredients = recipeData.ingredients || [];
-  const tags = recipeData.Tags || [];
+  const tags = recipeData.tags || [];
 console.log("Recipe Data:", recipeData); // Debugging line to check the fetched data
   return (
     <div className="recipe-container">
@@ -52,7 +52,7 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
           </div>
         </div>
       )}
-      <RatingCard  />
+      <RatingCard recipeId={id} />
       <div className="recipe-content">
         <section>
           <h2 className="section-title">Description</h2>

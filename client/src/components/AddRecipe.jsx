@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { parseRecipeDocument, readRecipeFile } from '../RecipeParser';
 import { Upload, Plus, Minus, Clock, Star, Tag } from 'lucide-react';
-
+import { postRequest } from "../Requests";
 // Move ArrayInput outside the component to prevent re-creation
 const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addArrayItem, removeArrayItem }) => (
   <div className="array-section">
@@ -30,15 +30,22 @@ const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addA
   </div>
 );
 
-const AddRecipe = ({ onRecipeSaved }) => {
+const AddRecipe = () => {
   const [recipe, setRecipe] = useState({
-    name: '', chef: '', description: '', image: '', prepTime: '',
-    difficulty: 'Easy', category: '', dishType: '',
-    ingredients: [''], instructions: '', tags: ['']
+    Title: '', // Changed from 'name' // Changed from 'chef' - this should be a number/ID
+    Description: '', 
+    ImageURL: '', // Changed from 'image'
+    PrepTimeMinutes: '', // Changed from 'prepTime'
+    Difficulty: 'Easy', // Changed from 'difficulty'
+    Category: '', // Changed from 'category'
+    DishType: '', // Changed from 'dishType'
+    Instructions: '', // Changed from 'instructions'
+    ingredients: [''], // Keep for ingredients handling
+    tags: [''] // Keep for tags handling
   });
 
   const difficulties = ['Easy', 'Medium', 'Hard'];
-  const categories = ['Meat', 'Vegetarian', 'Vegan', 'Seafood', 'Dessert', 'Appetizer'];
+  const categories = ['Meat', 'Dairy', 'Parve']; // Updated to match your ENUM values
   const dishTypes = ['Main Course', 'Side Dish', 'Appetizer', 'Dessert', 'Snack', 'Beverage'];
 
   const handleFileUpload = async (event) => {
@@ -46,7 +53,19 @@ const AddRecipe = ({ onRecipeSaved }) => {
     try {
       const text = await readRecipeFile(file);
       const parsedRecipe = parseRecipeDocument(text);
-      setRecipe(parsedRecipe);
+      // Map parsed recipe to correct field names
+      setRecipe({
+        Title: parsedRecipe.name || '',
+        Description: parsedRecipe.description || '',
+        ImageURL: parsedRecipe.image || '',
+        PrepTimeMinutes: parsedRecipe.prepTime || '',
+        Difficulty: parsedRecipe.difficulty || 'Easy',
+        Category: parsedRecipe.category || '',
+        DishType: parsedRecipe.dishType || '',
+        Instructions: parsedRecipe.instructions || '',
+        ingredients: parsedRecipe.ingredients || [''],
+        tags: parsedRecipe.tags || ['']
+      });
     } catch (error) {
       alert(error.message);
       console.error(error);
@@ -80,25 +99,59 @@ const AddRecipe = ({ onRecipeSaved }) => {
   };
 
   const saveRecipe = () => {
-    if (!recipe.name.trim()) {
-      alert('Please enter a recipe name');
+    if (!recipe.Title.trim()) {
+      alert('Please enter a recipe title');
       return;
     }
+    if (!recipe.Category) {
+      alert('Please select a category');
+      return;
+    }
+    if (!recipe.ImageURL.trim()) {
+      alert('Please enter an image URL');
+      return;
+    }
+    if (!recipe.Description.trim()) {
+      alert('Please enter a description');
+      return;
+    }
+
+    // Prepare the recipe data for the backend
     const cleanRecipe = {
-      ...recipe,
+      ChefID: JSON.parse(localStorage.getItem("CurrentUser")).id, // Ensure it's a number
+      Title: recipe.Title,
+      Description: recipe.Description,
+      ImageURL: recipe.ImageURL,
+      Instructions: recipe.Instructions,
+      PrepTimeMinutes: recipe.PrepTimeMinutes ? parseInt(recipe.PrepTimeMinutes) : null,
+      Difficulty: recipe.Difficulty,
+      Category: recipe.Category,
+      DishType: recipe.DishType,
+      // Note: ingredients and tags will need separate handling since they're in different tables
       ingredients: recipe.ingredients.filter(item => item.trim()),
       tags: recipe.tags.filter(item => item.trim())
     };
-    onRecipeSaved(cleanRecipe);
+    console.log('Clean Recipe Data:', cleanRecipe); // Debugging line to check the data being sent
+    
+   postRequest('recipes', cleanRecipe)
+    // Send the recipe data to the backend
+
+    
+    // Reset form
     setRecipe({
-      name: '', chef: '', description: '', image: '', prepTime: '',
-      difficulty: 'Easy', category: '', dishType: '',
-      ingredients: [''], instructions: '', tags: ['']
+      Title: '',
+      Description: '',
+      ImageURL: '',
+      PrepTimeMinutes: '',
+      Difficulty: 'Easy',
+      Category: '',
+      DishType: '',
+      Instructions: '',
+      ingredients: [''],
+      tags: ['']
     });
     alert('Recipe saved successfully!');
   };
-
-
 
   return (
     <div>
@@ -125,30 +178,20 @@ const AddRecipe = ({ onRecipeSaved }) => {
         <div className="form-section">
           <h3 className="section-title">Basic Information</h3>
           <div className="form-group">
-            <label className="label">Recipe Name:</label>
+            <label className="label">Recipe Title:</label>
             <input 
               type="text" 
-              value={recipe.name} 
-              onChange={(e) => handleInputChange('name', e.target.value)} 
-              placeholder="Enter recipe name" 
-              className="input" 
-            />
-          </div>
-          <div className="form-group">
-            <label className="label">Chef:</label>
-            <input 
-              type="text" 
-              value={recipe.chef} 
-              onChange={(e) => handleInputChange('chef', e.target.value)} 
-              placeholder="Chef name" 
+              value={recipe.Title} 
+              onChange={(e) => handleInputChange('Title', e.target.value)} 
+              placeholder="Enter recipe title" 
               className="input" 
             />
           </div>
           <div className="form-group">
             <label className="label">Description:</label>
             <textarea 
-              value={recipe.description} 
-              onChange={(e) => handleInputChange('description', e.target.value)} 
+              value={recipe.Description} 
+              onChange={(e) => handleInputChange('Description', e.target.value)} 
               placeholder="Brief description of the dish" 
               className="textarea" 
             />
@@ -157,8 +200,8 @@ const AddRecipe = ({ onRecipeSaved }) => {
             <label className="label">Image URL:</label>
             <input 
               type="url" 
-              value={recipe.image} 
-              onChange={(e) => handleInputChange('image', e.target.value)} 
+              value={recipe.ImageURL} 
+              onChange={(e) => handleInputChange('ImageURL', e.target.value)} 
               placeholder="https://example.com/image.jpg" 
               className="input" 
             />
@@ -169,13 +212,13 @@ const AddRecipe = ({ onRecipeSaved }) => {
           <h3 className="section-title">Recipe Details</h3>
           <div className="form-group">
             <label className="label">
-              <Clock size={16} className="inline-icon" /> Prep Time:
+              <Clock size={16} className="inline-icon" /> Prep Time (Minutes):
             </label>
             <input 
-              type="text" 
-              value={recipe.prepTime} 
-              onChange={(e) => handleInputChange('prepTime', e.target.value)} 
-              placeholder="e.g., 30 minutes" 
+              type="number" 
+              value={recipe.PrepTimeMinutes} 
+              onChange={(e) => handleInputChange('PrepTimeMinutes', e.target.value)} 
+              placeholder="e.g., 30" 
               className="input" 
             />
           </div>
@@ -184,8 +227,8 @@ const AddRecipe = ({ onRecipeSaved }) => {
               <Star size={16} className="inline-icon" /> Difficulty:
             </label>
             <select 
-              value={recipe.difficulty} 
-              onChange={(e) => handleInputChange('difficulty', e.target.value)} 
+              value={recipe.Difficulty} 
+              onChange={(e) => handleInputChange('Difficulty', e.target.value)} 
               className="select"
             >
               {difficulties.map(diff => (
@@ -196,8 +239,8 @@ const AddRecipe = ({ onRecipeSaved }) => {
           <div className="form-group">
             <label className="label">Category:</label>
             <select 
-              value={recipe.category} 
-              onChange={(e) => handleInputChange('category', e.target.value)} 
+              value={recipe.Category} 
+              onChange={(e) => handleInputChange('Category', e.target.value)} 
               className="select"
             >
               <option value="">Select category</option>
@@ -209,8 +252,8 @@ const AddRecipe = ({ onRecipeSaved }) => {
           <div className="form-group">
             <label className="label">Dish Type:</label>
             <select 
-              value={recipe.dishType} 
-              onChange={(e) => handleInputChange('dishType', e.target.value)} 
+              value={recipe.DishType} 
+              onChange={(e) => handleInputChange('DishType', e.target.value)} 
               className="select"
             >
               <option value="">Select dish type</option>
@@ -237,8 +280,8 @@ const AddRecipe = ({ onRecipeSaved }) => {
         <div className="form-group">
           <label className="label">Instructions:</label>
           <textarea 
-            value={recipe.instructions} 
-            onChange={(e) => handleInputChange('instructions', e.target.value)} 
+            value={recipe.Instructions} 
+            onChange={(e) => handleInputChange('Instructions', e.target.value)} 
             placeholder="Write step-by-step instructions here..." 
             className="textarea instructions-textarea" 
           />

@@ -44,7 +44,8 @@ async function getRecipeById(recipeId) {
     );
 
     result.tags = tags.map(t => t.Name); // simplify to array of strings
-
+    console.log("Tags:", result.tags);
+    
     return result;
 
   } catch (err) {

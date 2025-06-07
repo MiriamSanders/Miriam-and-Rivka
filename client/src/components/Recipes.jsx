@@ -11,7 +11,7 @@ function Recipes({createMenu}) {
   const limit = 10;
 
   const getRecipes = async () => {
-    const requestResult = await getRequest(`recipes?limit=${limit}&offset=${page}`);
+    const requestResult = await getRequest(`recipes?limit=${limit}&page=${page}`);
     if (requestResult.succeeded) {
       const newRecipes = requestResult.data;
       if (newRecipes.length < limit) {

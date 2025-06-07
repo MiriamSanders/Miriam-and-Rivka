@@ -189,11 +189,11 @@ body {
 .tag {
   display: inline-block;
   padding: 0.5rem 1rem;
+  border-radius: 5%;
   background-color: #000000;
   color: #ffffff;
   font-size: 0.85rem;
   font-weight: 500;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   transition: all 0.3s ease;
   cursor: default;
