@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
-import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
+// import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
 
-const RecipeDiscussion = ({ recipeId }) => {
+const ArticleDiscussion = ({ articleId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [commentsLoaded, setCommentsLoaded] = useState(false);
@@ -16,7 +16,7 @@ const RecipeDiscussion = ({ recipeId }) => {
     if (loading) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/recipecomments/${recipeId}?page=${pageNum}&limit=5`);
+      const response = await fetch(`http://localhost:3001/articlecomments/${articleId}?page=${pageNum}&limit=5`);
       const data = await response.json();
       if (data && data.length > 0) {
         setComments((prev) => [...prev, ...data]);
@@ -86,7 +86,7 @@ const RecipeDiscussion = ({ recipeId }) => {
     if (currentUser) {
       try {
         
-        const response = await fetch(`http://localhost:3001/recipecomments`, {
+        const response = await fetch(`http://localhost:3001/articlecomments`, {
           method: "POST",
            credentials: "include",
           headers: {
@@ -95,7 +95,7 @@ const RecipeDiscussion = ({ recipeId }) => {
           body: JSON.stringify({
             CommentText: newComment,
             UserID: currentUser.id,
-            RecipeID: recipeId
+            ArticleID: articleId
           }),
         });
         const data = await response.json();
@@ -150,5 +150,5 @@ const RecipeDiscussion = ({ recipeId }) => {
   );
 };
 
-export default RecipeDiscussion;
+export default ArticleDiscussion;
 

@@ -15,6 +15,8 @@ async function articleGetAll(limit, offset) {
       query += ` OFFSET ?`;
       params.push(offset);
     }
+    console.log(mysql.format(query, params));
+    
     const [rows] = await db.execute(mysql.format(query, params));
   
     return rows;

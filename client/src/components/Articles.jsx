@@ -5,13 +5,13 @@ import '../styles/Articles.css';
 
 function Articles() {
   const [articles, setArticles] = useState([]);
-  const [page, setPage] = useState(1); 
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
   const limit = 6;
 
   const getArticles = async () => {
-    const requestResult = await getRequest(`articles?limit=${limit}&offset=${page}`);
+    const requestResult = await getRequest(`articles?limit=${limit}&page=${page}`);
     if (requestResult.succeeded) {
       const newArticles = requestResult.data;
       if (newArticles.length < limit) {

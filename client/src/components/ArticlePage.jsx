@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../styles/ArticlePage.css'; // Optional for styling
+import ArticleDiscussion from './ArticleDiscussion';
 
 function ArticlePage() {
   const { id } = useParams();
@@ -46,6 +47,7 @@ function ArticlePage() {
           paragraph.trim() ? <p key={index}>{paragraph}</p> : <br key={index} />
         )}
       </div>
+          <ArticleDiscussion articleId={id}/>
     </div>
   );
 }
