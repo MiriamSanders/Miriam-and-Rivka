@@ -1,36 +1,45 @@
 import React from "react";
+import "../styles/Footer.css"; // Assuming you have a CSS file for styling
+
 export default function Footer() {
+<<<<<<< HEAD
     const handleSubmit=async()=>{
 
     }
+=======
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Add your form submission logic here
+    console.log("Form submitted");
+  };
+
+>>>>>>> 51e36454c77ae86786d3b7eb21c559064f31d7cf
   return (
-    <footer className="bg-gray-800 text-white p-6 mt-12">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-xl font-semibold mb-2">Request to join as a chef</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+    <footer className="footer">
+      <div className="footer-container">
+        <h2 className="footer-title">Request to join as a chef</h2>
+        <form onSubmit={handleSubmit} className="footer-form">
           <input
             type="text"
             placeholder="name"
-            className="p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="footer-input"
+            required
           />
           <input
             type="email"
             placeholder="email"
-            className="p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="footer-input"
+            required
           />
           <textarea
             placeholder="Anything you would like to add?"
-            rows="4"
-            className="p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="footer-textarea"
           />
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
-          >
+          <button type="submit" className="footer-button">
             send
           </button>
         </form>
-        <p className="text-sm mt-4 text-gray-400">&copy; 2025 All rights reserved.</p>
+        <p className="footer-copyright">&copy; 2025 All rights reserved.</p>
       </div>
     </footer>
   );
