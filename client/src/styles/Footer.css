@@ -1,0 +1,106 @@
+/* Footer.css */
+
+.footer {
+  background-color: #1f2937; /* gray-800 */
+  color: white;
+  padding: 24px; /* p-6 */
+  margin-top: 48px; /* mt-12 */
+}
+
+.footer-container {
+  max-width: 896px; /* max-w-4xl */
+  margin: 0 auto; /* mx-auto */
+}
+
+.footer-title {
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 600; /* font-semibold */
+  margin-bottom: 8px; /* mb-2 */
+}
+
+.footer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* space-y-4 */
+}
+
+.footer-input {
+  padding: 8px; /* p-2 */
+  border-radius: 4px; /* rounded */
+  background-color: #374151; /* bg-gray-700 */
+  border: none;
+  color: white;
+  outline: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.footer-input::placeholder {
+  color: #9ca3af; /* placeholder-gray-400 */
+}
+
+.footer-input:focus {
+  box-shadow: 0 0 0 2px #3b82f6; /* focus:ring-2 focus:ring-blue-500 */
+}
+
+.footer-textarea {
+  padding: 8px; /* p-2 */
+  border-radius: 4px; /* rounded */
+  background-color: #374151; /* bg-gray-700 */
+  border: none;
+  color: white;
+  outline: none;
+  resize: vertical;
+  min-height: 96px; /* rows="4" equivalent */
+  font-family: inherit;
+  transition: box-shadow 0.2s ease;
+}
+
+.footer-textarea::placeholder {
+  color: #9ca3af; /* placeholder-gray-400 */
+}
+
+.footer-textarea:focus {
+  box-shadow: 0 0 0 2px #3b82f6; /* focus:ring-2 focus:ring-blue-500 */
+}
+
+.footer-button {
+  background-color: #2563eb; /* bg-blue-600 */
+  color: white;
+  padding: 8px 0; /* py-2 */
+  border-radius: 4px; /* rounded */
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.footer-button:hover {
+  background-color: #1d4ed8; /* hover:bg-blue-700 */
+}
+
+.footer-button:active {
+  background-color: #1e40af;
+}
+
+.footer-copyright {
+  font-size: 0.875rem; /* text-sm */
+  margin-top: 16px; /* mt-4 */
+  color: #9ca3af; /* text-gray-400 */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .footer {
+    padding: 16px;
+    margin-top: 32px;
+  }
+  
+  .footer-container {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+  
+  .footer-title {
+    font-size: 1.125rem;
+  }
+}
