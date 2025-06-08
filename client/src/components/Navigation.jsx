@@ -44,6 +44,7 @@ function Navigation({ userType = "guest", onLogout }) {
     // localStorage.removeItem('userToken'); // or whatever you store
     
     setIsLoggedIn(false);
+    localStorage.removeItem('CurrentUser'); // Clear user data from localStorage
     if (onLogout) {
       onLogout();
     }
