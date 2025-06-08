@@ -1,7 +1,7 @@
 import React from "react";
 export default function Footer() {
     const handleSubmit=async()=>{
-        
+
     }
   return (
     <footer className="bg-gray-800 text-white p-6 mt-12">
