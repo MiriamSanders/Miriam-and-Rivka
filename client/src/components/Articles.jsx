@@ -51,7 +51,7 @@ const openArticle = (e) => {
             <div key={article.ArticleID} className="article-card" data-article-id={article.ArticleID} onClick={openArticle}>
                 <div className="article-overlay">
                   <h2>{article.Title}</h2>
-                  <p>Written by:{article. AuthorName}</p>
+                  <p>Written by:{article.UserName}</p>
                 </div>
               </div>
           ))
