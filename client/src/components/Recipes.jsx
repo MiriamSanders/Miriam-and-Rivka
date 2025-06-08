@@ -14,6 +14,7 @@ function Recipes({createMenu}) {
     const requestResult = await getRequest(`recipes?limit=${limit}&page=${page}`);
     if (requestResult.succeeded) {
       const newRecipes = requestResult.data;
+      console.log(newRecipes);
       if (newRecipes.length < limit) {
         setHasMore(false);
       }
@@ -55,6 +56,7 @@ function Recipes({createMenu}) {
                 <div className="recipe-overlay">
                   <h2>{recipe.Title}</h2>
                   <p>{recipe.Description}</p>
+                  <p>tag:{recipe.Name}</p>
                 </div>
               </div>
             </div>

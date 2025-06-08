@@ -53,6 +53,28 @@ async function getRecipeById(recipeId) {
     throw err;
   } 
 }
+async function GetAllRecipes(limit, offset) {
+  try {
+    const db = await dbPromise;
+    const query = `
+      SELECT r.RecipeID, r.Title, r.ImageURL,r.Category,r.Description,u.UserName,t.Name
+      FROM recipes r
+      JOIN Users u ON r.ChefID = u.UserID
+     LEFT JOIN recipetags p ON r.RecipeID=p.RecipeID
+     LEFT JOIN tags t ON p.TagID =t.TagID 
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `;
+
+    const [rows] = await db.execute(query);
+    return rows;
+
+  } catch (error) {
+    console.error('Error fetching recipes:', error);
+    throw error;
+  }
+}
 module.exports = {
-    getRecipeById
+    getRecipeById,
+    GetAllRecipes
 };
