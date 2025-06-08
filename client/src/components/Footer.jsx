@@ -3,9 +3,7 @@ import "../styles/Footer.css"; // Assuming you have a CSS file for styling
 
 export default function Footer() {
 <<<<<<< HEAD
-    const handleSubmit=async()=>{
 
-    }
 =======
   const handleSubmit = async (e) => {
     e.preventDefault();
