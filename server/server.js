@@ -15,6 +15,7 @@ const recipesRouter = require('./routes/recipesRoutes');
 const articlesRouter = require('./routes/articlesRoutes');
 const ratingRouter = require('./routes/ratingRoutes');
 const commentsRouter = require('./routes/commentsRoutes');
+const chefRouter = require('./routes/chefRoutes');
 
 app.use(express.json());
 app.use(cookieParser());
@@ -24,6 +25,7 @@ app.use('/',recipesRouter);
 app.use('/',articlesRouter);
 app.use('/',ratingRouter);
 app.use('/', commentsRouter);
+app.use('/', chefRouter);
 app.listen(PORT, () => {
   console.log('http://localhost:3001');
 });

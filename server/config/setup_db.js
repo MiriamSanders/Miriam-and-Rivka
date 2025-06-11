@@ -10,168 +10,174 @@ const createTables = async () => {
     });
 
 const queries = [
-  // 1. Users
-  `CREATE TABLE IF NOT EXISTS Users (
-    UserID INT AUTO_INCREMENT PRIMARY KEY,
-    UserName VARCHAR(50) UNIQUE NOT NULL,
-    UserType ENUM('Regular', 'Chef') NOT NULL,
-    Email VARCHAR(50) NOT NULL
+  // 1. Roles (referenced by users)
+   `CREATE TABLE IF NOT EXISTS roles (
+    roleId INT AUTO_INCREMENT PRIMARY KEY,
+    roleName VARCHAR(50) NOT NULL
   )`,
 
-  // 2. Roles
-  `CREATE TABLE IF NOT EXISTS Roles (
-    RoleID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT NOT NULL,
-    RoleName VARCHAR(50) NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+  // 2. Difficulty (referenced by recipes)
+  `CREATE TABLE IF NOT EXISTS difficulty (
+  difficultyId INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50)
   )`,
 
-  // 3. Chefs
-  `CREATE TABLE IF NOT EXISTS Chefs (
-    ChefID INT PRIMARY KEY,
-    ImageURL VARCHAR(255),
-    Education VARCHAR(100),
-    ExperienceYears INT,
-    Style VARCHAR(100),
-    FOREIGN KEY (ChefID) REFERENCES Users(UserID) ON DELETE CASCADE
+  // 3. Users (references roles)
+  `CREATE TABLE IF NOT EXISTS users (
+    userId INT AUTO_INCREMENT PRIMARY KEY,
+    userName VARCHAR(50) UNIQUE NOT NULL,
+    userType INT NOT NULL,
+    email VARCHAR(50) NOT NULL,
+      FOREIGN KEY (userType) REFERENCES roles(roleId)
   )`,
 
-  // 4. Passwords
-  `CREATE TABLE IF NOT EXISTS Passwords (
-    UserID INT PRIMARY KEY,
-    PasswordHash VARCHAR(255) NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+ // 4. Chefs (references users)
+  `CREATE TABLE IF NOT EXISTS chefs (
+    chefId INT PRIMARY KEY,
+    imageURL VARCHAR(255),
+    education VARCHAR(100),
+    experienceYears INT,
+    style VARCHAR(100),
+    FOREIGN KEY (chefId) REFERENCES users(userId) ON DELETE CASCADE
   )`,
 
-  // 5. Recipes
-  `CREATE TABLE IF NOT EXISTS Recipes (
-    RecipeID INT AUTO_INCREMENT PRIMARY KEY,
-    ChefID INT NOT NULL,
-    Title VARCHAR(100) NOT NULL,
-    Description TEXT,
-    ImageURL VARCHAR(255),
-    Instructions TEXT,
-    PrepTimeMinutes INT,
-    Difficulty ENUM('Easy', 'Medium', 'Hard'),
-    Category ENUM('Meat', 'Dairy', 'Parve'),
-    DishType VARCHAR(50),
-    FOREIGN KEY (ChefID) REFERENCES Chefs(ChefID) ON DELETE CASCADE
+  // 5. Passwords (references users)
+  `CREATE TABLE IF NOT EXISTS passwords (
+    userId INT PRIMARY KEY,
+    passwordHash VARCHAR(255) NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
   )`,
 
-  // 6. Ingredients
-  `CREATE TABLE IF NOT EXISTS Ingredients (
-    IngredientID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    CaloriesPer100g FLOAT,
-    ProteinPer100g FLOAT,
-    CarbsPer100g FLOAT,
-    FatPer100g FLOAT,
-    FiberPer100g FLOAT
+  // 6. Ingredients (no dependencies)
+  `CREATE TABLE IF NOT EXISTS ingredients (
+    ingredientID INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    caloriesPer100g FLOAT,
+    proteinPer100g FLOAT,
+    carbsPer100g FLOAT,
+    fatPer100g FLOAT,
+    fiberPer100g FLOAT
   )`,
 
-  // 7. RecipeIngredients
+  // 7. Recipes (references chefs and difficulty)
+  `CREATE TABLE IF NOT EXISTS recipes (
+    recipeId INT AUTO_INCREMENT PRIMARY KEY,
+    chefId INT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    description TEXT,
+    imageURL VARCHAR(255),
+    instructions TEXT,
+    prepTimeMinutes INT,
+    difficulty INT,
+    category ENUM('Meat', 'Dairy', 'Parve'),
+    dishType VARCHAR(50),
+    FOREIGN KEY (chefId) REFERENCES chefs(chefId) ON DELETE CASCADE,
+    FOREIGN KEY (difficulty) REFERENCES difficulty(difficultyId)
+  )`,
+
+  // 8. RecipeIngredients (references recipes and ingredients)
   `CREATE TABLE IF NOT EXISTS RecipeIngredients (
-    RecipeID INT NOT NULL,
-    IngredientID INT NOT NULL,
-    Quantity VARCHAR(50) NOT NULL,
-    OrderIndex INT,
-    PRIMARY KEY (RecipeID, IngredientID),
-    FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID) ON DELETE CASCADE,
-    FOREIGN KEY (IngredientID) REFERENCES Ingredients(IngredientID) ON DELETE CASCADE
+    recipeId INT NOT NULL,
+    ingredientId INT NOT NULL,
+    quantity VARCHAR(50) NOT NULL,
+    orderIndex INT,
+    PRIMARY KEY (recipeId, ingredientId),
+    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE,
+    FOREIGN KEY (ingredientId) REFERENCES ingredients(ingredientId) ON DELETE CASCADE
   )`,
 
-  // 8. Comments
-  `CREATE TABLE IF NOT EXISTS Comments (
-    CommentID INT AUTO_INCREMENT PRIMARY KEY,
-    RecipeID INT NOT NULL,
-    UserID INT NOT NULL,
-    CommentText TEXT,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID) ON DELETE CASCADE,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+  // 9. Comments (references recipes and users)
+  `CREATE TABLE IF NOT EXISTS comments (
+    commentId INT AUTO_INCREMENT PRIMARY KEY,
+    recipeId INT NOT NULL,
+    userId INT NOT NULL,
+    commentText TEXT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
   )`,
 
-  // 9. Articles
-  `CREATE TABLE IF NOT EXISTS Articles (
-    ArticleID INT AUTO_INCREMENT PRIMARY KEY,
-    AuthorID INT NOT NULL,
-    Title VARCHAR(255) NOT NULL,
-    Content TEXT NOT NULL,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (AuthorID) REFERENCES Users(UserID) ON DELETE CASCADE
+  // 10. Articles (references users)
+  `CREATE TABLE IF NOT EXISTS articles (
+    articleId INT AUTO_INCREMENT PRIMARY KEY,
+    authorId INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (authorId) REFERENCES users(userId) ON DELETE CASCADE
   )`,
 
-  // 10. ArticleComments
-  `CREATE TABLE IF NOT EXISTS ArticleComments (
-    CommentID INT AUTO_INCREMENT PRIMARY KEY,
-    ArticleID INT NOT NULL,
-    UserID INT NOT NULL,
-    CommentText TEXT NOT NULL,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ArticleID) REFERENCES Articles(ArticleID) ON DELETE CASCADE,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+  // 11. ArticleComments (references articles and users)
+  `CREATE TABLE IF NOT EXISTS articleComments (
+    commentId INT AUTO_INCREMENT PRIMARY KEY,
+    articleId INT NOT NULL,
+    userId INT NOT NULL,
+    commentText TEXT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (articleId) REFERENCES articles(articleId) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
   )`,
 
-  // 11. Tags
-  `CREATE TABLE IF NOT EXISTS Tags (
-    TagID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(50) UNIQUE NOT NULL
+  // 12. Tags (no dependencies)
+  `CREATE TABLE IF NOT EXISTS tags (
+    tagId INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
   )`,
 
-  // 12. Preferences (linking users to tag-based preferences)
-  `CREATE TABLE IF NOT EXISTS Preferences (
-    PreferenceID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT NOT NULL,
-    TagID INT NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (TagID) REFERENCES Tags(TagID) ON DELETE CASCADE
+  // 13. Preferences (references users and tags)
+  `CREATE TABLE IF NOT EXISTS preferences (
+    preferenceId INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    tagId INT NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tags(tagId) ON DELETE CASCADE
   )`,
 
-  // 13. SavedRecipes
-  `CREATE TABLE IF NOT EXISTS SavedRecipes (
-    UserID INT NOT NULL,
-    RecipeID INT NOT NULL,
-    SavedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (UserID, RecipeID),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID) ON DELETE CASCADE
+  // 14. SavedRecipes (references users and recipes)
+  `CREATE TABLE IF NOT EXISTS savedrecipes (
+    userId INT NOT NULL,
+    recipeId INT NOT NULL,
+    savedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (userId, recipeId),
+    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
+    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE
   )`,
 
-  // 14. RecipeRatings (individual ratings per user)
-  `CREATE TABLE IF NOT EXISTS RecipeRatings (
-    UserID INT NOT NULL,
-    RecipeID INT NOT NULL,
-    Rating INT CHECK (Rating BETWEEN 1 AND 5),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (UserID, RecipeID),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID) ON DELETE CASCADE
+  // 15. RecipeRatings (references users and recipes)
+  `CREATE TABLE IF NOT EXISTS recipeRatings (
+    userId INT NOT NULL,
+    recipeId INT NOT NULL,
+    rating INT CHECK (Rating BETWEEN 1 AND 5),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (userId, recipeId),
+    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
+    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE
   )`,
 
-  // 15. DailyMenus
-  `CREATE TABLE IF NOT EXISTS DailyMenus (
-    MenuID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT NOT NULL,
-    MenuDate DATE NOT NULL UNIQUE,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+  // 16. DailyMenus (references users)
+  `CREATE TABLE IF NOT EXISTS dailymenus (
+    menuId INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    menuDate DATE NOT NULL UNIQUE,
+    FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE CASCADE
   )`,
 
-  // 16. MenuRecipes
-  `CREATE TABLE IF NOT EXISTS MenuRecipes (
-    MenuID INT NOT NULL,
-    RecipeID INT NOT NULL,
-    PRIMARY KEY (MenuID, RecipeID),
-    FOREIGN KEY (MenuID) REFERENCES DailyMenus(MenuID) ON DELETE CASCADE,
-    FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID) ON DELETE CASCADE
+  // 17. MenuRecipes (references dailymenus and recipes)
+  `CREATE TABLE IF NOT EXISTS menurecipes (
+    menuId INT NOT NULL,
+    recipeId INT NOT NULL,
+    PRIMARY KEY (menuId, recipeId),
+    FOREIGN KEY (menuId) REFERENCES dailymenus(menuId) ON DELETE CASCADE,
+    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE
   )`,
 
-  // 17. RecipeTags
-  `CREATE TABLE IF NOT EXISTS RecipeTags (
-    RecipeID INT NOT NULL,
-    TagID INT NOT NULL,
-    PRIMARY KEY (RecipeID, TagID),
-    FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID) ON DELETE CASCADE,
-    FOREIGN KEY (TagID) REFERENCES Tags(TagID) ON DELETE CASCADE
+  // 18. RecipeTags (references recipes and tags)
+  `CREATE TABLE IF NOT EXISTS recipetags (
+    recipeId INT NOT NULL,
+    tagId INT NOT NULL,
+    PRIMARY KEY (recipeId, tagId),
+    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tags(tagId) ON DELETE CASCADE
   )`
 ];
 
@@ -181,52 +187,6 @@ const queries = [
             await connection.execute(queries[i]);
             console.log(`Query #${i + 1} executed successfully`);
         }
-        try {
-    // Insert users (chefs + regular)
-    await connection.execute(`
-        INSERT INTO Users (UserName, UserType, Email)
-        VALUES 
-        ('JohnDoe', 'Chef', 'john.doe@example.com'),
-        ('SarahBaker', 'Chef', 'sarah.baker@example.com'),
-        ('MikeSmith', 'Chef', 'mike.smith@example.com'),
-        ('EmmaFoodie', 'Regular', 'emma.foodie@example.com'),
-        ('AlexCook', 'Regular', 'alex.cook@example.com')
-    `);
-
-    // Insert chefs (Chefs match UserID)
-    await connection.execute(`
-        INSERT INTO Chefs (ChefID, ImageURL, Education, ExperienceYears, Style)
-        VALUES 
-        (1, 'https://example.com/images/chef-john.jpg', 'Le Cordon Bleu', 10, 'French Cuisine'),
-        (2, 'https://example.com/images/chef-sarah.jpg', 'CIA New York', 8, 'Pastry & Desserts'),
-        (3, 'https://example.com/images/chef-mike.jpg', 'Italian Culinary Institute', 12, 'Italian Cuisine')
-    `);
-
-    // Insert articles
-    await connection.execute(`
-        INSERT INTO Articles (AuthorID, Title, Content)
-        VALUES 
-        (1, 'The Art of French Cooking', 'Explore classic French techniques and recipes from Chef John Doe.'),
-        (2, 'Baking 101: Sweet Secrets', 'Chef Sarah shares her secrets to the perfect cake.'),
-        (3, 'Mastering Italian Pasta', 'Chef Mike reveals how to make authentic Italian pasta from scratch.')
-    `);
-
-    // Insert recipes
-    await connection.execute(`
-        INSERT INTO Recipes (ChefID, Title, Description, ImageURL, Instructions, PrepTimeMinutes, Difficulty, Category, DishType)
-        VALUES 
-        (1, 'Coq au Vin', 'Classic French chicken stew with wine.', 'https://example.com/images/coq-au-vin.jpg', 'Marinate chicken, cook with wine and mushrooms, serve hot.', 120, 'Hard', 'Meat', 'Main Course'),
-        (2, 'Chocolate Lava Cake', 'Decadent molten chocolate dessert.', 'https://example.com/images/lava-cake.jpg', 'Prepare batter, bake, serve warm with ice cream.', 45, 'Medium', 'Dairy', 'Dessert'),
-        (3, 'Homemade Fettuccine', 'Fresh pasta with creamy Alfredo sauce.', 'https://example.com/images/fettuccine.jpg', 'Mix dough, roll pasta, cook, prepare sauce.', 60, 'Medium', 'Dairy', 'Pasta'),
-        (1, 'French Onion Soup', 'Rich and flavorful soup with caramelized onions.', 'https://example.com/images/french-onion-soup.jpg', 'Caramelize onions, add broth, simmer, top with cheese.', 90, 'Medium', 'Dairy', 'Soup'),
-        (3, 'Margherita Pizza', 'Classic Italian pizza with fresh basil and mozzarella.', 'https://example.com/images/margherita-pizza.jpg', 'Prepare dough, add toppings, bake at high temperature.', 70, 'Easy', 'Dairy', 'Pizza')
-    `);
-
-    console.log("Default data inserted successfully!");
-
-} catch (err) {
-    console.error("Error inserting default data:", err.message);
-}
     } catch (err) {
         console.error(" Error running queries:", err.message);
     } finally {
@@ -236,4 +196,4 @@ const queries = [
 
 
 }
-createTables();0
+createTables();

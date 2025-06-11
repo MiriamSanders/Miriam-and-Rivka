@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getRequest } from '../Requests';
+import SearchFilterBar from './SearchBar';
 import '../styles/Recipes.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,7 +39,7 @@ function Recipes({createMenu}) {
   return (
     <div className="recipes-container">
       <h1>Recipes</h1>
-
+      <SearchFilterBar /> 
       <div className="recipes-list">
         {recipes.length === 0 ? (
           <p className="no-recipes">No recipes found available</p>
