@@ -2,16 +2,12 @@ import React from "react";
 import "../styles/Footer.css"; // Assuming you have a CSS file for styling
 
 export default function Footer() {
-<<<<<<< HEAD
-
-=======
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Add your form submission logic here
     console.log("Form submitted");
   };
 
->>>>>>> 51e36454c77ae86786d3b7eb21c559064f31d7cf
   return (
     <footer className="footer">
       <div className="footer-container">

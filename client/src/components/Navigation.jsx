@@ -15,11 +15,11 @@ const navOptions = {
   loggedIn: [
     { path: "/logout", label: "Logout", isLogout: true },
   ],
-  Regular: [
+  regular: [
     { path: "/personal-area", label: "Personal Area" },
     { path: "/personal-area/menus", label: "My Menus" },
   ],
-  Chef: [
+  chef: [
     { path: "/chef-area", label: "Chef Area" },
     { path: "/chef-area/recipe-manager", label: "Recipe Manager" },
     { path: "/chef-area/article-manager", label: "Article Manager" },
@@ -44,7 +44,7 @@ function Navigation({ userType = "guest", onLogout }) {
     // localStorage.removeItem('userToken'); // or whatever you store
     
     setIsLoggedIn(false);
-    localStorage.removeItem('CurrentUser'); // Clear user data from localStorage
+    localStorage.removeItem('currentUser'); // Clear user data from localStorage
     if (onLogout) {
       onLogout();
     }
@@ -55,10 +55,10 @@ function Navigation({ userType = "guest", onLogout }) {
   
   // Add user-specific links if logged in
   if (isLoggedIn && (userType === "Regular" || userType === "Chef")) {
-    links = links.concat(navOptions.Regular);
+    links = links.concat(navOptions.regular);
   }
   if (isLoggedIn && userType === "Chef") {
-    links = links.concat(navOptions.Chef);
+    links = links.concat(navOptions.chef);
   }
   
   // Add auth links at the end based on login status

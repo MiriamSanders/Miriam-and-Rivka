@@ -3,8 +3,8 @@ const dbPromise = require("./dbConnection");
 async function articleGetAll(limit, offset) {
   try {
     const db = await dbPromise;
-    let query = `SELECT a.ArticleID, u.UserName,Title FROM articles a
-       JOIN Users u ON a.AuthorID = u.UserID`;
+    let query = `SELECT a.articleId, u.userName,title FROM articles a
+       JOIN users u ON a.authorId = u.userId`;
  const params = [];
 
     if (limit) {
@@ -35,11 +35,11 @@ async function GenericPost(table, data) {
 
         let id = insertResult.insertId;
         if (id) {
-            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE UserID = ?`, [table, id]);
+            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE userId = ?`, [table, id]);
             const [rows] = await db.execute(selectQuery);
             return rows[0] || null;
-        } else if (data.UserID) {
-            const idQuery = mysql.format(`SELECT * FROM ?? WHERE UserID = ?`, [table, data.UserID]);
+        } else if (data.userId) {
+            const idQuery = mysql.format(`SELECT * FROM ?? WHERE userId = ?`, [table, data.userId]);
             const [rows] = await db.execute(idQuery);
             if (rows.length === 0) throw new Error('No record found for the given userID');
             return rows[0];
@@ -55,10 +55,10 @@ async function getArticleById(id) {
     try {
         const db = await dbPromise;
         const query = `
-            SELECT a.*, u.UserName AS AuthorName
+            SELECT a.*, u.userName AS authorName
             FROM articles a
-            JOIN users u ON a.AuthorID = u.UserID
-            WHERE a.ArticleID = ?
+            JOIN users u ON a.authorId = u.userId
+            WHERE a.articleId = ?
         `;
         const [rows] = await db.execute(query, [id]);
         if (rows.length === 0) return null;

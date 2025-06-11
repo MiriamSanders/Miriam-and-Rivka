@@ -2,7 +2,6 @@ import Footer from "./Footer";
 
 function Home(){
 const currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
-console.lo
   return (
     <div>
       <img

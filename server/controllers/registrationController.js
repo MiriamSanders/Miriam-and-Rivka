@@ -1,27 +1,27 @@
-const GenericDA = require('../services/GenericDA');
-const loginDA = require('../services/loginDA');
+const genericService= require('../services/genericService');
+const loginService = require('../services/loginService');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.registerUser = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { userName, email, password } = req.body;
 
-    if (!username || !password) {
+    if (!userName || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const userData = { UserName: username, Email: email, UserType: 'Regular' };
+        const userData = { userName: userName, email: email, userType: 'regular' };
 
-        const newUser = await GenericDA.GenericPost('users', userData);
+        const newUser = await genericService.genericPost('users', userData);
         if (!newUser) {
             return res.status(400).json({ error: 'User registration failed' });
         }
         // Store the hashed password in the database
-        await GenericDA.GenericPost('passwords', { UserID: newUser.UserID, PasswordHash: hashedPassword });
+        await genericService.genericPost('passwords', { userId: newUser.userId, passwordHash: hashedPassword });
         // צור טוקן JWT
         const token = jwt.sign(
-            { id: newUser.UserID, username: newUser.UserName, userType: newUser.UserType },
+            { id: newUser.userId, userName: newUser.userName, userType: newUser.userType },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -33,7 +33,7 @@ exports.registerUser = async (req, res) => {
             sameSite: "Lax",
             maxAge: 1000 * 60 * 60
         });
-        res.status(201).json({ id: newUser.UserID, username: newUser.UserName, userType: newUser.UserType });
+        res.status(201).json({ id: newUser.userId, userName: newUser.userName, userType: newUser.userType });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -41,26 +41,26 @@ exports.registerUser = async (req, res) => {
 }
 
 exports.loginUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { userName, password } = req.body;
 
-    if (!username || !password) {
+    if (!userName || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
     }
 
     try {
-        const user = await loginDA.getUserWithPasswordByUserName(username);
+        const user = await loginService.getUserWithPasswordByUserName(userName);
 
         if (!user) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.PasswordHash);
+        const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
 
         const token = jwt.sign(
-            { id: user.UserID, username: user.UserName, userType: user.UserType },
+            { id: user.userId, userName: user.userName, userType: user.userType },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -72,7 +72,7 @@ exports.loginUser = async (req, res) => {
             maxAge: 1000 * 60 * 60 // שעה
         });
 
-        res.status(201).json({ id: user.UserID, username: user.UserName, userType: user.UserType });
+        res.status(201).json({ id: user.userId, userName: user.userName, userType: user.userType });
 
 
     } catch (error) {

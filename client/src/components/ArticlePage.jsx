@@ -31,19 +31,19 @@ function ArticlePage() {
   if (error) return <div className="article-error">Error: {error}</div>;
   if (!articleData) return <div>No article found.</div>;
 
-  const { Title, AuthorID, CreatedAt, Content,AuthorName } = articleData;
-  const formattedDate = new Date(CreatedAt).toLocaleDateString();
+  const { title, authorId, createdAt, content,authorName } = articleData;
+  const formattedDate = new Date(createdAt).toLocaleDateString();
 
   return (
     <div className="article-container">
-      <h1 className="article-title">{Title}</h1>
+      <h1 className="article-title">{title}</h1>
       <div className="article-meta">
-        <span>By {AuthorName}</span>
+        <span>By {authorName}</span>
         <span> | </span>
         <span>{formattedDate}</span>
       </div>
       <div className="article-content">
-        {Content.split('\n').map((paragraph, index) =>
+        {content.split('\n').map((paragraph, index) =>
           paragraph.trim() ? <p key={index}>{paragraph}</p> : <br key={index} />
         )}
       </div>
