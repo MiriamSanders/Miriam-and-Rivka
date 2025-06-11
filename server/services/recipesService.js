@@ -2,18 +2,17 @@ const mysql = require('mysql2/promise');
 const dbPromise = require("./dbConnection"); 
 async function getRecipeById(recipeId) {
     try {
-        
     const result = {};
     const db = await dbPromise;
     // 1. Get the recipe itself with the chef name
     const [recipeRows] = await db.execute(
-      `SELECT r.RecipeID, r.Title, r.Description, r.ImageURL, r.Instructions,
-              r.PrepTimeMinutes, r.Difficulty, r.Category, r.DishType,
-              u.UserName AS ChefName
-       FROM Recipes r
-       JOIN Chefs c ON r.ChefID = c.ChefID
-       JOIN Users u ON c.ChefID = u.UserID
-       WHERE r.RecipeID = ?`,
+      `SELECT r.recipeId, r.title, r.description, r.imageURL, r.instructions,
+              r.prepTimeMinutes, r.difficulty, r.category, r.dishType,
+              u.userName AS chefName
+       FROM recipes r
+       JOIN chefs c ON r.chefID = c.chefID
+       JOIN users u ON c.chefID = u.userID
+       WHERE r.recipeId = ?`,
        [recipeId]
     );
 
@@ -25,11 +24,11 @@ async function getRecipeById(recipeId) {
 
     // 2. Get ingredients
     const [ingredients] = await db.execute(
-      `SELECT i.Name, ri.Quantity, ri.OrderIndex
-       FROM RecipeIngredients ri
-       JOIN Ingredients i ON ri.IngredientID = i.IngredientID
-       WHERE ri.RecipeID = ?
-       ORDER BY ri.OrderIndex`, [recipeId]
+      `SELECT i.name, ri.quantity, ri.orderIndex
+       FROM recipeIngredients ri
+       JOIN ingredients i ON ri.ingredientID = i.ingredientID
+       WHERE ri.recipeId = ?
+       ORDER BY ri.orderIndex`, [recipeId]
     );
     console.log("Ingredients:", ingredients);
     
@@ -37,13 +36,13 @@ async function getRecipeById(recipeId) {
 
     // 3. Get tags
     const [tags] = await db.execute(
-      `SELECT t.Name
-       FROM RecipeTags rt
-       JOIN Tags t ON rt.TagID = t.TagID
-       WHERE rt.RecipeID = ?`, [recipeId]
+      `SELECT t.name
+       FROM recipeTags rt
+       JOIN tags t ON rt.tagId = t.tagId
+       WHERE rt.recipeId = ?`, [recipeId]
     );
 
-    result.tags = tags.map(t => t.Name); // simplify to array of strings
+    result.tags = tags.map(t => t.name); // simplify to array of strings
     console.log("Tags:", result.tags);
     
     return result;
@@ -53,15 +52,15 @@ async function getRecipeById(recipeId) {
     throw err;
   } 
 }
-async function GetAllRecipes(limit, offset) {
+async function getAllRecipes(limit, offset) {
   try {
     const db = await dbPromise;
     const query = `
-      SELECT r.RecipeID, r.Title, r.ImageURL,r.Category,r.Description,u.UserName,t.Name
+      SELECT r.recipeId, r.title, r.imageURL,r.category,r.description,u.userName,t.name
       FROM recipes r
-      JOIN Users u ON r.ChefID = u.UserID
-     LEFT JOIN recipetags p ON r.RecipeID=p.RecipeID
-     LEFT JOIN tags t ON p.TagID =t.TagID 
+      JOIN users u ON r.chefId = u.userId
+     LEFT JOIN recipetags p ON r.recipeId=p.recipeId
+     LEFT JOIN tags t ON p.tagId =t.tagId
       LIMIT ${limit}
       OFFSET ${offset}
     `;
@@ -76,5 +75,5 @@ async function GetAllRecipes(limit, offset) {
 }
 module.exports = {
     getRecipeById,
-    GetAllRecipes
+    getAllRecipes
 };

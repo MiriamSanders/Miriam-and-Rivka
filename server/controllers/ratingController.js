@@ -1,4 +1,4 @@
-const ratingsDA =require( "../services/ratingsDA");
+const ratingsService =require( "../services/ratingsService");
 exports.postRatings = async (req, res) => {
   const { userId, recipeId, rating } = req.body;
 
@@ -7,7 +7,7 @@ exports.postRatings = async (req, res) => {
   }
 
   try {
-    await ratingsDA.postRatings(recipeId, rating,userId);
+    await ratingsService.postRatings(recipeId, rating,userId);
     res.status(201).json({ message: 'Rating added successfully' });
   } catch (error) {
     console.error('Error adding rating:', error);
@@ -20,7 +20,7 @@ exports.getRatings = async (req, res) => {
         return res.status(400).json({ error: "Recipe ID is required" });
     }
     try {
-        const rating = await ratingsDA.getRatings(recipeId);
+        const rating = await ratingsService.getRatings(recipeId);
         res.json({ averageRating: rating });
     } catch (error) {
         console.error("Error fetching ratings:", error);

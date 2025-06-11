@@ -1,14 +1,13 @@
-const GenericDA = require('../services/GenericDA');
-const articlesDA = require('../services/articlesDA');
+const articlesService = require('../services/articlesService');
 
 exports.getAllArticles = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-       const page= parseInt(req.query.page) || 0;
-        const offset = page * limit-limit;
+    const page = parseInt(req.query.page) || 0;
+    const offset = page * limit - limit;
 
-    const articles = await articlesDA.articleGetAll(limit, offset );
-console.log(articles);
+    const articles = await articlesService.articleGetAll(limit, offset);
+    console.log(articles);
 
     if (!articles || articles.length === 0) {
       return res.json([]);
@@ -27,7 +26,7 @@ exports.getArticleById = async (req, res) => {
   }
 
   try {
-    const article = await articlesDA.getArticleById(articleId);
+    const article = await articlesService.getArticleById(articleId);
     if (!article || article.length === 0) {
       return res.status(404).json({ error: 'Article not found' });
     }

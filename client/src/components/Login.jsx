@@ -5,7 +5,7 @@ import { postRequest } from "../Requests";
 
 function Login({ setUserType }) {
     const [form, setForm] = useState({
-        username: "",
+        userName: "",
         password: ""
     });
     const navigate = useNavigate();
@@ -38,7 +38,7 @@ function Login({ setUserType }) {
                 <input
                     type="text"
                     name="username"
-                    value={form.username}
+                    value={form.userName}
                     onChange={handleChange}
                     required
                 />

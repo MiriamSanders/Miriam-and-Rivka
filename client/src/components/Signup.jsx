@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate for naviga
 
 function Signup({ setUserType }) {
     const [form, setForm] = useState({
-        username: "",
+        userName: "",
         email: "",
         password: ""
     });
@@ -19,8 +19,8 @@ function Signup({ setUserType }) {
         const requestResult = await postRequest("auth/register", form);
         if (requestResult.succeeded) {
             alert("Account created successfully!");
-             setUserType(requestResult.data.UserType);
-             localStorage.setItem("CurrentUser", JSON.stringify(requestResult.data))
+             setUserType(requestResult.data.userType);
+             localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
             // Assuming the user type is "user" after signup
             navigate("/"); // Redirect to login page after successful signup
             // Optionally redirect to login or home page
@@ -37,8 +37,8 @@ function Signup({ setUserType }) {
                 <label>User Name</label>
                 <input
                     type="text"
-                    name="username"
-                    value={form.username}
+                    name="userName"
+                    value={form.userName}
                     onChange={handleChange}
                     required
                 />

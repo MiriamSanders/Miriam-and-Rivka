@@ -12,16 +12,20 @@ function Recipes({createMenu}) {
   const limit = 10;
 
   const getRecipes = async () => {
-    const requestResult = await getRequest(`recipes?limit=${limit}&page=${page}`);
-    if (requestResult.succeeded) {
-      const newRecipes = requestResult.data;
-      console.log(newRecipes);
+    try{
+    const response = await fetch(`http://localhost:3001/recipes?limit=${limit}&page=${page}`);
+    if (response.ok) {
+       const data = await response.json();
+      const newRecipes = data;
       if (newRecipes.length < limit) {
         setHasMore(false);
       }
       setRecipes((prev) => [...prev, ...newRecipes]); 
     } else {
-      console.log(requestResult.error);
+      throw new Error("EEROR:"+response.Error)
+    }}
+    catch(err){
+console.log(err);
     }
   };
  const openRecipePage = (e) => {
@@ -45,8 +49,8 @@ function Recipes({createMenu}) {
           <p className="no-recipes">No recipes found available</p>
         ) : (
           recipes.map((recipe) => (
-            <div key={recipe.RecipeID} name={recipe.RecipeID} className="recipe-card" onClick={openRecipePage}>
-              <div className="recipe-image" style={{ backgroundImage: `url(${recipe.ImageURL})` }}>
+            <div key={recipe.recipeId} name={recipe.recipeId} className="recipe-card" onClick={openRecipePage}>
+              <div className="recipe-image" style={{ backgroundImage: `url(${recipe.imageURL})` }}>
                  {createMenu && (
                     <button className="add-to-menu-button" onClick={(e) => {
                       e.stopPropagation(); // Prevent triggering the recipe click
@@ -55,9 +59,9 @@ function Recipes({createMenu}) {
                     </button>
                   )}
                 <div className="recipe-overlay">
-                  <h2>{recipe.Title}</h2>
-                  <p>{recipe.Description}</p>
-                  <p>tag:{recipe.Name}</p>
+                  <h2>{recipe.title}</h2>
+                  <p>{recipe.description}</p>
+                  <p>tag:{recipe.name}</p>
                 </div>
               </div>
             </div>

@@ -93,25 +93,29 @@ const RecipeDiscussion = ({ recipeId }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            CommentText: newComment,
-            UserID: currentUser.id,
-            RecipeID: recipeId
+            commentText: newComment,
+            userId: currentUser.id,
+            recipeId: recipeId
           }),
         });
         const data = await response.json();
         if(response.ok){
         setComments([...comments, {
-          CommentID: data, CommentText: newComment,
-          UserName: currentUser.username
+          commentId: data, commentText: newComment,
+          userName: currentUser.userName
         }])}
-        else{
-          throw new Error("Error add comments:")
-        };
+        else if(response.status==401){
+          throw new Error("you are not connected try login again")
+        }else{
+           throw new Error("server error")
+        }
       } catch (err) {
         console.error("Error add comments:", err);
       } finally {
         setNewComment("");
       }
+    }else{
+console.log("you have to be connected to comment");
     }
   };
 
@@ -121,8 +125,8 @@ const RecipeDiscussion = ({ recipeId }) => {
 
       <div ref={commentsRef} className="comments-list">
         {comments.map((comment) => (
-          <div key={comment.CommentID} className="comment">
-            <strong>{comment.UserName}:</strong> <span>{comment.CommentText}</span>
+          <div key={comment.commentId} className="comment">
+            <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
           </div>
         ))}
 

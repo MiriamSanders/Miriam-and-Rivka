@@ -48,10 +48,10 @@ const openArticle = (e) => {
           <p className="no-articles">No articles found available</p>
         ) : (
           articles.map((article) => (
-            <div key={article.ArticleID} className="article-card" data-article-id={article.ArticleID} onClick={openArticle}>
+            <div key={article.articleId} className="article-card" data-article-id={article.articleId} onClick={openArticle}>
                 <div className="article-overlay">
-                  <h2>{article.Title}</h2>
-                  <p>Written by:{article.UserName}</p>
+                  <h2>{article.title}</h2>
+                  <p>Written by:{article.userName}</p>
                 </div>
               </div>
           ))

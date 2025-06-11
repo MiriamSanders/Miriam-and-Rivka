@@ -1,13 +1,13 @@
 const e = require('express');
-const GenericDA = require('../services/GenericDA');
-const RecipeDA = require('../services/recipeDA');
+const genericService = require('../services/genericService');
+const recipeService = require('../services/recipesService');
 exports.getAllRecipes = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 0;
     console.log(limit, page);
-    const offset = page * limit-limit;
-    const recipes = await RecipeDA.GetAllRecipes(limit,offset)
+    const offset = page * limit - limit;
+    const recipes = await recipeService.getAllRecipes(limit, offset)
     res.json(recipes);
   } catch (error) {
     console.error('Error fetching recipes:', error);
@@ -23,7 +23,7 @@ exports.getRecipeById = async (req, res) => {
 
   try {
     console.log('Fetching recipe with ID:', recipeId)
-    const recipe = await RecipeDA.getRecipeById(recipeId);
+    const recipe = await recipeService.getRecipeById(recipeId);
     if (!recipe) {
       return res.status(404).json({ error: 'Recipe not found' });
     }
@@ -37,40 +37,40 @@ exports.getRecipeById = async (req, res) => {
 //לפרק לפונקיציות קטנות יותר
 exports.createRecipe = async (req, res) => {
   const {
-    ChefID,
-    Title,
-    Description,
-    ImageURL,
-    Instructions,
-    PrepTimeMinutes,
-    Difficulty,
-    Category,
-    DishType,
+    chefId,
+    title,
+    description,
+    imageURL,
+    instructions,
+    prepTimeMinutes,
+    difficulty,
+    chefIdategory,
+    dishType,
     ingredients,
     tags
   } = req.body;
 
   // Validate required fields
-  if (!ChefID || !Title || !ImageURL || !Category || !Description) {
-    return res.status(400).json({ error: 'ChefID, Title, ImageURL, Category, and Description are required' });
+  if (!chefId || !title || !imageURL || !category || !description) {
+    return res.status(400).json({ error: 'chefId, title, imageURL, category, and description are required' });
   }
 
   try {
     // First, create the recipe
     const recipeData = {
-      ChefID,
-      Title,
-      Description,
-      ImageURL,
-      Instructions,
-      PrepTimeMinutes: PrepTimeMinutes || null,
-      Difficulty: Difficulty || 'Easy',
-      Category,
-      DishType
+      chefId,
+      title,
+      description,
+      imageURL,
+      instructions,
+      prepTimeMinutes: prepTimeMinutes || null,
+      difficulty: difficulty || 'Easy',
+      category,
+      dishType
     };
 
-    const newRecipe = await GenericDA.GenericPost('Recipes', recipeData, 'RecipeID');
-    const recipeId = newRecipe.RecipeID;
+    const newRecipe = await genericService.genericPost('Recipes', recipeData, 'recipeId');
+    const recipeId = newRecipe.recipeId;
 
     // Handle ingredients if provided
     if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
@@ -87,7 +87,7 @@ exports.createRecipe = async (req, res) => {
               try {
                 // Try to find existing ingredient by name (case-insensitive)
                 const searchResult = await GenericDA.GenericGet('Ingredients', "Name", ingredientName);
-                 // Assuming GenericGet returns an array
+                // Assuming GenericGet returns an array
                 existingIngredient = searchResult[0];
               } catch (error) {
                 // Ingredient doesn't exist, create it
@@ -99,18 +99,18 @@ exports.createRecipe = async (req, res) => {
                   FatPer100g: null,
                   FiberPer100g: null
                 };
-                existingIngredient = await GenericDA.GenericPost('Ingredients', newIngredientData, 'IngredientID');
+                existingIngredient = await genericService.genericPost('ingredients', newIngredientData, 'ingredientId');
                 console.log(newIngredientData);
               }
               // Link the ingredient to the recipe
               const recipeIngredientData = {
-                RecipeID: recipeId,
-                IngredientID: existingIngredient.IngredientID,
-                Quantity: quantity,
-                OrderIndex: i + 1
+                recipeId: recipeId,
+                ingredientId: existingIngredient.ingredientId,
+                quantity: quantity,
+                orderIndex: i + 1
               };
 
-              await GenericDA.GenericPost('RecipeIngredients', recipeIngredientData, 'RecipeID');
+              await genericService.genericPost('recipeIngredients', recipeIngredientData, 'recipeId');
             } catch (error) {
               console.error(`Error processing ingredient "${ingredientText}":`, error);
               // Continue with other ingredients even if one fails
@@ -127,23 +127,23 @@ exports.createRecipe = async (req, res) => {
         if (tagName) {
           // First, find or create the tag
           let existingTag;
-         
-            existingTag = await GenericDA.GenericGet('Tags', "Name", tagName);
-          if(!existingTag){
+
+          existingTag = await genericService.genericGet('tags', "name", tagName);
+          if (!existingTag) {
             // Tag doesn't exist, create it
-            existingTag = await GenericDA.GenericPost('Tags', { Name: tagName }, 'TagID');
+            existingTag = await genericService.genericPost('tags', { name: tagName }, 'tagId');
           }
-         // console.log(`Linking recipe ${recipeId} to tag ${existingTag.TagID} (${tagName})`);
+          // console.log(`Linking recipe ${recipeId} to tag ${existingTag.TagID} (${tagName})`);
           //existingTag = existingTag[0]; // Assuming GenericGet returns an array
           console.log(existingTag);
-          
+
           // Then link the recipe to the tag
           const recipeTagData = {
-            RecipeID: recipeId,
-            TagID: existingTag.TagID
+            recipeId: recipeId,
+            tagId: existingTag.tagId
           };
 
-          await GenericDA.GenericPost('RecipeTags', recipeTagData, 'RecipeID');
+          await genericService.genericPost('recipeTags', recipeTagData, 'recipeId');
         }
       }
     }

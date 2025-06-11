@@ -28,21 +28,21 @@ const RecipePage = () => {
 
   if (loading) return <div className="center-text">Loading...</div>;
   if (!recipeData) return <div className="center-text">Recipe not found.</div>;
- const { Title, Subtitle, ChefName, PrepTimeMinutes, Difficulty, Category, Description, Instructions, ImageURL,ingredientsList } = recipeData.recipe || {};
+ const { title, subtitle, chefName, prepTimeMinutes, difficulty, category, description, instructions, imageURL,ingredientsList } = recipeData.recipe || {};
   const ingredients = recipeData.ingredients || [];
   const tags = recipeData.tags || [];
 console.log("Recipe Data:", recipeData); // Debugging line to check the fetched data
   return (
     <div className="recipe-container">
-      <h1 className="recipe-title">{Title}</h1>
-      <h2 className="recipe-subtitle">{Subtitle}</h2>
-      <p className="recipe-subtext">By: {ChefName}</p>
+      <h1 className="recipe-title">{title}</h1>
+      <h2 className="recipe-subtitle">{subtitle}</h2>
+      <p className="recipe-subtext">By: {chefName}</p>
       <p className="recipe-subtext">
-        Prep Time: {PrepTimeMinutes} min · Difficulty: {Difficulty} · Category: {Category}
+        Prep Time: {prepTimeMinutes} min · Difficulty: {difficulty} · Category: {category}
       </p>
 <RecipeReader recipeData={recipeData} />
-      {ImageURL ? (
-        <img src={ImageURL} alt={Title} className="recipe-image-style" />
+      {imageURL ? (
+        <img src={imageURL} alt={title} className="recipe-image-style" />
       ) : (
         <div className="image-placeholder">
           <div className="shapes">
@@ -56,35 +56,35 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
       <div className="recipe-content">
         <section>
           <h2 className="section-title">Description</h2>
-          <p>{Description}</p>
+          <p>{description}</p>
         </section>
 
            <section>
           <h2 className="section-title">Ingredients</h2>
           <ul className="ingredients-list">
             {Array.isArray(ingredients) ? (
-              ingredients.map((item, idx) => (
-                <li key={idx}>
-                  {item.Quantity} {item.Name}
+              ingredients.map((item, index) => (
+                <li key={index}>
+                  {item.Quantity} {item.name}
                 </li>
               ))
             ) : (
-              ingredientsList.map((item, idx) => (
-                <li key={idx}>{item.trim()}</li>
+              ingredientsList.map((item, index) => (
+                <li key={index}>{item.trim()}</li>
               ))
             )}
           </ul>
         </section>
           <section>
           <h2 className="section-title">Instructions</h2>
-          <p className="instructions">{Instructions}</p>
+          <p className="instructions">{instructions}</p>
         </section>
 
         <section>
           <h2 className="section-title">Tags</h2>
           <div className="tags-container">
-            {tags.map((tag, idx) => (
-              <span key={idx} className="tag">#{tag}</span>
+            {tags.map((tag,index) => (
+              <span key={index} className="tag">#{tag}</span>
             ))}
           </div>
         </section>

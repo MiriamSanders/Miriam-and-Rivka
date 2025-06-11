@@ -93,16 +93,16 @@ const ArticleDiscussion = ({ articleId }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            CommentText: newComment,
-            UserID: currentUser.id,
-            ArticleID: articleId
+            commentText: newComment,
+            userId: currentUser.id,
+            articleId: articleId
           }),
         });
         const data = await response.json();
         if(response.ok){
         setComments([...comments, {
-          CommentID: data, CommentText: newComment,
-          UserName: currentUser.username
+          commentId: data, commentText: newComment,
+          userName: currentUser.userName
         }])}
         else{
           throw new Error("Error add comments:")
@@ -121,8 +121,8 @@ const ArticleDiscussion = ({ articleId }) => {
 
       <div ref={commentsRef} className="comments-list">
         {comments.map((comment) => (
-          <div key={comment.CommentID} className="comment">
-            <strong>{comment.UserName}:</strong> <span>{comment.CommentText}</span>
+          <div key={comment.commentId} className="comment">
+            <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
           </div>
         ))}
 

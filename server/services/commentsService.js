@@ -1,14 +1,14 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require("./dbConnection"); 
-async function GetRecipeComments(recipeId, limit, offset) {
+async function getRecipeComments(recipeId, limit, offset) {
   try {
     const db = await dbPromise;
 
     const query = `
-      SELECT c.CommentID, u.UserName, c.CommentText
+      SELECT c.commentId, u.userName, c.commentText
       FROM comments c
-      JOIN Users u ON c.UserID = u.UserID
-      WHERE c.RecipeID = ?
+      JOIN users u ON c.userId = u.userId
+      WHERE c.recipeId = ?
       LIMIT ${limit}
       OFFSET ${offset}
     `;
@@ -21,20 +21,20 @@ async function GetRecipeComments(recipeId, limit, offset) {
     throw error;
   }
 }
-async function GetArticleComments(ArticleId, limit, offset) {
+async function getArticleComments(articleId, limit, offset) {
   try {
     const db = await dbPromise;
 
     const query = `
-      SELECT c.CommentID, u.UserName, c.CommentText
+      SELECT c.commentId, u.userName, c.commentText
       FROM articlecomments c
-      JOIN Users u ON c.UserID = u.UserID
-      WHERE c.ArticleID = ?
+      JOIN users u ON c.userId = u.userId
+      WHERE c.articleId = ?
       LIMIT ${limit}
       OFFSET ${offset}
     `;
 
-    const [rows] = await db.execute(query, [ArticleId]);
+    const [rows] = await db.execute(query, [articleId]);
     return rows;
 
   } catch (error) {
@@ -42,15 +42,15 @@ async function GetArticleComments(ArticleId, limit, offset) {
     throw error;
   }
 }
-async function postRecipeComments(recipeId, userID, commentText) {
+async function postRecipeComments(recipeId, userId, commentText) {
     try {
         const db = await dbPromise;
 
         const insertQuery = `
-            INSERT INTO Comments (RecipeID, UserID, CommentText)
+            INSERT INTO comments (recipeID, userId, commentText)
             VALUES (?, ?, ?)
         `;
-        const [insertResult] = await db.execute(insertQuery, [recipeId, userID, commentText]);
+        const [insertResult] = await db.execute(insertQuery, [recipeId, userId, commentText]);
 
         const insertedId = insertResult.insertId;
 
@@ -65,15 +65,15 @@ async function postRecipeComments(recipeId, userID, commentText) {
         throw error;
     }
 }
-async function postArticleComments(ArticleId, userID, commentText) {
+async function postArticleComments(articleId, userId, commentText) {
     try {
         const db = await dbPromise;
 
         const insertQuery = `
-            INSERT INTO articlecomments (ArticleID, UserID, CommentText)
+            INSERT INTO articlecomments (articleId, userId, commentText)
             VALUES (?, ?, ?)
         `;
-        const [insertResult] = await db.execute(insertQuery, [ArticleId, userID, commentText]);
+        const [insertResult] = await db.execute(insertQuery, [articleId, userId, commentText]);
 
         const insertedId = insertResult.insertId;
 
@@ -88,8 +88,8 @@ async function postArticleComments(ArticleId, userID, commentText) {
 }
 
 module.exports = {
- GetRecipeComments,
- GetArticleComments,
+ getRecipeComments,
+ getArticleComments,
  postRecipeComments,
  postArticleComments
 };

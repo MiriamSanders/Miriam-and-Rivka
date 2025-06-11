@@ -32,14 +32,14 @@ const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addA
 
 const AddRecipe = () => {
   const [recipe, setRecipe] = useState({
-    Title: '', // Changed from 'name' // Changed from 'chef' - this should be a number/ID
-    Description: '', 
-    ImageURL: '', // Changed from 'image'
-    PrepTimeMinutes: '', // Changed from 'prepTime'
-    Difficulty: 'Easy', // Changed from 'difficulty'
-    Category: '', // Changed from 'category'
-    DishType: '', // Changed from 'dishType'
-    Instructions: '', // Changed from 'instructions'
+    title: '', // Changed from 'name' // Changed from 'chef' - this should be a number/ID
+    description: '', 
+    imageURL: '', // Changed from 'image'
+    prepTimeMinutes: '', // Changed from 'prepTime'
+    difficulty: 'Easy', // Changed from 'difficulty'
+    category: '', // Changed from 'category'
+    dishType: '', // Changed from 'dishType'
+    instructions: '', // Changed from 'instructions'
     ingredients: [''], // Keep for ingredients handling
     tags: [''] // Keep for tags handling
   });
@@ -55,14 +55,14 @@ const AddRecipe = () => {
       const parsedRecipe = parseRecipeDocument(text);
       // Map parsed recipe to correct field names
       setRecipe({
-        Title: parsedRecipe.name || '',
-        Description: parsedRecipe.description || '',
-        ImageURL: parsedRecipe.image || '',
-        PrepTimeMinutes: parsedRecipe.prepTime || '',
-        Difficulty: parsedRecipe.difficulty || 'Easy',
-        Category: parsedRecipe.category || '',
-        DishType: parsedRecipe.dishType || '',
-        Instructions: parsedRecipe.instructions || '',
+        title: parsedRecipe.name || '',
+        description: parsedRecipe.description || '',
+        imageURL: parsedRecipe.image || '',
+        prepTimeMinutes: parsedRecipe.prepTime || '',
+        difficulty: parsedRecipe.difficulty || 'Easy',
+        category: parsedRecipe.category || '',
+        dishType: parsedRecipe.dishType || '',
+        instructions: parsedRecipe.instructions || '',
         ingredients: parsedRecipe.ingredients || [''],
         tags: parsedRecipe.tags || ['']
       });
@@ -99,34 +99,34 @@ const AddRecipe = () => {
   };
 
   const saveRecipe = () => {
-    if (!recipe.Title.trim()) {
+    if (!recipe.title.trim()) {
       alert('Please enter a recipe title');
       return;
     }
-    if (!recipe.Category) {
+    if (!recipe.category) {
       alert('Please select a category');
       return;
     }
-    if (!recipe.ImageURL.trim()) {
+    if (!recipe.imageURL.trim()) {
       alert('Please enter an image URL');
       return;
     }
-    if (!recipe.Description.trim()) {
+    if (!recipe.description.trim()) {
       alert('Please enter a description');
       return;
     }
 
     // Prepare the recipe data for the backend
     const cleanRecipe = {
-      ChefID: JSON.parse(localStorage.getItem("CurrentUser")).id, // Ensure it's a number
-      Title: recipe.Title,
-      Description: recipe.Description,
-      ImageURL: recipe.ImageURL,
-      Instructions: recipe.Instructions,
-      PrepTimeMinutes: recipe.PrepTimeMinutes ? parseInt(recipe.PrepTimeMinutes) : null,
-      Difficulty: recipe.Difficulty,
-      Category: recipe.Category,
-      DishType: recipe.DishType,
+      chefID: JSON.parse(localStorage.getItem("CurrentUser")).id, // Ensure it's a number
+      title: recipe.title,
+      description: recipe.description,
+      imageURL: recipe.imageURL,
+      instructions: recipe.instructions,
+      prepTimeMinutes: recipe.prepTimeMinutes ? parseInt(recipe.prepTimeMinutes) : null,
+      difficulty: recipe.difficulty,
+      category: recipe.category,
+      dishType: recipe.dishType,
       // Note: ingredients and tags will need separate handling since they're in different tables
       ingredients: recipe.ingredients.filter(item => item.trim()),
       tags: recipe.tags.filter(item => item.trim())
@@ -139,14 +139,14 @@ const AddRecipe = () => {
     
     // Reset form
     setRecipe({
-      Title: '',
-      Description: '',
-      ImageURL: '',
-      PrepTimeMinutes: '',
-      Difficulty: 'Easy',
-      Category: '',
-      DishType: '',
-      Instructions: '',
+      title: '',
+      description: '',
+      imageURL: '',
+      prepTimeMinutes: '',
+      difficulty: 'Easy',
+      category: '',
+      dishType: '',
+      instructions: '',
       ingredients: [''],
       tags: ['']
     });
@@ -181,7 +181,7 @@ const AddRecipe = () => {
             <label className="label">Recipe Title:</label>
             <input 
               type="text" 
-              value={recipe.Title} 
+              value={recipe.title} 
               onChange={(e) => handleInputChange('Title', e.target.value)} 
               placeholder="Enter recipe title" 
               className="input" 
@@ -190,7 +190,7 @@ const AddRecipe = () => {
           <div className="form-group">
             <label className="label">Description:</label>
             <textarea 
-              value={recipe.Description} 
+              value={recipe.description} 
               onChange={(e) => handleInputChange('Description', e.target.value)} 
               placeholder="Brief description of the dish" 
               className="textarea" 
@@ -216,7 +216,7 @@ const AddRecipe = () => {
             </label>
             <input 
               type="number" 
-              value={recipe.PrepTimeMinutes} 
+              value={recipe.prepTimeMinutes} 
               onChange={(e) => handleInputChange('PrepTimeMinutes', e.target.value)} 
               placeholder="e.g., 30" 
               className="input" 
@@ -227,7 +227,7 @@ const AddRecipe = () => {
               <Star size={16} className="inline-icon" /> Difficulty:
             </label>
             <select 
-              value={recipe.Difficulty} 
+              value={recipe.difficulty} 
               onChange={(e) => handleInputChange('Difficulty', e.target.value)} 
               className="select"
             >
@@ -239,7 +239,7 @@ const AddRecipe = () => {
           <div className="form-group">
             <label className="label">Category:</label>
             <select 
-              value={recipe.Category} 
+              value={recipe.category} 
               onChange={(e) => handleInputChange('Category', e.target.value)} 
               className="select"
             >
@@ -252,7 +252,7 @@ const AddRecipe = () => {
           <div className="form-group">
             <label className="label">Dish Type:</label>
             <select 
-              value={recipe.DishType} 
+              value={recipe.dishType} 
               onChange={(e) => handleInputChange('DishType', e.target.value)} 
               className="select"
             >
@@ -280,7 +280,7 @@ const AddRecipe = () => {
         <div className="form-group">
           <label className="label">Instructions:</label>
           <textarea 
-            value={recipe.Instructions} 
+            value={recipe.instructions} 
             onChange={(e) => handleInputChange('Instructions', e.target.value)} 
             placeholder="Write step-by-step instructions here..." 
             className="textarea instructions-textarea" 
