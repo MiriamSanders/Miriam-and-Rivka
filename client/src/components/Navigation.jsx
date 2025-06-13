@@ -16,7 +16,6 @@ const navOptions = {
     { path: "/logout", label: "Logout", isLogout: true },
   ],
   regular: [
-    { path: "/personal-area", label: "Personal Area" },
     { path: "/personal-area/menus", label: "My Menus" },
   ],
   chef: [
@@ -37,6 +36,7 @@ function Navigation({ userType = "guest", onLogout }) {
     // For demo purposes, using a mock check
     setIsLoggedIn(userType !== "guest");
   }, [userType]);
+  //listin to local storage change,
 
   const handleLogout = () => {
     // In your actual app, add:
@@ -54,10 +54,10 @@ function Navigation({ userType = "guest", onLogout }) {
   let links = [...navOptions.guest];
   
   // Add user-specific links if logged in
-  if (isLoggedIn && (userType === "Regular" || userType === "Chef")) {
+  if (isLoggedIn && (userType === "regular" || userType === "chef")) {
     links = links.concat(navOptions.regular);
   }
-  if (isLoggedIn && userType === "Chef") {
+  if (isLoggedIn && userType === "chef") {
     links = links.concat(navOptions.chef);
   }
   

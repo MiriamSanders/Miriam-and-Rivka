@@ -11,7 +11,7 @@ exports.registerUser = async (req, res) => {
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const userData = { userName: userName, email: email, userType: 'regular' };
+        const userData = { userName: userName, email: email, userType: 1 }; // Default userType to 1 (regular user)
 
         const newUser = await genericService.genericPost('users', userData);
         if (!newUser) {
@@ -19,9 +19,13 @@ exports.registerUser = async (req, res) => {
         }
         // Store the hashed password in the database
         await genericService.genericPost('passwords', { userId: newUser.userId, passwordHash: hashedPassword });
+        //need to change- 
+        let userType=await genericService.genericGet('roles',"roleId", newUser.userType);
+        userType=userType[0];
+        console.log(userType);
         // צור טוקן JWT
         const token = jwt.sign(
-            { id: newUser.userId, userName: newUser.userName, userType: newUser.userType },
+            { id: newUser.userId, userName: newUser.userName, userType: userType.roleName },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -33,7 +37,7 @@ exports.registerUser = async (req, res) => {
             sameSite: "Lax",
             maxAge: 1000 * 60 * 60
         });
-        res.status(201).json({ id: newUser.userId, userName: newUser.userName, userType: newUser.userType });
+        res.status(201).json({ id: newUser.userId, userName: newUser.userName, userType: userType.roleName });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -58,9 +62,10 @@ exports.loginUser = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
-
+        console.log(user);
+        
         const token = jwt.sign(
-            { id: user.userId, userName: user.userName, userType: user.userType },
+            { id: user.userId, userName: user.userName, userType: user.roleName },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -72,7 +77,7 @@ exports.loginUser = async (req, res) => {
             maxAge: 1000 * 60 * 60 // שעה
         });
 
-        res.status(201).json({ id: user.userId, userName: user.userName, userType: user.userType });
+        res.status(201).json({ id: user.userId, userName: user.userName, userType: user.roleName });
 
 
     } catch (error) {

@@ -1,4 +1,5 @@
 const articlesService = require('../services/articlesService');
+const genericService=require('../services/genericService');
 
 exports.getAllArticles = async (req, res) => {
   try {
@@ -37,3 +38,13 @@ exports.getArticleById = async (req, res) => {
   }
 };
 
+exports.postArticle= async(req,res)=>{
+   try{ const data=req.body;
+    const articleResult=await genericService.genericPost("articles",data,"articleId");
+     res.status(201).json(articleResult);
+  }
+    catch(error){
+      res.status(500).json({error:"internal server error"});
+    }
+
+}

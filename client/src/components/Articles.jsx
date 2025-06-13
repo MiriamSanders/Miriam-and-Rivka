@@ -8,7 +8,7 @@ function Articles() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
-  const limit = 6;
+  const limit = 8;
 
   const getArticles = async () => {
     const requestResult = await getRequest(`articles?limit=${limit}&page=${page}`);

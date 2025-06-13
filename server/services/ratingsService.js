@@ -36,6 +36,7 @@ async function postRatings(recipeId, rating, userId) {
         );
     }
 }
+
 module.exports = {
     getRatings,
     postRatings

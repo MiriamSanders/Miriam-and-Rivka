@@ -13,8 +13,8 @@ const insertSampleData = async () => {
         // 1. Insert Roles
         await connection.execute(`
             INSERT INTO roles (roleName) VALUES 
-            ('Chef'),
-            ('Regular User'),
+            ('regular'),
+            ('chef'),
             ('Admin'),
             ('Food Critic')
         `);

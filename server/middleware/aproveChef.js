@@ -1,12 +1,6 @@
-const express = require('express');
+
 const nodemailer = require('nodemailer');
-const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// ✅ Correct createTransport usage
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,

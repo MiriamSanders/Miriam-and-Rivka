@@ -52,42 +52,38 @@ async function genericGet(table, fieldName, fieldValue, limit, offset) {
 //     }
 // }
 
-// async function GenericGetAll(table, limit, offset, columns = []) {
-//     try {
-//         const db = await dbPromise;
+async function genericGetAll(table, limit, offset) {
+    try {
+        const db = await dbPromise;     
+        let query = `SELECT * FROM ??`;
+        const params = [table];
 
-//         const columnsPart = (Array.isArray(columns) && columns.length > 0)
-//             ? columns.map(col => `\`${col}\``).join(', ')
-//             : '*';
-//         let query = `SELECT ${columnsPart} FROM ??`;
-//         const params = [table];
+        if (limit) {
+            query += ` LIMIT ?`;
+            params.push(limit);
+        }
 
-//         if (limit) {
-//             query += ` LIMIT ?`;
-//             params.push(limit);
-//         }
+        if (offset) {
+            query += ` OFFSET ?`;
+            params.push(offset);
+        }
+        console.log(query, params);
 
-//         if (offset) {
-//             query += ` OFFSET ?`;
-//             params.push(offset);
-//         }
-//         console.log(query, params);
+        const [rows] = await db.execute(mysql.format(query, params));
 
-//         const [rows] = await db.execute(mysql.format(query, params));
-
-//         return rows;
-//     } catch (error) {
-//         console.error('Error fetching all data:', error);
-//         throw error;
-//     }
-// }
+        return rows;
+    } catch (error) {
+        console.error('Error fetching all data:', error);
+        throw error;
+    }
+}
 
 async function genericPost(table, data, returnId = "userId") {
     try {
         const db = await dbPromise;
         const insertQuery = mysql.format(`INSERT INTO ?? SET ?`, [table, data]);
         console.log(insertQuery);
-        
+
         const [insertResult] = await db.execute(insertQuery);
         console.log(data);
 
@@ -97,9 +93,9 @@ async function genericPost(table, data, returnId = "userId") {
             const [rows] = await db.execute(selectQuery);
             return rows[0] || null;
         } else if (data[returnId]) {
-           
+
             const idQuery = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [table, returnId, data[returnId]]);
-             console.log(idQuery)
+            console.log(idQuery)
             const [rows] = await db.execute(idQuery);
             if (rows.length === 0) throw new Error('No record found for the given ID');
             return rows[0];
@@ -110,7 +106,7 @@ async function genericPost(table, data, returnId = "userId") {
         console.error('Error inserting data:', error);
         throw error;
     }
-}
+};
 
 // async function GenericPut(table, id, data) {
 //     try {
@@ -173,4 +169,4 @@ async function genericPost(table, data, returnId = "userId") {
 //     const logQuery = mysql.format(`INSERT INTO logs SET ?`, [data]);
 //     await db.execute(logQuery);
 // }
-module.exports = {genericGet, genericPost};
+module.exports = { genericGet, genericPost,genericGetAll };

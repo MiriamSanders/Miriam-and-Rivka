@@ -21,7 +21,7 @@ function Login({ setUserType }) {
             console.log(requestResult.data)
 
             setUserType(requestResult.data.userType);// Assuming the user type is "user" after login
-            localStorage.setItem("CurrentUser", JSON.stringify(requestResult.data))
+            localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
             navigate("/");
             // Optionally redirect to login or home page
         } else {
@@ -37,7 +37,7 @@ function Login({ setUserType }) {
                 <label>User Name</label>
                 <input
                     type="text"
-                    name="username"
+                    name="userName"
                     value={form.userName}
                     onChange={handleChange}
                     required

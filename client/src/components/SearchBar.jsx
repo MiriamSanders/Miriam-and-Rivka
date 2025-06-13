@@ -45,7 +45,7 @@ export default function SearchFilterBar() {
   };
 
   return (
-    <div className="container">
+    <div className="search-container" >
       <div className="searchContainer">
         <div className="relative">
           <Search className="searchIcon" />
@@ -170,10 +170,6 @@ export default function SearchFilterBar() {
           ))}
         </div>
       )}
-
-      <div className="resultsSummary">
-        Showing results for your search and filter criteria
-      </div>
     </div>
   );
 }
