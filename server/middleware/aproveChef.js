@@ -43,17 +43,17 @@ const joinReq = async (info) => {
       <p><strong>Style:</strong> ${style || 'N/A'}</p>
       <p><strong>Additional Info:</strong> ${additionalInfo || 'N/A'}</p>
       
-      <div style="margin: 20px 0;">
-        <a href="${approveUrl}" 
-           style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
-          ✅ APPROVE
-        </a>
-        
-        <a href="${rejectUrl}" 
-           style="background-color: #f44336; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
-          ❌ REJECT
-        </a>
-      </div>
+     <div style="margin: 20px 0;">
+  <a href="${approveUrl}" 
+     style="background-color: #000000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-right: 12px; font-weight: 500; border: 1px solid #000000; transition: all 0.2s ease;">
+    APPROVE
+  </a>
+  
+  <a href="${rejectUrl}" 
+     style="background-color: transparent; color: #000000; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500; border: 1px solid #e5e5e5;">
+    REJECT
+  </a>
+</div>
     `;
     
     await transporter.sendMail({
