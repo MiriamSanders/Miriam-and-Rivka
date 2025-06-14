@@ -33,6 +33,7 @@ exports.joinReq = async (req, res) => {
             guid,
             name: userData.userName,
             email: userData.email,
+            imageURL,
             education,
             experienceYears,
             style,
