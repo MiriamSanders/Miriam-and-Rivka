@@ -65,7 +65,7 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
             {Array.isArray(ingredients) ? (
               ingredients.map((item, index) => (
                 <li key={index}>
-                  {item.Quantity} {item.name}
+                  {item.quantity} {item.name}
                 </li>
               ))
             ) : (

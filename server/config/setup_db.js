@@ -178,7 +178,18 @@ const queries = [
     PRIMARY KEY (recipeId, tagId),
     FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE,
     FOREIGN KEY (tagId) REFERENCES tags(tagId) ON DELETE CASCADE
-  )`
+  )`,
+  `CREATE TABLE pending_chef_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  guid VARCHAR(36) UNIQUE NOT NULL,
+  chef_id VARCHAR(255),
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  education TEXT,
+  experience_years INT,
+  style VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);`
 ];
 
 

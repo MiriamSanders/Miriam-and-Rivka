@@ -11,16 +11,13 @@ export default function SearchFilterBar() {
 
   const categories = [
     { value: 'all', label: 'All Categories' },
-    { value: 'products', label: 'Products' },
-    { value: 'services', label: 'Services' },
-    { value: 'articles', label: 'Articles' },
-    { value: 'people', label: 'People' }
+    { value: 'meat', label: 'Meat' },
+    { value: 'parve', label: 'Parve' },
+    { value: 'dairy', label: 'Dairy' }
   ];
 
   const sortOptions = [
-    { value: 'relevance', label: 'Relevance' },
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
+    { value: 'rating', label: 'Rating' },
     { value: 'name-asc', label: 'Name A-Z' },
     { value: 'name-desc', label: 'Name Z-A' }
   ];

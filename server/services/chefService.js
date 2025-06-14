@@ -10,6 +10,19 @@ const dbPromise = require("./dbConnection");
     }
     return chefs[0];
 }
+async function addChef(chefData) {
+    const db = await dbPromise;
+    const query = `INSERT INTO chefs (chefId, imageURL, education, experienceYears, style) VALUES (?, ?, ?, ?, ?)`;
+    const params = [chefData.chefId, chefData.imageURL, chefData.education, chefData.experienceYears, chefData.style];
+    const updateQuery = `UPDATE users SET userType = 2 WHERE userId = ?`;
+    const updateParams = [chefData.chefId];
+    await db.execute(mysql.format(updateQuery, updateParams));
+    const [result] = await db.execute(mysql.format(query, params));
+    console.log("Chef added:", result);
+    return result;
+}
+
 module.exports = {
-    getAllChefs
+    getAllChefs,
+    addChef
 };

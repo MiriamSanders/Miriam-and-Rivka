@@ -28,6 +28,23 @@ async function genericGet(table, fieldName, fieldValue, limit, offset) {
         throw error;
     }
 }
+async function genericGetByColumnName(table, id, column) {
+    try { 
+        const db = await dbPromise;
+        const query = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [ table,column,id,]);
+        console.log(query);
+        const [rows] = await db.execute(query);
+        if (rows.length === 0) {
+            return null;
+        }
+        return rows[0];
+      }
+catch(error) {
+        console.error('Error fetching data by ID:', error);
+        throw error;
+    }
+}
+
 // async function GenericGetIn(table, fieldName, fieldValues, fields = ['*']) {
 //     try {
 //         if (!Array.isArray(fieldValues) || fieldValues.length === 0) {
@@ -126,21 +143,20 @@ async function genericPost(table, data, returnId = "userId") {
 //     }
 // }
 
-// async function GenericDelete(table, id) {
-//     try {
-//         const db = await dbPromise;
-//         const query = mysql.format(` 
-//             UPDATE ?? 
-//             SET is_deleted = 1 
-//             WHERE id = ?
-//         `, [table, id]);
-//         const [result] = await db.execute(query, [table, id]);
-//         return result.affectedRows;
-//     } catch (error) {
-//         console.error('Error deleting data:', error);
-//         throw error;
-//     }
-// }
+async function genericDelete(table, id,fieldName ) {
+    try {
+        const db = await dbPromise;
+        const query = mysql.format(` 
+            DELETE FROM ??
+            WHERE ?? = ?
+        `, [table,fieldName, id]);
+        const [result] = await db.execute(query, [table, id]);
+        return result.affectedRows;
+    } catch (error) {
+        console.error('Error deleting data:', error);
+        throw error;
+    }
+}
 
 // async function CascadeDelete(table, id, foreignKeyTable, foreignKeyColumn) {
 //     try {
@@ -169,4 +185,4 @@ async function genericPost(table, data, returnId = "userId") {
 //     const logQuery = mysql.format(`INSERT INTO logs SET ?`, [data]);
 //     await db.execute(logQuery);
 // }
-module.exports = { genericGet, genericPost,genericGetAll };
+module.exports = { genericGet, genericPost,genericGetAll ,genericGetByColumnName,genericDelete};

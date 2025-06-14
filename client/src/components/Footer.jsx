@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {postRequest} from "../Requests";
 import "../styles/Footer.css";
 
 export default function Footer() {
@@ -24,7 +25,7 @@ export default function Footer() {
     e.preventDefault();
     
     // Validate required fields
-    if (!formData.name || !formData.email || !formData.education || !formData.experienceYears || !formData.style) {
+    if ( !formData.education || !formData.experienceYears || !formData.style) {
       alert('Please fill in all required fields');
       return;
     }
@@ -36,13 +37,13 @@ export default function Footer() {
     }
 
     try {
+      const submitData = {chefId:JSON.parse(localStorage.getItem("currentUser")).id, ...formData};
+      await postRequest('chef-application', submitData);
       // Here you would make your API call to submit the chef application
       console.log('Chef application submitted:', formData);
       
       // Reset form after successful submission
       setFormData({
-        name: '',
-        email: '',
         imageURL: '',
         education: '',
         experienceYears: '',
@@ -68,26 +69,7 @@ export default function Footer() {
         </div>
         
         <form onSubmit={handleSubmit} className="footer-form">
-          <div className="form-row">
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name *"
-              className="footer-input"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address *"
-              className="footer-input"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+
 
           <div className="form-row">
             <input
