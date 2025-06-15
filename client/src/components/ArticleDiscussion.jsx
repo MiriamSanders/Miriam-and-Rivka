@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-// import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
+import { useErrorMessage } from "./useErrorMessage";
 
 const ArticleDiscussion = ({ articleId }) => {
   const [comments, setComments] = useState([]);
@@ -8,6 +8,8 @@ const ArticleDiscussion = ({ articleId }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [errorCode, setErrorCode] = useState<number | undefined>(undefined);
+  const errorMessage = useErrorMessage(errorCode);
   const commentsRef = useRef(null);
   const loadMoreRef = useRef(null);
   const hasStarted = useRef(false);
@@ -17,19 +19,64 @@ const ArticleDiscussion = ({ articleId }) => {
     setLoading(true);
     try {
       const response = await fetch(`http://localhost:3001/articlecomments/${articleId}?page=${pageNum}&limit=5`);
+      if (!response.ok) {
+        setErrorCode(response.status);
+        return;
+      }
+
       const data = await response.json();
       if (data && data.length > 0) {
         setComments((prev) => [...prev, ...data]);
         setHasMore(data.length === 5);
         setPage((prev) => prev + 1);
+        setErrorCode(undefined);
       } else {
         setHasMore(false);
       }
     } catch (err) {
-      console.error("Error loading comments:", err);
+      setErrorCode(500);
     } finally {
       setLoading(false);
       setCommentsLoaded(true);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (newComment.trim() === "") return;
+
+    const currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
+    if (currentUser) {
+      try {
+        const response = await fetch(`http://localhost:3001/articlecomments`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            commentText: newComment,
+            userId: currentUser.id,
+            articleId: articleId
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setComments([...comments, {
+            commentId: data,
+            commentText: newComment,
+            userName: currentUser.userName
+          }]);
+          setErrorCode(undefined);
+        } else {
+          setErrorCode(response.status);
+        }
+      } catch (err) {
+        setErrorCode(500);
+        console.error("Error add comments:", err);
+      } finally {
+        setNewComment("");
+      }
     }
   };
 
@@ -80,44 +127,15 @@ const ArticleDiscussion = ({ articleId }) => {
     };
   }, [commentsLoaded, page, hasMore, loading]);
 
-  const handleAddComment = async () => {
-    if (newComment.trim() === "") return;
-    const currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
-    if (currentUser) {
-      try {
-        
-        const response = await fetch(`http://localhost:3001/articlecomments`, {
-          method: "POST",
-           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            commentText: newComment,
-            userId: currentUser.id,
-            articleId: articleId
-          }),
-        });
-        const data = await response.json();
-        if(response.ok){
-        setComments([...comments, {
-          commentId: data, commentText: newComment,
-          userName: currentUser.userName
-        }])}
-        else{
-          throw new Error("Error add comments:")
-        };
-      } catch (err) {
-        console.error("Error add comments:", err);
-      } finally {
-        setNewComment("");
-      }
-    }
-  };
-
   return (
     <div className="discussion-container">
       <h2 className="section-title">Questions & Responses</h2>
+
+      {errorMessage && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          ⚠️ {errorMessage}
+        </div>
+      )}
 
       <div ref={commentsRef} className="comments-list">
         {comments.map((comment) => (
@@ -126,7 +144,12 @@ const ArticleDiscussion = ({ articleId }) => {
           </div>
         ))}
 
-        {"You have reached the end"}
+        {!hasMore && comments.length > 0 && (
+          <div style={{ textAlign: "center", marginTop: "1rem", color: "#666" }}>
+            You have reached the end
+          </div>
+        )}
+
         {hasMore && (
           <div ref={loadMoreRef} style={{ height: "1px" }}></div>
         )}
@@ -151,4 +174,5 @@ const ArticleDiscussion = ({ articleId }) => {
 };
 
 export default ArticleDiscussion;
+
 

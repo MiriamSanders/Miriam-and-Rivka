@@ -1,8 +1,10 @@
 import React, { useState,useEffect } from "react";
 import "../styles/RatingCard.css"; // Assuming you have a CSS file for styling
 import { postRequest } from "../Requests";
-
+import { useErrorMessage } from "./useErrorMessage";
 const RatingCard = ({ recipeId }) => {
+    const [errorCode, setErrorCode] = useState<number | undefined>(undefined);
+  const errorMessage = useErrorMessage(errorCode);
   const [rating, setRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
   const [showModal, setShowModal] = useState(false);

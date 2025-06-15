@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
 import * as mammoth from 'mammoth';
-
 const AddArticle = ({ onSave }) => {
   const [newArticle, setNewArticle] = useState({
     title: '',
