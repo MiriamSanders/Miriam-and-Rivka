@@ -2,33 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../styles/ArticlePage.css'; // Optional for styling
 import ArticleDiscussion from './ArticleDiscussion';
-
+import { useErrorMessage } from "./useErrorMessage";
+import { getRequest } from '../Requests';
 function ArticlePage() {
   const { id } = useParams();
   const [articleData, setArticleData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+ const [errorCode, setErrorCode] = useState(undefined);
+  const errorMessage = useErrorMessage(errorCode);
 
   useEffect(() => {
     const fetchArticle = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/articles/${id}`);
-        if (!response.ok) throw new Error("Failed to fetch article.");
-        const data = await response.json();
-        setArticleData(data);
-      } catch (err) {
-        console.error("Error loading article:", err);
-        setError(err.message);
-      } finally {
+        const requestResult = await getRequest(`articles/${id}`);
+        if (!requestResult.succeeded){  setErrorCode(requestResult.status);}
+          else{ setArticleData(requestResult.data);
+        setErrorCode(undefined);}
         setLoading(false);
-      }
     };
 
     fetchArticle();
   }, [id]);
 
   if (loading) return <div className="article-loading">Loading article...</div>;
-  if (error) return <div className="article-error">Error: {error}</div>;
   if (!articleData) return <div>No article found.</div>;
 
   const { title, authorId, createdAt, content,authorName } = articleData;
@@ -36,6 +31,11 @@ function ArticlePage() {
 
   return (
     <div className="article-container">
+      {errorMessage && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          ⚠️ {errorMessage}
+        </div>
+      )}
       <h1 className="article-title">{title}</h1>
       <div className="article-meta">
         <span>By {authorName}</span>

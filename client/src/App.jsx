@@ -10,7 +10,9 @@ import RecipePage from './components/RecipePage'
 import Articles from './components/Articles'
 import ArticlePage from './components/ArticlePage'
 import MenuManager from './components/MenuManager'
+import ChefPage from './components/ChefPage'
 import ChefArea from './components/ChefArea'
+import Chefs from './components/Chefs'
 import RecipeManager from './components/RecipeManager';
 import ArticleManager from './components/ArticleManager';
 import './styles/App.css'
@@ -42,13 +44,17 @@ function App() {
 
         {/* Recipes */}
         <Route path="recipes" element={<Recipes createMenu={createMenu} />} />
+        <Route path="chefs/:id/recipes`" element={<Recipes/>} />
         <Route path="recipes/:id" element={<RecipePage />} />
 
+ {/* Chefs */}
+        <Route path="chefs" element={<Chefs/>} />
+        <Route path="chefs/:id" element={<ChefPage />} />
 
         {/* Articles */}
         <Route path="articles" element={<Articles />} />
         <Route path="articles/:id" element={<ArticlePage />} />
-
+   <Route path="chefs/:id/articles`" element={<Articles />} />
         {/* Personal Area */}
         <Route path="personal-area/menus" element={<MenuManager setCreateMenu={setCreateMenu} />} />
         {/* <Route path="menus/:id" element={<MenuDetail />} /> */}

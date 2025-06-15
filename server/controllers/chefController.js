@@ -14,6 +14,16 @@ exports.getAllChefs = async (req, res) => {
         res.status(500).json({ error: 'Failed to retrieve chefs' });
     }
 }
+exports.getChef = async (req, res) => {
+   const chefId = req.params.chefId;
+    const result = await chefService.getChef(chefId);
+    if (result) {
+        res.status(200).json(result);
+    } else {
+        res.status(500).json({ error: 'Failed to retrieve chefs' });
+    }
+}
+
 exports.joinReq = async (req, res) => {
     const { chefId, imageURL, education, experienceYears, style, additionalInfo } = req.body;
     console.log(req.body);

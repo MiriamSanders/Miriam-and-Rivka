@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import "../styles/Signup.css"; // Assuming you have a CSS file for styling
 import { postRequest } from "../Requests";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-
+import { useErrorMessage } from "./useErrorMessage";
 function Signup({ setUserType }) {
     const [form, setForm] = useState({
         userName: "",
         email: "",
         password: ""
     });
+        const [errorCode, setErrorCode] = useState(undefined);
+  const errorMessage = useErrorMessage(errorCode);
     const navigate = useNavigate(); // Initialize useNavigate
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,8 +26,9 @@ function Signup({ setUserType }) {
             // Assuming the user type is "user" after signup
             navigate("/"); // Redirect to login page after successful signup
             // Optionally redirect to login or home page
+                setErrorCode(undefined);
         } else {
-            alert("Error creating account: " + requestResult.error);
+            setErrorCode(requestResult.status);
         }
         console.log(form);
     };
@@ -33,6 +36,11 @@ function Signup({ setUserType }) {
     return (
         <form onSubmit={handleSubmit} className="signup-form">
             <h2>Create Account</h2>
+             {errorMessage && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          ⚠️ {errorMessage}
+        </div>
+      )}
             <div>
                 <label>User Name</label>
                 <input

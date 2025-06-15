@@ -55,12 +55,12 @@ exports.loginUser = async (req, res) => {
         const user = await loginService.getUserWithPasswordByUserName(userName);
 
         if (!user) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(400).json({ error: 'Invalid username or password' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(400).json({ error: 'Invalid username or password' });
         }
         console.log(user);
         
@@ -77,7 +77,7 @@ exports.loginUser = async (req, res) => {
             maxAge: 1000 * 60 * 60 // שעה
         });
 
-        res.status(201).json({ id: user.userId, userName: user.userName, userType: user.roleName });
+        res.status(200).json({ id: user.userId, userName: user.userName, userType: user.userType });
 
 
     } catch (error) {

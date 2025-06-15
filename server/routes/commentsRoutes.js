@@ -15,6 +15,6 @@ router.post('/articlecomments',async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: "Must be logged in to comment" });
   }
-Controller.postArticleComments(req,res);
+controller.postArticleComments(req,res);
 });
 module.exports = router;

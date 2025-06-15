@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getRequest } from '../Requests';
 import '../styles/Articles.css';
-
+import { useErrorMessage } from "./useErrorMessage";
 function Articles() {
   const [articles, setArticles] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
   const limit = 8;
+    const [errorCode, setErrorCode] = useState(undefined);
+  const errorMessage = useErrorMessage(errorCode);
 
   const getArticles = async () => {
     const requestResult = await getRequest(`articles?limit=${limit}&page=${page}`);
@@ -18,8 +20,9 @@ function Articles() {
         setHasMore(false);
       }
       setArticles((prev) => [...prev, ...newArticles]); 
+        setErrorCode(undefined);
     } else {
-      console.log(requestResult.error);
+       setErrorCode(requestResult.status);
     }
   };
 
@@ -42,7 +45,11 @@ const openArticle = (e) => {
   return (
     <div className="articles-container">
       <h1>Articles</h1>
-
+ {errorMessage && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          ⚠️ {errorMessage}
+        </div>
+      )}
       <div className="articles-list">
         {articles.length === 0 ? (
           <p className="no-articles">No articles found available</p>
