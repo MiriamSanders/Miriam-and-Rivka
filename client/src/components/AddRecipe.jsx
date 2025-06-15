@@ -118,7 +118,7 @@ const AddRecipe = () => {
 
     // Prepare the recipe data for the backend
     const cleanRecipe = {
-      chefId: JSON.parse(localStorage.getItem("CurrentUser")).id, // Ensure it's a number
+      chefId: JSON.parse(localStorage.getItem("currentUser")).id, // Ensure it's a number
       title: recipe.title,
       description: recipe.description,
       imageURL: recipe.imageURL,

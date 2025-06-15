@@ -4,7 +4,7 @@ import "../styles/Signup.css"; // Reusing the same CSS as Signup
 import { postRequest } from "../Requests";
 import { useErrorMessage } from "./useErrorMessage";
 function Login({ setUserType }) {
-      const [errorCode, setErrorCode] = useState<number | undefined>(undefined);
+      const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
     const [form, setForm] = useState({
         userName: "",

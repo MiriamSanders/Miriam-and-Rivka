@@ -10,6 +10,20 @@ const dbPromise = require("./dbConnection");
     }
     return chefs[0];
 }
+async function getChef(chefId) {
+  const db = await dbPromise;
+  const query = `
+    SELECT c.*, u.userName 
+    FROM chefs c 
+    JOIN users u ON c.chefId = u.userId 
+    WHERE c.chefId = ?
+  `;
+  const formattedQuery = mysql.format(query, [chefId]);
+  const [rows] = await db.execute(formattedQuery);
+  console.log("Chef fetched:", rows);
+  return rows;
+}
+
 async function addChef(chefData) {
     const db = await dbPromise;
     const query = `INSERT INTO chefs (chefId, imageURL, education, experienceYears, style) VALUES (?, ?, ?, ?, ?)`;
@@ -24,5 +38,6 @@ async function addChef(chefData) {
 
 module.exports = {
     getAllChefs,
-    addChef
+    addChef,
+    getChef
 };

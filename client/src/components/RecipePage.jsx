@@ -2,25 +2,29 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import RatingCard from "./RatingCard";
 import RecipeReader from "./RecipeReader";
+import { useErrorMessage } from "./useErrorMessage";
 import RecipeDiscussion from "./RecipeDiscussion";
 import "../styles/RecipePage.css"; 
+import { getRequest } from "../Requests";
 
 const RecipePage = () => {
   const { id } = useParams();
   const [recipeData, setRecipeData] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+      const [errorCode, setErrorCode] = useState(undefined);
+  const errorMessage = useErrorMessage(errorCode);
   useEffect(() => {
     const fetchRecipe = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/recipes/${id}`);
-        const data = await response.json();
-        setRecipeData(data);
-      } catch (err) {
-        console.error("Error loading recipe:", err);
-      } finally {
+      
+        const requestResult = await getRequest(`recipes/${id}`);
+        if (requestResult.succeeded) {
+          setRecipeData(requestResult.data);
+              setErrorCode(undefined);
+        }
+        else{
+setErrorCode(requestResult.status);
+        }
         setLoading(false);
-      }
     };
 
     fetchRecipe();
@@ -34,6 +38,11 @@ const RecipePage = () => {
 console.log("Recipe Data:", recipeData); // Debugging line to check the fetched data
   return (
     <div className="recipe-container">
+       {errorMessage && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          ⚠️ {errorMessage}
+        </div>
+      )}
       <h1 className="recipe-title">{title}</h1>
       <h2 className="recipe-subtitle">{subtitle}</h2>
       <p className="recipe-subtext">By: {chefName}</p>

@@ -7,6 +7,7 @@ const navOptions = {
     { path: "/", label: "Home" },
     { path: "/recipes", label: "Recipes" },
     { path: "/articles", label: "Articles" },
+    {path:"/chefs",label:"Chefs"}
   ],
   guestAuth: [
     { path: "/login", label: "Login" },

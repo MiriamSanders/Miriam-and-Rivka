@@ -3,12 +3,8 @@ import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
 import {postRequest} from '../Requests.js'
 import * as mammoth from 'mammoth';
-<<<<<<< HEAD
-const AddArticle = ({ onSave }) => {
-=======
 
 const AddArticle = () => {
->>>>>>> 4ef20f4c7785d30141715af6f5abd05bdf4554b8
   const [newArticle, setNewArticle] = useState({
     title: '',
     content: ''

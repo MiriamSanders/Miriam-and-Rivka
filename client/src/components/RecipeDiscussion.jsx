@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
-
+import { getRequest, postRequest } from "../Requests";
+import { useErrorMessage } from "./useErrorMessage";
 const RecipeDiscussion = ({ recipeId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
@@ -11,26 +12,27 @@ const RecipeDiscussion = ({ recipeId }) => {
   const commentsRef = useRef(null);
   const loadMoreRef = useRef(null);
   const hasStarted = useRef(false);
-
+  const [errorCode, setErrorCode] = useState(undefined);
+  const errorMessage = useErrorMessage(errorCode);
   const fetchComments = async (pageNum) => {
     if (loading) return;
     setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3001/recipecomments/${recipeId}?page=${pageNum}&limit=5`);
-      const data = await response.json();
-      if (data && data.length > 0) {
-        setComments((prev) => [...prev, ...data]);
-        setHasMore(data.length === 5);
+    const requestResult = await getRequest(`recipecomments/${recipeId}?page=${page}&limit=5`);
+    if (requestResult.succeeded) {
+      if (requestResult.data && requestResult.data.length > 0) {
+        setComments((prev) => [...prev, ...requestResult.data]);
+        setHasMore(requestResult.data.length === 5);
         setPage((prev) => prev + 1);
       } else {
         setHasMore(false);
       }
-    } catch (err) {
-      console.error("Error loading comments:", err);
-    } finally {
-      setLoading(false);
-      setCommentsLoaded(true);
+      setErrorCode(undefined);
     }
+    else {
+      setErrorCode(requestResult.status);
+    }
+    setLoading(false);
+    setCommentsLoaded(true);
   };
 
   useEffect(() => {
@@ -82,77 +84,64 @@ const RecipeDiscussion = ({ recipeId }) => {
 
   const handleAddComment = async () => {
     if (newComment.trim() === "") return;
-    const currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (currentUser) {
-      try {
-        
-        const response = await fetch(`http://localhost:3001/recipecomments`, {
-          method: "POST",
-           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            commentText: newComment,
-            userId: currentUser.id,
-            recipeId: recipeId
-          }),
-        });
-        const data = await response.json();
-        if(response.ok){
+      const requestResult = await postRequest(`recipecomments`, {
+        commentText: newComment,
+        userId: currentUser.id,
+        recipeId: recipeId
+      });
+      if (requestResult.succeeded) {
         setComments([...comments, {
-          commentId: data, commentText: newComment,
+          commentId: requestResult.data, commentText: newComment,
           userName: currentUser.userName
-        }])}
-        else if(response.status==401){
-          throw new Error("you are not connected try login again")
-        }else{
-           throw new Error("server error")
-        }
-      } catch (err) {
-        console.error("Error add comments:", err);
-      } finally {
-        setNewComment("");
+        }])
+        setErrorCode(undefined);
       }
-    }else{
-console.log("you have to be connected to comment");
-    }
-  };
-
-  return (
-    <div className="discussion-container">
-      <h2 className="section-title">Questions & Responses</h2>
-
-      <div ref={commentsRef} className="comments-list">
-        {comments.map((comment) => (
-          <div key={comment.commentId} className="comment">
-            <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
-          </div>
-        ))}
-
-        {"You have reached the end"}
-        {hasMore && (
-          <div ref={loadMoreRef} style={{ height: "1px" }}></div>
-        )}
-
-        {loading && <p style={{ textAlign: "center" }}>Loading more comments...</p>}
-      </div>
-
-      <div className="comment-input-container">
-        <input
-          type="text"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-          className="comment-input"
-        />
-        <button onClick={handleAddComment} className="comment-button">
-          Post
-        </button>
-      </div>
-    </div>
-  );
+      else {
+        setErrorCode(requestResult.status);
+      }
+      setNewComment("");
+    };
 };
+    return (
+      <div className="discussion-container">
+        <h2 className="section-title">Questions & Responses</h2>
+        {errorMessage && (
+          <div style={{ color: "red", marginBottom: "1rem" }}>
+            ⚠️ {errorMessage}
+          </div>
+        )}
+        <div ref={commentsRef} className="comments-list">
+          {comments.map((comment) => (
+            <div key={comment.commentId} className="comment">
+              <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
+            </div>
+          ))}
 
-export default RecipeDiscussion;
+          {"You have reached the end"}
+          {hasMore && (
+            <div ref={loadMoreRef} style={{ height: "1px" }}></div>
+          )}
+
+          {loading && <p style={{ textAlign: "center" }}>Loading more comments...</p>}
+        </div>
+
+        <div className="comment-input-container">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+            className="comment-input"
+          />
+          <button onClick={handleAddComment} className="comment-button">
+            Post
+          </button>
+        </div>
+      </div>
+    );
+  
+}
+  export default RecipeDiscussion;
 

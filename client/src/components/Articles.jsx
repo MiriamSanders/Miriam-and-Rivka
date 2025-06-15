@@ -9,7 +9,7 @@ function Articles() {
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
   const limit = 8;
-    const [errorCode, setErrorCode] = useState<number | undefined>(undefined);
+    const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
 
   const getArticles = async () => {

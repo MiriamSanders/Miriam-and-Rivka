@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useErrorMessage } from "./useErrorMessage";
+import { postRequest, getRequest } from "../Requests"; // הוספתי גם getRequest שהיה חסר
 
 const ArticleDiscussion = ({ articleId }) => {
   const [comments, setComments] = useState([]);
@@ -8,7 +9,7 @@ const ArticleDiscussion = ({ articleId }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [errorCode, setErrorCode] = useState<number | undefined>(undefined);
+  const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
   const commentsRef = useRef(null);
   const loadMoreRef = useRef(null);
@@ -17,66 +18,46 @@ const ArticleDiscussion = ({ articleId }) => {
   const fetchComments = async (pageNum) => {
     if (loading) return;
     setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3001/articlecomments/${articleId}?page=${pageNum}&limit=5`);
-      if (!response.ok) {
-        setErrorCode(response.status);
-        return;
-      }
-
-      const data = await response.json();
-      if (data && data.length > 0) {
-        setComments((prev) => [...prev, ...data]);
-        setHasMore(data.length === 5);
+    const requestResult = await getRequest(`articlecomments/${articleId}?page=${pageNum}&limit=5`);
+    if (requestResult.succeeded) {
+      if (requestResult.data && requestResult.data.length > 0) {
+        setComments((prev) => [...prev, ...requestResult.data]);
+        setHasMore(requestResult.data.length === 5);
         setPage((prev) => prev + 1);
         setErrorCode(undefined);
       } else {
         setHasMore(false);
+        setErrorCode(undefined);
       }
-    } catch (err) {
-      setErrorCode(500);
-    } finally {
-      setLoading(false);
-      setCommentsLoaded(true);
+    } else {
+      setErrorCode(requestResult.status);
     }
+    setLoading(false);
+    setCommentsLoaded(true);
   };
 
   const handleAddComment = async () => {
     if (newComment.trim() === "") return;
 
-    const currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (currentUser) {
-      try {
-        const response = await fetch(`http://localhost:3001/articlecomments`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            commentText: newComment,
-            userId: currentUser.id,
-            articleId: articleId
-          }),
-        });
+      const requestResult = await postRequest(`articlecomments`, {
+        commentText: newComment,
+        userId: currentUser.id,
+        articleId: articleId
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          setComments([...comments, {
-            commentId: data,
-            commentText: newComment,
-            userName: currentUser.userName
-          }]);
-          setErrorCode(undefined);
-        } else {
-          setErrorCode(response.status);
-        }
-      } catch (err) {
-        setErrorCode(500);
-        console.error("Error add comments:", err);
-      } finally {
-        setNewComment("");
+      if (requestResult.succeeded) {
+        setComments([...comments, {
+          commentId: requestResult.data,
+          commentText: newComment,
+          userName: currentUser.userName
+        }]);
+        setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
       }
+      setNewComment("");
     }
   };
 
@@ -174,5 +155,6 @@ const ArticleDiscussion = ({ articleId }) => {
 };
 
 export default ArticleDiscussion;
+
 
 

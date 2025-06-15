@@ -27,7 +27,6 @@ export async function postRequest(currentUrl, data) {
     const responseData = await response.json();
     return { succeeded: true, data: responseData };
   } catch (status) {
-    console.error("Error in postRequest:", error);
     return { succeeded: false, status:status };
   }
 }

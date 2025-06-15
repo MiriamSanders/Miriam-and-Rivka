@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getRequest } from '../Requests';
 import SearchFilterBar from './SearchBar';
+import { useErrorMessage } from "./useErrorMessage";
 import '../styles/Recipes.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,26 +9,24 @@ function Recipes({ createMenu }) {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+      const [errorCode, setErrorCode] = useState(undefined);
+  const errorMessage = useErrorMessage(errorCode);
   const navigate = useNavigate();
   const limit = 10;
 
   const getRecipes = async () => {
-    try {
-      const response = await fetch(`http://localhost:3001/recipes?limit=${limit}&page=${page}`);
-      if (response.ok) {
-        const data = await response.json();
-        const newRecipes = data;
+    
+      const requestResult = await getRequest(`recipes?limit=${limit}&page=${page}`);
+      if (requestResult.succeeded) {
+        const newRecipes = requestResult.data;
         if (newRecipes.length < limit) {
           setHasMore(false);
         }
         setRecipes((prev) => [...prev, ...newRecipes]);
+            setErrorCode(undefined);
       } else {
-        throw new Error("EEROR:" + response.Error)
+        setErrorCode(requestResult.status);
       }
-    }
-    catch (err) {
-      console.log(err);
-    }
   };
   const openRecipePage = (e) => {
     const recipeId = e.currentTarget.getAttribute('name');
@@ -46,6 +45,11 @@ function Recipes({ createMenu }) {
   return (
     <div className="recipes-container">
       <h1>Recipes</h1>
+       {errorMessage && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          ⚠️ {errorMessage}
+        </div>
+      )}
       <SearchFilterBar />
       <div className="recipes-list">
         {recipes.length === 0 ? (
