@@ -84,6 +84,124 @@ async function getAllRecipes(limit, offset=0) {
     throw error;
   }
 }
+async function getRecipesAdvanced(options = {}) {
+  const {
+    limit = 10,
+    offset = 0,
+    category,
+    chefName,
+    title,
+    tags = [],
+    anyTags = [],
+    sortBy = 'recipeId',
+    sortOrder = 'DESC'
+  } = options;
+
+  // Validate sortBy to prevent SQL injection
+  const allowedSortFields = ['title', 'category', 'userName'];
+  const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'recipeId';
+  const validSortOrder = ['ASC', 'DESC'].includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+
+  try {
+    const db = await dbPromise;
+
+    let query = `
+      SELECT 
+        r.recipeId,
+        r.title,
+        r.imageURL,
+        r.category,
+        r.description,
+        u.userName,
+        GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags
+      FROM recipes r
+      JOIN users u ON r.chefId = u.userId
+      LEFT JOIN recipetags p ON r.recipeId = p.recipeId
+      LEFT JOIN tags t ON p.tagId = t.tagId
+    `;
+
+    const conditions = [];
+    const params = [];
+
+    if (category) {
+      conditions.push('r.category = ?');
+      params.push(category);
+    }
+
+    if (chefName) {
+      conditions.push('u.userName LIKE ?');
+      params.push(`%${chefName}%`);
+    }
+
+    if (title) {
+      conditions.push('r.title LIKE ?');
+      params.push(`%${title}%`);
+    }
+
+    // Specific tags (AND logic) - must have ALL tags
+    if (tags.length > 0) {
+      const tagPlaceholders = tags.map(() => '?').join(',');
+      conditions.push(`r.recipeId IN (
+        SELECT rt.recipeId 
+        FROM recipetags rt 
+        JOIN tags tg ON rt.tagId = tg.tagId 
+        WHERE tg.name IN (${tagPlaceholders})
+        GROUP BY rt.recipeId 
+        HAVING COUNT(DISTINCT tg.name) = ?
+      )`);
+      params.push(...tags, tags.length);
+    }
+
+    // Any tags (OR logic) - must have ANY of these tags
+    if (anyTags.length > 0) {
+      const tagPlaceholders = anyTags.map(() => '?').join(',');
+      conditions.push(`r.recipeId IN (
+        SELECT DISTINCT rt.recipeId 
+        FROM recipetags rt 
+        JOIN tags tg ON rt.tagId = tg.tagId 
+        WHERE tg.name IN (${tagPlaceholders})
+      )`);
+      params.push(...anyTags);
+    }
+
+    if (conditions.length > 0) {
+      query += ` WHERE ${conditions.join(' AND ')}`;
+    }
+
+    query += `
+      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, u.userName
+      ORDER BY r.${validSortBy} ${validSortOrder}
+      LIMIT ? OFFSET ?
+    `;
+
+    params.push(limit, offset);
+
+    console.log('Executing query:', query);
+    console.log('With params:', params);
+
+    // Execute query - MySQL2 returns [rows, fields]
+    const [rows] = await db.execute(mysql.format(query, params));
+
+    // Transform the results
+    const results = rows.map(row => ({
+      recipeId: row.recipeId,
+      title: row.title,
+      imageURL: row.imageURL,
+      category: row.category,
+      description: row.description,
+      userName: row.userName,
+      tags: row.tags ? row.tags.split(',').map(tag => tag.trim()) : []
+    }));
+
+    return results;
+
+  } catch (error) {
+    console.error('Error fetching recipes:', error);
+  //  console.error('Query:', query);
+  //  console.error('Params:', params);
+    throw error;
+  }
+}
 async function getBestRatedRecipes(limit = 4) {
     const db = await dbPromise;
     const [rows] = await db.execute(
@@ -130,6 +248,7 @@ async function getRecipesByChefId(chefId) {
 module.exports = {
     getRecipeById,
     getAllRecipes,
+    getRecipesAdvanced,
     getBestRatedRecipes,
     getRecipesByChefId
 };

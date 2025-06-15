@@ -7,7 +7,22 @@ exports.getAllRecipes = async (req, res) => {
     const page = parseInt(req.query.page) || 0;
     console.log(limit, page);
     const offset = page * limit - limit;
+     if (Object.keys(req.query).length === 0) {
     const recipes = await recipeService.getAllRecipes(limit, offset)
+    return res.json(recipes);}
+    const options = {
+      limit: limit,
+      offset: offset,
+      category: req.query.category,
+      chefName: req.query.chefName,
+      title: req.query.title,
+      tags: req.query.tags ? req.query.tags.split(',') : [],
+      anyTags: req.query.anyTags ? req.query.anyTags.split(',') : [],
+      sortBy: req.query.sortBy || 'recipeId',
+      sortOrder: req.query.sortOrder || 'DESC'
+    };
+    const recipes = await recipeService.getRecipesAdvanced(options);
+    console.log('Recipes fetched:', recipes);
     res.json(recipes);
   } catch (error) {
     console.error('Error fetching recipes:', error);

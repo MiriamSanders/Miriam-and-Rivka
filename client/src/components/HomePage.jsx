@@ -105,7 +105,7 @@ const HomePage = ({ userType }) => {
 
           <div className="recipe-grid">
             {popularRecipes.map((recipe) => (
-              <div key={recipe.recipeId} className="recipe-card" style={{ backgroundImage: `url(${recipe.imageURL})` }} onClick={() => { navigate(`/recipes/${recipe.recipeId}`) }}>
+              <div key={recipe.recipeId} className="home-recipe-card" style={{ backgroundImage: `url(${recipe.imageURL})` }} onClick={() => { navigate(`/recipes/${recipe.recipeId}`) }}>
                 <div className="recipe-image-container">
                   {/* <img
                     src={recipe.imageURL}

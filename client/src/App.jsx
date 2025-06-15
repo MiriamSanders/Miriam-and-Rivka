@@ -28,16 +28,7 @@ function App() {
     setUserType(user ? user.userType : "guest");
   }, []); // This will run on component mount
 
-  // Optional: Listen for localStorage changes from other tabs
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const user = JSON.parse(localStorage.getItem('CurrentUser')) || null;
-      setUserType(user ? user.userType : "guest");
-    };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
   return (
     <>
       <Navigation userType={userType} />

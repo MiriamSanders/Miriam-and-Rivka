@@ -40,7 +40,7 @@ const openArticle = (e) => {
 
 }
   return (
-    <div className="articlesrecipes-container">
+    <div className="articles-container">
       <h1>Articles</h1>
 
       <div className="articles-list">

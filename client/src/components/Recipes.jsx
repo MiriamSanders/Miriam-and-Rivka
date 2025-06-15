@@ -46,7 +46,7 @@ function Recipes({ createMenu }) {
   return (
     <div className="recipes-container">
       <h1>Recipes</h1>
-      <SearchFilterBar />
+      <SearchFilterBar setRecipes={setRecipes}/>
       <div className="recipes-list">
         {recipes.length === 0 ? (
           <p className="no-recipes">No recipes found available</p>
@@ -66,7 +66,7 @@ function Recipes({ createMenu }) {
                   <p>{recipe.description}</p>
                   <div>
                     Tags:
-                    {recipe.tags?.split(',').map((tag, index) => (
+                    {recipe.tags?.map((tag, index) => (
                       <span key={index} style={{ marginRight: '6px', padding: '2px 6px', backgroundColor: 'black', borderRadius: '4px' }}>
                         {tag}
                       </span>

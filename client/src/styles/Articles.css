@@ -1,4 +1,4 @@
-.articlesrecipes-container {
+/* .articlesrecipes-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
@@ -6,7 +6,7 @@
 }
 
 .articlesrecipes-container h1 {
-  /* text-align: center; */
+ 
   margin-top: 5%;
   font-size: 2.5rem;
   margin-bottom: 2rem;
@@ -65,4 +65,172 @@
 .load-more-button:hover {
   background-color: #0056b3;
 }
+ */
+.articles-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  background: #ffffff;
+  min-height: 100vh;
+}
 
+.articles-container h1 {
+  color: #000000;
+  font-size: 2.5rem;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 3rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.articles-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.article-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 0;
+  overflow: hidden;
+  position: relative;
+  min-height: 200px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.article-card:hover {
+  border-color: #000000;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+.article-overlay {
+  padding: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
+.article-overlay h2 {
+  color: #000000;
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.article-overlay p {
+  color: #666666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+
+.no-articles {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #666666;
+  font-size: 1.2rem;
+  padding: 4rem 2rem;
+  border: 1px solid #e5e5e5;
+  background: #fafafa;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.load-more-button {
+  display: block;
+  margin: 0 auto;
+  padding: 1rem 3rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.load-more-button:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .articlesrecipes-container {
+    padding: 2rem 1rem;
+  }
+  
+  .articlesrecipes-container h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .articles-list {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .article-card {
+    min-height: 180px;
+  }
+  
+  .article-overlay {
+    padding: 1.5rem;
+  }
+  
+  .article-overlay h2 {
+    font-size: 1.2rem;
+  }
+  
+  .article-overlay p {
+    font-size: 0.85rem;
+  }
+  
+  .load-more-button {
+    width: 100%;
+    max-width: 300px;
+    padding: 1rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .articless-container {
+    padding: 1.5rem 0.75rem;
+  }
+  
+  .articles-container h1 {
+    font-size: 1.8rem;
+  }
+  
+  .article-card {
+    min-height: 160px;
+  }
+  
+  .article-overlay {
+    padding: 1.2rem;
+  }
+  
+  .article-overlay h2 {
+    font-size: 1.1rem;
+  }
+  
+  .article-overlay p {
+    font-size: 0.8rem;
+  }
+}
