@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getRequest } from '../Requests';
 import { useErrorMessage } from "./useErrorMessage";
-import '../styles/Recipes.css';
+import '../styles/Chefs.css';
 import { useNavigate } from 'react-router-dom';
 function Chefs(){
  const [chefs, setChefs] = useState([]);
@@ -41,7 +41,7 @@ useEffect(() => {
         ) : (
           chefs.map((chef) => (
             <div key={chef.chefId} name={chef.chefId} className="chef-card" onClick={openChefPage}>
-              <div className="chef-image" style={{ backgroundImage: `url(${chef.imageURL})` }}>
+              <div className="chefs-image" style={{ backgroundImage: `url(${chef.imageURL})` }}>
                 <div className="chef-overlay">
                   <h2>{chef.userName}</h2>
                 </div>
