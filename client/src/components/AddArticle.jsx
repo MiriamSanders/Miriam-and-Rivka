@@ -1,11 +1,16 @@
 // AddArticle.jsx
 import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
+import {postRequest} from '../Requests.js'
 import * as mammoth from 'mammoth';
+<<<<<<< HEAD
 const AddArticle = ({ onSave }) => {
+=======
+
+const AddArticle = () => {
+>>>>>>> 4ef20f4c7785d30141715af6f5abd05bdf4554b8
   const [newArticle, setNewArticle] = useState({
     title: '',
-    author: '',
     content: ''
   });
 
@@ -32,9 +37,7 @@ const handleFileUpload = async (event) => {
     for (const line of lines) {
       if (line.toLowerCase().startsWith('title:')) {
         title = line.slice(6).trim();
-      } else if (line.toLowerCase().startsWith('author:')) {
-        author = line.slice(7).trim();
-      } else if (line.toLowerCase().startsWith('content:')) {
+      }  else if (line.toLowerCase().startsWith('content:')) {
         inContent = true;
       } else if (inContent) {
         content += line + '\n';
@@ -44,7 +47,6 @@ const handleFileUpload = async (event) => {
     setNewArticle(prev => ({
       ...prev,
       title,
-      author,
       content: content.trim()
     }));
   } catch (error) {
@@ -53,10 +55,10 @@ const handleFileUpload = async (event) => {
 };
 
 
-  const save = () => {
+  const save = async() => {
     if (newArticle.title.trim() && newArticle.content.trim()) {
-      onSave(newArticle);
-      setNewArticle({ title: '', author: '', content: '' });
+      await postRequest("articles",{...newArticle,authorId:JSON.parse(localStorage.getItem("currentUser")).id});
+      setNewArticle({ title: '', content: '' });
     }
   };
 
@@ -82,9 +84,6 @@ const handleFileUpload = async (event) => {
       <div className="form-fields">
         <label>Article Name</label>
         <input type="text" value={newArticle.title} onChange={e => setNewArticle(prev => ({ ...prev, title: e.target.value }))} />
-
-        <label>Author</label>
-        <input type="text" value={newArticle.author} onChange={e => setNewArticle(prev => ({ ...prev, author: e.target.value }))} />
 
         <label>Content</label>
         <textarea value={newArticle.content} onChange={e => setNewArticle(prev => ({ ...prev, content: e.target.value }))} rows={8} />

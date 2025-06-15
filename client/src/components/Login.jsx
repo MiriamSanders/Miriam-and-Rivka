@@ -21,8 +21,7 @@ function Login({ setUserType }) {
         if (requestResult.succeeded) {
             alert("login successfull!");
             setUserType(requestResult.data.userType);// Assuming the user type is "user" after login
-            localStorage.setItem("CurrentUser", JSON.stringify(requestResult.data))
-              setErrorCode(undefined);
+            localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
             navigate("/");
             // Optionally redirect to login or home page
         } else {

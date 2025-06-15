@@ -118,7 +118,7 @@ const AddRecipe = () => {
 
     // Prepare the recipe data for the backend
     const cleanRecipe = {
-      chefID: JSON.parse(localStorage.getItem("CurrentUser")).id, // Ensure it's a number
+      chefId: JSON.parse(localStorage.getItem("CurrentUser")).id, // Ensure it's a number
       title: recipe.title,
       description: recipe.description,
       imageURL: recipe.imageURL,
@@ -182,7 +182,7 @@ const AddRecipe = () => {
             <input 
               type="text" 
               value={recipe.title} 
-              onChange={(e) => handleInputChange('Title', e.target.value)} 
+              onChange={(e) => handleInputChange('title', e.target.value)} 
               placeholder="Enter recipe title" 
               className="input" 
             />
@@ -191,7 +191,7 @@ const AddRecipe = () => {
             <label className="label">Description:</label>
             <textarea 
               value={recipe.description} 
-              onChange={(e) => handleInputChange('Description', e.target.value)} 
+              onChange={(e) => handleInputChange('description', e.target.value)} 
               placeholder="Brief description of the dish" 
               className="textarea" 
             />
@@ -201,7 +201,7 @@ const AddRecipe = () => {
             <input 
               type="url" 
               value={recipe.ImageURL} 
-              onChange={(e) => handleInputChange('ImageURL', e.target.value)} 
+              onChange={(e) => handleInputChange('imageURL', e.target.value)} 
               placeholder="https://example.com/image.jpg" 
               className="input" 
             />
@@ -217,7 +217,7 @@ const AddRecipe = () => {
             <input 
               type="number" 
               value={recipe.prepTimeMinutes} 
-              onChange={(e) => handleInputChange('PrepTimeMinutes', e.target.value)} 
+              onChange={(e) => handleInputChange('prepTimeMinutes', e.target.value)} 
               placeholder="e.g., 30" 
               className="input" 
             />
@@ -228,7 +228,7 @@ const AddRecipe = () => {
             </label>
             <select 
               value={recipe.difficulty} 
-              onChange={(e) => handleInputChange('Difficulty', e.target.value)} 
+              onChange={(e) => handleInputChange('difficulty', e.target.value)} 
               className="select"
             >
               {difficulties.map(diff => (
@@ -240,7 +240,7 @@ const AddRecipe = () => {
             <label className="label">Category:</label>
             <select 
               value={recipe.category} 
-              onChange={(e) => handleInputChange('Category', e.target.value)} 
+              onChange={(e) => handleInputChange('category', e.target.value)} 
               className="select"
             >
               <option value="">Select category</option>
@@ -253,7 +253,7 @@ const AddRecipe = () => {
             <label className="label">Dish Type:</label>
             <select 
               value={recipe.dishType} 
-              onChange={(e) => handleInputChange('DishType', e.target.value)} 
+              onChange={(e) => handleInputChange('dishType', e.target.value)} 
               className="select"
             >
               <option value="">Select dish type</option>
@@ -281,7 +281,7 @@ const AddRecipe = () => {
           <label className="label">Instructions:</label>
           <textarea 
             value={recipe.instructions} 
-            onChange={(e) => handleInputChange('Instructions', e.target.value)} 
+            onChange={(e) => handleInputChange('instructions', e.target.value)} 
             placeholder="Write step-by-step instructions here..." 
             className="textarea instructions-textarea" 
           />

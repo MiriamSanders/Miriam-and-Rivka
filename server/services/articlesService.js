@@ -71,7 +71,26 @@ async function getArticleById(id) {
     }
     
 }
+async function getArticlesByChefId(chefId) {
+    try {
+        const db = await dbPromise;
+        const query = `
+            SELECT a.articleId, a.title, a.content, u.userName AS authorName
+            FROM articles a
+            JOIN users u ON a.authorId = u.userId
+            WHERE a.authorId = ?
+        `;
+        const [rows] = await db.execute(query, [chefId]);
+        console.log("Articles by Chef ID:", rows);
+        
+        return rows;
+    } catch (error) {
+        console.error('Error fetching articles by chef ID:', error);
+        throw error;
+    }
+}
 module.exports = {
   articleGetAll,
-  getArticleById
+  getArticleById,
+  getArticlesByChefId,
 };

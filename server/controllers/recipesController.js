@@ -44,18 +44,26 @@ exports.createRecipe = async (req, res) => {
     instructions,
     prepTimeMinutes,
     difficulty,
-    chefIdategory,
+    category,
     dishType,
     ingredients,
     tags
   } = req.body;
-
+ console.log(req.body);
+ 
   // Validate required fields
   if (!chefId || !title || !imageURL || !category || !description) {
+    console.log("error");
+    
     return res.status(400).json({ error: 'chefId, title, imageURL, category, and description are required' });
   }
 
   try {
+    let difficultyId=await genericService.genericGet("difficulty","name",difficulty);
+    if(!difficultyId)
+    {
+     difficultyId=await genericService.genericPost("difficulty",{name:difficulty},"difficultyId")
+    }
     // First, create the recipe
     const recipeData = {
       chefId,
@@ -63,15 +71,17 @@ exports.createRecipe = async (req, res) => {
       description,
       imageURL,
       instructions,
+      difficulty:difficultyId[0].difficultyId,
       prepTimeMinutes: prepTimeMinutes || null,
-      difficulty: difficulty || 'Easy',
       category,
       dishType
     };
-
-    const newRecipe = await genericService.genericPost('Recipes', recipeData, 'recipeId');
+    console.log(recipeData);
+    
+    const newRecipe = await genericService.genericPost('recipes', recipeData, 'recipeId');
     const recipeId = newRecipe.recipeId;
-
+    console.log(newRecipe);
+    
     // Handle ingredients if provided
     if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
       for (let i = 0; i < ingredients.length; i++) {
@@ -86,9 +96,11 @@ exports.createRecipe = async (req, res) => {
               let existingIngredient;
               try {
                 // Try to find existing ingredient by name (case-insensitive)
-                const searchResult = await GenericDA.GenericGet('Ingredients', "Name", ingredientName);
+                const searchResult = await genericService.genericGet('ingredients', "name", ingredientName);
                 // Assuming GenericGet returns an array
                 existingIngredient = searchResult[0];
+                console.log(existingIngredient);
+                
               } catch (error) {
                 // Ingredient doesn't exist, create it
                 const newIngredientData = {
@@ -100,12 +112,12 @@ exports.createRecipe = async (req, res) => {
                   FiberPer100g: null
                 };
                 existingIngredient = await genericService.genericPost('ingredients', newIngredientData, 'ingredientId');
-                console.log(newIngredientData);
+                console.log(existingIngredient);
               }
               // Link the ingredient to the recipe
               const recipeIngredientData = {
                 recipeId: recipeId,
-                ingredientId: existingIngredient.ingredientId,
+                ingredientId: existingIngredient.ingredientID,
                 quantity: quantity,
                 orderIndex: i + 1
               };
@@ -129,6 +141,7 @@ exports.createRecipe = async (req, res) => {
           let existingTag;
 
           existingTag = await genericService.genericGet('tags', "name", tagName);
+          existingTag=existingTag[0];
           if (!existingTag) {
             // Tag doesn't exist, create it
             existingTag = await genericService.genericPost('tags', { name: tagName }, 'tagId');
@@ -159,6 +172,16 @@ exports.createRecipe = async (req, res) => {
     res.status(500).json({ error: 'Something went wrong while creating the recipe' });
   }
 };
+exports.getbestRatedRecipes=async(req,res) =>{
+  try {
+    const bestRatedRecipes = await recipeService.getBestRatedRecipes();
+    res.json(bestRatedRecipes);
+  } catch (error) {
+    console.error('Error fetching best rated recipes:', error);
+    res.status(500).json({ error: 'Something went wrong while fetching best rated recipes' });
+  }
+  
+}
 // Helper function to parse ingredient text and extract quantity and ingredient name
 function parseIngredientText(ingredientText) {
   // Common patterns for ingredient parsing
