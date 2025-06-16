@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useErrorMessage } from "./useErrorMessage";
-import { postRequest, getRequest } from "../Requests"; // הוספתי גם getRequest שהיה חסר
+import { deleteRequest,postRequest, getRequest } from "../Requests"; // הוספתי גם getRequest שהיה חסר
 
 const ArticleDiscussion = ({ articleId }) => {
   const [comments, setComments] = useState([]);
@@ -9,6 +9,8 @@ const ArticleDiscussion = ({ articleId }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const isAdmin = currentUser?.userType === "Admin";
   const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
   const commentsRef = useRef(null);
@@ -38,8 +40,6 @@ const ArticleDiscussion = ({ articleId }) => {
 
   const handleAddComment = async () => {
     if (newComment.trim() === "") return;
-
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (currentUser) {
       const requestResult = await postRequest(`articlecomments`, {
         commentText: newComment,
@@ -60,7 +60,15 @@ const ArticleDiscussion = ({ articleId }) => {
       setNewComment("");
     }
   };
-
+const handleDeleteComment = async (commentId) => {
+      const requestResult = await deleteRequest(`articlecomments/${commentId}`);
+      if (requestResult.succeeded) {
+        setComments(prev => prev.filter(c => c.commentId !== commentId));
+          setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
+      }
+  };
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -108,7 +116,7 @@ const ArticleDiscussion = ({ articleId }) => {
     };
   }, [commentsLoaded, page, hasMore, loading]);
 
-  return (
+   return (
     <div className="discussion-container">
       <h2 className="section-title">Questions & Responses</h2>
 
@@ -122,6 +130,18 @@ const ArticleDiscussion = ({ articleId }) => {
         {comments.map((comment) => (
           <div key={comment.commentId} className="comment">
             <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
+            {console.log(comment.userId)}
+            {(isAdmin ||currentUser.userId===comment.userId)&& 
+             <button
+    onClick={() => handleDeleteComment(comment.commentId)}
+    style={{
+      color: "black",
+      marginLeft: "5px"
+    }}
+  >
+    🗑
+  </button>
+            }
           </div>
         ))}
 

@@ -5,7 +5,7 @@ async function getRecipeComments(recipeId, limit, offset) {
     const db = await dbPromise;
 
     const query = `
-      SELECT c.commentId, u.userName, c.commentText
+      SELECT c.commentId, u.userName, c.commentText, c.userId 
       FROM comments c
       JOIN users u ON c.userId = u.userId
       WHERE c.recipeId = ?
@@ -26,7 +26,7 @@ async function getArticleComments(articleId, limit, offset) {
     const db = await dbPromise;
 
     const query = `
-      SELECT c.commentId, u.userName, c.commentText
+      SELECT c.commentId, u.userName,c.userId, c.commentText
       FROM articlecomments c
       JOIN users u ON c.userId = u.userId
       WHERE c.articleId = ?
@@ -86,10 +86,35 @@ async function postArticleComments(articleId, userId, commentText) {
         throw error;
     }
 }
+async function deleteRecipeComment(commentId) {
+   try{
+  const db = await dbPromise;
+    const query = `DELETE FROM comments WHERE commentId = ?`;
 
+    const [result] = await db.execute(query, [commentId]);
+    return result.affectedRows > 0;
+  } catch (err) {
+    console.error("Error deleting recipe comment:", err);
+    return false;
+  }
+}
+async function deleteArticleComment(commentId) {
+try{
+   const db = await dbPromise;
+    const query = `DELETE FROM articlecomments WHERE commentId = ?`;
+ 
+    const [result] = await db.execute(query, [commentId]);
+    return result.affectedRows > 0;
+  } catch (err) {
+    console.error("Error deleting article comment:", err);
+    return false;
+  }
+}
 module.exports = {
  getRecipeComments,
  getArticleComments,
  postRecipeComments,
- postArticleComments
+ postArticleComments,
+ deleteRecipeComment,
+ deleteArticleComment
 };

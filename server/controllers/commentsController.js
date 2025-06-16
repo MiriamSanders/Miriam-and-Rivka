@@ -51,3 +51,23 @@ exports.postArticleComments = async (req, res) => {
     res.status(500).json({ error: 'somthing went wrong' });
   }
 }
+exports.deleteArticleComment = async (req, res) => {
+  try {
+   const commentId = parseInt(req.params.id);
+    const result=await commentsService.deleteArticleComment(commentId);
+     res.json(result);
+  } catch (error) {
+    console.error('Error delet comment:', error);
+    res.status(500).json({ error: 'somthing went wrong' });
+  }
+}
+exports.deleteRecipeComment = async (req, res) => {
+  try {
+   const commentId = parseInt(req.params.id);
+    const result=await commentsService.deleteRecipeComment(commentId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error delet comment:', error);
+    res.status(500).json({ error: 'somthing went wrong' });
+  }
+}

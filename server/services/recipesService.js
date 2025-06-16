@@ -6,17 +6,21 @@ async function getRecipeById(recipeId) {
     const db = await dbPromise;
     // 1. Get the recipe itself with the chef name
     const [recipeRows] = await db.execute(
-      `SELECT r.recipeId, r.title, r.description, r.imageURL, r.instructions,
+      `SELECT r.recipeId, r.title, r.description, r.imageURL, r.instructions,c.chefID,
               r.prepTimeMinutes, d.name, r.category, r.dishType,
               u.userName AS chefName
        FROM recipes r
        JOIN chefs c ON r.chefID = c.chefID
        JOIN users u ON c.chefID = u.userID
        JOIN difficulty d on d.difficultyId =r.difficulty
+<<<<<<< HEAD
+       WHERE r.recipeId = ?`, 
+       [recipeId]
+=======
        WHERE r.recipeId = ?`,
       [recipeId]
+>>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
     );
-
     if (recipeRows.length === 0) {
       throw new Error('Recipe not found');
     }
@@ -63,7 +67,11 @@ async function getAllRecipes(limit, offset = 0) {
     r.imageURL, 
     r.category, 
     r.description, 
+<<<<<<< HEAD
+    u.userID,
+=======
     r.dishType,
+>>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
     u.userName, 
     GROUP_CONCAT(t.name) AS tags
   FROM recipes r
@@ -248,10 +256,119 @@ async function getRecipesByChefId(chefId) {
     throw error;
   }
 }
+async function deleteRecipe(recipeId) {
+   try{
+         const db = await dbPromise;
+          const query = `DELETE FROM recipes WHERE recipeId = ?`;
+          const [result] = await db.execute(query, [recipeId]);
+          return result.affectedRows > 0;
+        } catch (err) {
+          console.error("Error deleting recipe:", err);
+          return false;
+        }
+}
+async function putRecipe(recipeId, updatedData) {
+  const db = await dbPromise;
+  try {
+    // עדכון מתכון ראשי
+    await db.execute(
+      `UPDATE recipes
+       SET title = ?, description = ?, imageURL = ?, instructions = ?,
+           prepTimeMinutes = ?, difficulty = ?, category = ?, dishType = ?
+       WHERE recipeId = ?`,
+      [
+        updatedData.title,
+        updatedData.description,
+        updatedData.imageURL,
+        updatedData.instructions,
+        updatedData.prepTimeMinutes,
+        updatedData.difficulty,
+        updatedData.category,
+        updatedData.dishType,
+        recipeId,
+      ]
+    );
+
+    // מחיקת תגיות קיימות
+    await db.execute(`DELETE FROM recipeTags WHERE recipeId = ?`, [recipeId]);
+
+    // הוספת תגיות חדשות
+    if (Array.isArray(updatedData.tags)) {
+      for (const tagName of updatedData.tags) {
+        // בדיקה אם התגית כבר קיימת
+        const [tagRows] = await db.execute(`SELECT tagId FROM tags WHERE name = ?`, [tagName]);
+        let tagId;
+
+        if (tagRows.length > 0) {
+          tagId = tagRows[0].tagId;
+        } else {
+          // אם לא קיימת, יוצרים תגית חדשה
+          const [insertResult] = await db.execute(`INSERT INTO tags (name) VALUES (?)`, [tagName]);
+          tagId = insertResult.insertId;
+        }
+
+        // הכנסת הקשר בין מתכון לתגית
+        await db.execute(`INSERT INTO recipeTags (recipeId, tagId) VALUES (?, ?)`, [recipeId, tagId]);
+      }
+    }
+
+    return { succeeded: true };
+  } catch (err) {
+    console.error("Update error:", err);
+    return { succeeded: false, error: err.message };}
+}
+async function updateRecipeById(updatedRecipeData) {
+  try {
+    const db = await dbPromise;
+
+    const updateQuery = mysql.format(`
+      UPDATE recipes SET
+        title = ?,
+        description = ?,
+        imageURL = ?,
+        instructions = ?,
+        prepTimeMinutes = ?,
+        difficulty = ?,
+        category = ?,
+        dishType = ?
+      WHERE recipeId = ?
+    `, [
+      updatedRecipeData.title,
+      updatedRecipeData.description,
+     updatedRecipeData. imageURL,
+      updatedRecipeData.instructions,
+      updatedRecipeData.prepTimeMinutes,
+      updatedRecipeData.difficulty,
+      updatedRecipeData.category,
+      updatedRecipeData.dishType,
+      updatedRecipeData.recipeId
+    ]);
+
+    await db.execute(updateQuery);
+const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ updatedRecipeData.recipeId]);
+    const [rows] = await db.execute(newQuery);
+    return rows[0] || null;
+  } catch (error) {
+    console.error("Error updating recipe:", error);
+    throw error;
+  }
+}
+
+
 module.exports = {
+<<<<<<< HEAD
+    getRecipeById,
+    getAllRecipes,
+    getBestRatedRecipes,
+    getRecipesByChefId,
+    deleteRecipe,
+    putRecipe,
+    updateRecipeById
+=======
   getRecipeById,
   getAllRecipes,
   getRecipesAdvanced,
   getBestRatedRecipes,
   getRecipesByChefId
+>>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
 };

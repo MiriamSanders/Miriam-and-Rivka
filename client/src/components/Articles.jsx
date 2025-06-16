@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRequest } from '../Requests';
+import { deleteRequest,getRequest } from '../Requests';
 import '../styles/Articles.css';
 import { useErrorMessage } from "./useErrorMessage";
 function Articles() {
   const [articles, setArticles] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const isAdmin = currentUser?.userType === "Admin";
   const navigate = useNavigate();
   const limit = 8;
     const [errorCode, setErrorCode] = useState(undefined);
@@ -25,7 +27,15 @@ function Articles() {
        setErrorCode(requestResult.status);
     }
   };
-
+const handleDeleteArticle = async (articleId) => {
+      const requestResult = await deleteRequest(`articles/${articleId}`);
+      if (requestResult.succeeded) {
+        setArticles(prev => prev.filter(c => c.articleId !== articleId));
+          setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
+      }
+  };
   useEffect(() => {
     getArticles();
   }, [page]);
@@ -60,6 +70,18 @@ const openArticle = (e) => {
                   <h2>{article.title}</h2>
                   <p>Written by:{article.userName}</p>
                 </div>
+                {console.log(article.userId)}
+                    {(isAdmin ||currentUser.userId===article.authorId)&& 
+             <button
+    onClick={() => handleDeleteArticle(article.articleId)}
+    style={{
+      color: "black",
+      marginLeft: "5px"
+    }}
+  >
+    🗑
+  </button>
+            }
               </div>
           ))
         )}

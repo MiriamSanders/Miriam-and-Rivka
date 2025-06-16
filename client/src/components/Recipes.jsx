@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import {deleteRequest, getRequest } from '../Requests';
+import SearchFilterBar from './SearchBar';
 import { Search, Filter, ChevronDown, X } from 'lucide-react';
-import { getRequest } from '../Requests';
 import { useErrorMessage } from "./useErrorMessage";
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
@@ -15,6 +16,8 @@ function Recipes({ createMenu,addToMenu,menu }) {
   const [tags, setTags] = useState([]);
 
   const errorMessage = useErrorMessage(errorCode);
+     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const isAdmin = currentUser?.userType === "Admin";
   const navigate = useNavigate();
   const location = useLocation();
   const limit = 12;
@@ -117,13 +120,8 @@ function Recipes({ createMenu,addToMenu,menu }) {
         } else {
           setHasMore(true);
         }
-
-        if (append) {
-          setRecipes((prev) => [...prev, ...newRecipes]);
-        } else {
-          setRecipes(newRecipes);
-        }
-        setErrorCode(undefined);
+        setRecipes((prev) => [...prev, ...newRecipes]);
+            setErrorCode(undefined);
       } else {
         setErrorCode(requestResult.status);
       }
@@ -233,7 +231,15 @@ function Recipes({ createMenu,addToMenu,menu }) {
     setHasMore(true);
     getRecipes(1, false);
   };
-
+  const handleDeleteRecipe = async (recipeId) => {
+      const requestResult = await deleteRequest(`recipes/${recipeId}`);
+      if (requestResult.succeeded) {
+        setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
+          setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
+      }
+  };
   const currentSearchParams = getSearchParamsFromUrl();
 
   return (
@@ -394,6 +400,17 @@ function Recipes({ createMenu,addToMenu,menu }) {
                     Add to Menu
                   </button>
                 )}
+                    {(isAdmin ||currentUser.userId===recipe.userId)&& 
+             <button
+    onClick={() => handleDeleteRecipe(recipe.recipeId)}
+    style={{
+      color: "black",
+      marginLeft: "5px"
+    }}
+  >
+    🗑
+  </button>
+            }
                 <div className="recipe-overlay">
                   <h2>{recipe.title}</h2>
                   <p>{recipe.description}</p>

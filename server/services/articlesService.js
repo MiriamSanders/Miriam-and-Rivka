@@ -3,7 +3,7 @@ const dbPromise = require("./dbConnection");
 async function articleGetAll(limit, offset) {
   try {
     const db = await dbPromise;
-    let query = `SELECT a.articleId, u.userName,title FROM articles a
+    let query = `SELECT a.articleId, u.userName,title,a.authorId FROM articles a
        JOIN users u ON a.authorId = u.userId`;
  const params = [];
 
@@ -89,8 +89,21 @@ async function getArticlesByChefId(chefId) {
         throw error;
     }
 }
+async function deleteArticle(articleId) {
+    try{
+       const db = await dbPromise;
+        const query = `DELETE FROM articles WHERE articleId = ?`;
+     
+        const [result] = await db.execute(query, [articleId]);
+        return result.affectedRows > 0;
+      } catch (err) {
+        console.error("Error deleting article:", err);
+        return false;
+      }
+}
 module.exports = {
   articleGetAll,
   getArticleById,
   getArticlesByChefId,
+  deleteArticle
 };
