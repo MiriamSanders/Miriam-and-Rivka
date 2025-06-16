@@ -231,7 +231,15 @@ function Recipes({ createMenu,addToMenu,menu }) {
     setHasMore(true);
     getRecipes(1, false);
   };
-
+  const handleDeleteRecipe = async (recipeId) => {
+      const requestResult = await deleteRequest(`recipes/${recipeId}`);
+      if (requestResult.succeeded) {
+        setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
+          setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
+      }
+  };
   const currentSearchParams = getSearchParamsFromUrl();
 
   return (
