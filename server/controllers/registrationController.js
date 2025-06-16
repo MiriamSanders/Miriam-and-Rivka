@@ -1,4 +1,4 @@
-const genericService= require('../services/genericService');
+const genericService = require('../services/genericService');
 const loginService = require('../services/loginService');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -20,8 +20,8 @@ exports.registerUser = async (req, res) => {
         // Store the hashed password in the database
         await genericService.genericPost('passwords', { userId: newUser.userId, passwordHash: hashedPassword });
         //need to change- 
-        let userType=await genericService.genericGet('roles',"roleId", newUser.userType);
-        userType=userType[0];
+        let userType = await genericService.genericGet('roles', "roleId", newUser.userType);
+        userType = userType[0];
         console.log(userType);
         // צור טוקן JWT
         const token = jwt.sign(
@@ -63,7 +63,6 @@ exports.loginUser = async (req, res) => {
             return res.status(400).json({ error: 'Invalid username or password' });
         }
         console.log(user);
-        
         const token = jwt.sign(
             { id: user.userId, userName: user.userName, userType: user.roleName },
             process.env.JWT_SECRET,
@@ -76,8 +75,9 @@ exports.loginUser = async (req, res) => {
             sameSite: "Lax",
             maxAge: 1000 * 60 * 60 // שעה
         });
-
-        res.status(200).json({ id: user.userId, userName: user.userName, userType: user.userType });
+         console.log(user);
+         
+        res.status(200).json({ id: user.userId, userName: user.userName, userType: user.roleName });
 
 
     } catch (error) {

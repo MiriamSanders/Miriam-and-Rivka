@@ -193,7 +193,7 @@ const HomePage = ({ userType }) => {
 
           <div className="chef-grid">
             {featuredChefs.map((chef) => (
-              <div key={chef.id} className="chef-card">
+              <div key={chef.id} className="home-chef-card">
                 <div className="chef-avatar-container">
                   <img
                     src={chef.imageURL}
@@ -202,7 +202,7 @@ const HomePage = ({ userType }) => {
                   />
                 </div>
 
-                <h3 className="chef-name">
+                <h3 className="home-chef-name">
                   {chef.userName}
                 </h3>
               </div>

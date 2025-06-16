@@ -257,13 +257,13 @@
   justify-items: center;
 }
 
-.chef-card {
+.home-chef-card {
   text-align: center;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
 
-.chef-card:hover {
+.home-chef-card:hover {
   transform: scale(1.1);
 }
 
@@ -284,7 +284,7 @@
   border-color: #d1d5db;
 }
 
-.chef-name {
+.home-chef-name {
   font-weight: 600;
   color: white;
   font-size: 0.875rem;
