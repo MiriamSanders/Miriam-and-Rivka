@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
 import '../styles/Recipes.css';
 
-function Recipes({ createMenu }) {
+function Recipes({ createMenu,addToMenu,menu }) {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -17,7 +17,7 @@ function Recipes({ createMenu }) {
   const errorMessage = useErrorMessage(errorCode);
   const navigate = useNavigate();
   const location = useLocation();
-  const limit = 10;
+  const limit = 12;
 
   const categories = [
     { value: 'all', label: 'All Categories' },
@@ -31,6 +31,24 @@ function Recipes({ createMenu }) {
     { value: 'name-asc', label: 'Name A-Z' },
     { value: 'name-desc', label: 'Name Z-A' }
   ];
+  const addRecipeToMenu = (recipeId, dishType) => {
+    if (createMenu) { 
+      addToMenu((prevMenu) => {
+        const updatedMenu = { ...prevMenu };
+        if (dishType === 'side') {
+          updatedMenu.sideIds.push(recipeId);
+        } else if (dishType === 'main') {
+          updatedMenu.mainIds.push(recipeId);
+        } else if (dishType === 'dessert') {
+          updatedMenu.dessertIds.push(recipeId);
+        }
+        return updatedMenu;
+      });
+    }
+  console.log("Recipe added to menu:", recipeId, "Dish Type:", dishType);
+  console.log("Current Menu State:", menu);
+  
+  }
 
   // Parse URL parameters into search params object
   const getSearchParamsFromUrl = () => {
@@ -92,6 +110,8 @@ function Recipes({ createMenu }) {
       const requestResult = await getRequest(apiQuery);
       if (requestResult.succeeded) {
         const newRecipes = requestResult.data;
+        console.log(newRecipes);
+        
         if (newRecipes.length < limit) {
           setHasMore(false);
         } else {
@@ -369,7 +389,7 @@ function Recipes({ createMenu }) {
               <div className="recipe-image" style={{ backgroundImage: `url(${recipe.imageURL})` }}>
                 {createMenu && (
                   <button className="add-to-menu-button" onClick={(e) => {
-                    e.stopPropagation();
+                    e.stopPropagation(); addRecipeToMenu(recipe.recipeId,recipe.dishType);
                   }}>
                     Add to Menu
                   </button>

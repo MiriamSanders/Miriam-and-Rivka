@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise');
-const dbPromise = require("./dbConnection"); 
+const dbPromise = require("./dbConnection");
 async function getRecipeById(recipeId) {
-    try {
+  try {
     const result = {};
     const db = await dbPromise;
     // 1. Get the recipe itself with the chef name
@@ -14,7 +14,7 @@ async function getRecipeById(recipeId) {
        JOIN users u ON c.chefID = u.userID
        JOIN difficulty d on d.difficultyId =r.difficulty
        WHERE r.recipeId = ?`,
-       [recipeId]
+      [recipeId]
     );
 
     if (recipeRows.length === 0) {
@@ -32,7 +32,7 @@ async function getRecipeById(recipeId) {
        ORDER BY ri.orderIndex`, [recipeId]
     );
     console.log("Ingredients:", ingredients);
-    
+
     result.ingredients = ingredients;
 
     // 3. Get tags
@@ -45,24 +45,25 @@ async function getRecipeById(recipeId) {
 
     result.tags = tags.map(t => t.name); // simplify to array of strings
     console.log("Tags:", result.tags);
-    
+
     return result;
 
   } catch (err) {
     console.error("Error:", err.message);
     throw err;
-  } 
+  }
 }
-async function getAllRecipes(limit, offset=0) {
+async function getAllRecipes(limit, offset = 0) {
   try {
     const db = await dbPromise;
-  const query = `
+    const query = `
   SELECT 
     r.recipeId, 
     r.title, 
     r.imageURL, 
     r.category, 
     r.description, 
+    r.dishType,
     u.userName, 
     GROUP_CONCAT(t.name) AS tags
   FROM recipes r
@@ -76,7 +77,7 @@ async function getAllRecipes(limit, offset=0) {
 
     const [rows] = await db.execute(query);
     console.log("All Recipes:", rows);
-    
+
     return rows;
 
   } catch (error) {
@@ -112,6 +113,7 @@ async function getRecipesAdvanced(options = {}) {
         r.imageURL,
         r.category,
         r.description,
+        r.dishType,
         u.userName,
         GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags
       FROM recipes r
@@ -169,7 +171,7 @@ async function getRecipesAdvanced(options = {}) {
     }
 
     query += `
-      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, u.userName
+      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType, u.userName
       ORDER BY r.${validSortBy} ${validSortOrder}
       LIMIT ? OFFSET ?
     `;
@@ -189,6 +191,7 @@ async function getRecipesAdvanced(options = {}) {
       imageURL: row.imageURL,
       category: row.category,
       description: row.description,
+      dishType: row.dishType,
       userName: row.userName,
       tags: row.tags ? row.tags.split(',').map(tag => tag.trim()) : []
     }));
@@ -197,58 +200,58 @@ async function getRecipesAdvanced(options = {}) {
 
   } catch (error) {
     console.error('Error fetching recipes:', error);
-  //  console.error('Query:', query);
-  //  console.error('Params:', params);
+    //  console.error('Query:', query);
+    //  console.error('Params:', params);
     throw error;
   }
 }
 async function getBestRatedRecipes(limit = 4) {
-    const db = await dbPromise;
-    const [rows] = await db.execute(
-        `SELECT recipeId, AVG(rating) as avgRating 
+  const db = await dbPromise;
+  const [rows] = await db.execute(
+    `SELECT recipeId, AVG(rating) as avgRating 
          FROM reciperatings 
          GROUP BY recipeId 
          ORDER BY avgRating DESC 
          LIMIT 4`
-    );
-    console.log(rows);
-    
-    let recipeIds = rows.map(row => row.recipeId);
-    console.log(recipeIds);
-    
-    let recipes = [];
-    for (let row of recipeIds) {
-        const recipe =await db.execute(
-            `SELECT r.recipeId, r.title, r.imageURL, r.description, u.userName AS chefName
+  );
+  console.log(rows);
+
+  let recipeIds = rows.map(row => row.recipeId);
+  console.log(recipeIds);
+
+  let recipes = [];
+  for (let row of recipeIds) {
+    const recipe = await db.execute(
+      `SELECT r.recipeId, r.title, r.imageURL, r.description, u.userName AS chefName
              FROM recipes r
              JOIN users u ON r.chefId = u.userId
              WHERE r.recipeId = ?`, [row]
-        );
-        recipes.push(recipe[0][0]); // Assuming recipe[0][0] is the recipe object
-      }
-   return recipes;
+    );
+    recipes.push(recipe[0][0]); // Assuming recipe[0][0] is the recipe object
+  }
+  return recipes;
 }
 async function getRecipesByChefId(chefId) {
-    try {
-        const db = await dbPromise;
-        const [rows] = await db.execute(
-            `SELECT r.recipeId, r.title, r.imageURL, r.description, u.userName AS chefName
+  try {
+    const db = await dbPromise;
+    const [rows] = await db.execute(
+      `SELECT r.recipeId, r.title, r.imageURL, r.description, u.userName AS chefName
              FROM recipes r
              JOIN users u ON r.chefId = u.userId
              WHERE r.chefId = ?`, [chefId]
-        );
-        console.log("Recipes by Chef ID:", rows);
-        
-        return rows;
-    } catch (error) {
-        console.error('Error fetching recipes by chef ID:', error);
-        throw error;
-    }
+    );
+    console.log("Recipes by Chef ID:", rows);
+
+    return rows;
+  } catch (error) {
+    console.error('Error fetching recipes by chef ID:', error);
+    throw error;
+  }
 }
 module.exports = {
-    getRecipeById,
-    getAllRecipes,
-    getRecipesAdvanced,
-    getBestRatedRecipes,
-    getRecipesByChefId
+  getRecipeById,
+  getAllRecipes,
+  getRecipesAdvanced,
+  getBestRatedRecipes,
+  getRecipesByChefId
 };

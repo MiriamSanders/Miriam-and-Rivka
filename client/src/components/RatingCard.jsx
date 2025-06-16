@@ -11,7 +11,7 @@ const RatingCard = ({ recipeId }) => {
   useEffect(() => {
     const fetchRating = async () => {
       
-        const requestResult = await getRequest(`ratings/${recipeId}`); 7
+        const requestResult = await getRequest(`ratings/${recipeId}`);
         if(requestResult.succeeded){
               setErrorCode(undefined);
         setRating(requestResult.data.averageRating|| 0); }// Set initial rating or default to 0
@@ -22,11 +22,11 @@ setErrorCode(requestResult.status);
     fetchRating();
   }, []);
 
-  const handleClick = (newRating) => {
+  const handleClick =async (newRating) => {
     const currentUser= JSON.parse(localStorage.getItem("currentUser"));
     const postData= { userId:currentUser.id ,recipeId:recipeId, rating: newRating }// Assuming userId is stored in localStorage
     console.log("Post Data:", postData); // Debugging line to check the data being sent
-    postRequest(`ratings`,postData )
+    const result=await postRequest(`ratings`,postData);
     setRating(newRating);
     setShowModal(false);
   };

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Plus, Calendar, Clock, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { postRequest } from '../Requests';
 import '../styles/MenuManager.css'; // Import your CSS styles
 
 
-const MenuManager = ({ setCreateMenu }) => {
+const MenuManager = ({ createMenu,setCreateMenu,menu }) => {
   //example initial menus
   const [menus, setMenus] = useState([
     {
@@ -34,6 +35,19 @@ const MenuManager = ({ setCreateMenu }) => {
       day: 'numeric'
     });
   };
+ async function createMenu(menu) {
+    const data={
+      userId: JSON.parse(localStorage.getItem('currentUser')).id,
+    sideIds:Array.isArray(menu.sideIds) ? menu.sideIds.join(', ') : menu.sideIds,
+    mainIds:Array.isArray(menu.mainIds) ? menu.mainIds.join(', ') : menu.mainIds,
+    dessertIds:Array.isArray(menu.dessertIds) ? menu.dessertIds.join(', ') : menu.dessertIds,
+    }
+    console.log("Creating menu with data:", data);
+    
+    const createdMenu = await postRequest('menu/meal-plan', data);
+    console.log("Created menu:", createdMenu);
+    
+ }
 
   return (
     <div className="menu-container">
@@ -48,13 +62,22 @@ const MenuManager = ({ setCreateMenu }) => {
       <div className="menu-main">
 
         <div className="create-button-container">
-          <button
+       <button
             className="create-button"
             onClick={() => { navigate('/recipes'); setCreateMenu(true) }}
           >
             <Plus className="create-button-icon" />
             Create New  Weekly Menu
           </button>
+        
+            <button
+              className="create-button"
+              onClick={() => { createMenu(menu) }}
+            >
+              <Plus className="create-button-icon" />
+              Click And Allow Us To Do The Rest
+            </button>
+         
         </div>
 
         {/* Menus List */}
@@ -75,7 +98,7 @@ const MenuManager = ({ setCreateMenu }) => {
               {menus.map((menu) => (
                 <div key={menu.id} className="menu-card">
                   <div className="menu-card-header">
-                    <h3 className="menu-card-title">{menu.name}</h3>
+                    {/* <h3 className="menu-card-title">{menu.name}</h3> */}
                     <button
                       className="delete-button"
                       onClick={() => handleDeleteMenu(menu.id)}

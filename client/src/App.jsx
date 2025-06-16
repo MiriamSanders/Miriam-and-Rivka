@@ -24,7 +24,10 @@ function App() {
   });
 
   const [createMenu, setCreateMenu] = useState(false);
-
+   const [menu, setMenu] = useState({
+    sideIds:[],
+    mainIds:[],
+    dessertIds:[]});
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('currentUser')) || null;
     setUserType(user ? user.userType : "guest");
@@ -43,7 +46,7 @@ function App() {
         <Route path="signup" element={<Signup setUserType={setUserType} />} />
 
         {/* Recipes */}
-        <Route path="recipes" element={<Recipes createMenu={createMenu} />} />
+        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu}/>} />
         <Route path="chefs/:id/recipes`" element={<Recipes/>} />
         <Route path="recipes/:id" element={<RecipePage />} />
 
@@ -56,7 +59,7 @@ function App() {
         <Route path="articles/:id" element={<ArticlePage />} />
    <Route path="chefs/:id/articles`" element={<Articles />} />
         {/* Personal Area */}
-        <Route path="personal-area/menus" element={<MenuManager setCreateMenu={setCreateMenu} />} />
+        <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu}/>} />
         {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
 
         {/* Chef Area */}
