@@ -17,4 +17,16 @@ router.post('/articlecomments',async (req, res) => {
   }
 controller.postArticleComments(req,res);
 });
+router.delete('/recipecomments/:id',async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Must be logged in to delet comment" });
+  }
+controller.deleteRecipeComment(req,res);
+})
+router.delete('/articlecomments/:id',async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Must be logged in to delet comment" });
+  }
+controller.deleteArticleComment(req,res);
+})
 module.exports = router;

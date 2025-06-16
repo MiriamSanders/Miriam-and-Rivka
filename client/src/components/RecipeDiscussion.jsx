@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
-import { getRequest, postRequest } from "../Requests";
+import { deleteRequest,getRequest, postRequest } from "../Requests";
 import { useErrorMessage } from "./useErrorMessage";
 const RecipeDiscussion = ({ recipeId }) => {
   const [comments, setComments] = useState([]);
@@ -9,6 +9,8 @@ const RecipeDiscussion = ({ recipeId }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const isAdmin = currentUser?.userType === "Admin";
   const commentsRef = useRef(null);
   const loadMoreRef = useRef(null);
   const hasStarted = useRef(false);
@@ -81,10 +83,17 @@ const RecipeDiscussion = ({ recipeId }) => {
       }
     };
   }, [commentsLoaded, page, hasMore, loading]);
-
+const handleDeleteComment = async (commentId) => {
+      const requestResult = await deleteRequest(`recipecomments/${commentId}`);
+      if (requestResult.succeeded) {
+        setComments(prev => prev.filter(c => c.commentId !== commentId));
+          setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
+      }
+  };
   const handleAddComment = async () => {
     if (newComment.trim() === "") return;
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (currentUser) {
       const requestResult = await postRequest(`recipecomments`, {
         commentText: newComment,
@@ -116,6 +125,17 @@ const RecipeDiscussion = ({ recipeId }) => {
           {comments.map((comment) => (
             <div key={comment.commentId} className="comment">
               <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
+                  {(isAdmin ||currentUser.userId===comment.userId)&& 
+             <button
+    onClick={() => handleDeleteComment(comment.commentId)}
+    style={{
+      color: "black",
+      marginLeft: "5px"
+    }}
+  >
+    🗑
+  </button>
+            }
             </div>
           ))}
 

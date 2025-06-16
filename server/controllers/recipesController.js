@@ -216,3 +216,119 @@ function parseIngredientText(ingredientText) {
     ingredientName: ingredientText
   };
 }
+exports.deleteRecipe=async(req,res)=>{
+   try {
+     const recipeId = parseInt(req.params.id);
+      const result= await recipeService.deleteRecipe(recipeId);
+       res.json(result);
+    } catch (error) {
+      console.error('Error delet recipe:', error);
+      res.status(500).json({ error: 'somthing went wrong' });
+    }
+}
+exports.putRecipe = async (req, res) => {
+  const recipeId = req.params.id;
+  const {
+    title,
+    description,
+    imageURL,
+    instructions,
+    prepTimeMinutes,
+    difficulty,
+    category,
+    dishType,
+    ingredientsList,
+    tags
+  } = req.body;
+
+  if (!title || !imageURL || !category || !description) {
+    return res.status(400).json({ error: 'title, imageURL, category, and description are required' });
+  }
+
+  try {
+    // Find or create difficulty ID
+    let difficultyId = await genericService.genericGet("difficulty", "name", difficulty);
+    if (!difficultyId || !difficultyId[0]) {
+      difficultyId = await genericService.genericPost("difficulty", { name: difficulty }, "difficultyId");
+    } else {
+      difficultyId = difficultyId[0].difficultyId;
+    }
+
+    // Update recipe data
+    const updatedRecipeData = {
+      recipeId,
+      title,
+      description,
+      imageURL,
+      instructions,
+      prepTimeMinutes: prepTimeMinutes || null,
+      difficulty: difficultyId,
+      category,
+      dishType
+    };
+
+  await recipeService.updateRecipeById(updatedRecipeData);
+
+    // 🧽 ניקוי רכיבי המתכון הקודמים
+    await genericService.genericDelete('recipeTags', recipeId, 'recipeId');
+
+    // ➕ הכנסת רכיבים חדשים
+    if (Array.isArray(ingredientsList)) {
+      for (let i = 0; i < ingredientsList.length; i++) {
+        const ingredientText = ingredientsList[i].trim();
+        if (ingredientText) {
+          const { quantity, ingredientName } = parseIngredientText(ingredientText);
+          if (!ingredientName) continue;
+
+          let ingredientRow = await genericService.genericGet("ingredients", "name", ingredientName);
+          if (!ingredientRow || !ingredientRow[0]) {
+            ingredientRow = await genericService.genericPost("ingredients", {
+              Name: ingredientName,
+              CaloriesPer100g: null,
+              ProteinPer100g: null,
+              CarbsPer100g: null,
+              FatPer100g: null,
+              FiberPer100g: null
+            }, "ingredientId");
+          }
+
+          await genericService.genericPost("recipeIngredients", {
+            recipeId,
+            ingredientId: ingredientRow[0]?.ingredientID || ingredientRow.ingredientID,
+            quantity,
+            orderIndex: i + 1
+          }, "recipeId");
+        }
+      }
+    }
+
+    // 🧽 ניקוי טאגים קודמים
+    await genericService.genericDeleteByField("recipeTags", "recipeId", recipeId);
+
+    // ➕ הכנסת טאגים חדשים
+    if (Array.isArray(tags)) {
+      for (const tagName of tags.map(t => t.trim()).filter(Boolean)) {
+        let tag = await genericService.genericGet("tags", "name", tagName);
+        if (!tag || !tag[0]) {
+          tag = await genericService.genericPost("tags", tagName, "tagId");
+        } else {
+          tag = tag[0];
+        }
+
+        await genericService.genericPost("recipeTags", {
+          recipeId,
+          tagId: tag.tagId
+        }, "recipeId");
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Recipe updated successfully'
+    });
+
+  } catch (err) {
+    console.error("Error updating recipe:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

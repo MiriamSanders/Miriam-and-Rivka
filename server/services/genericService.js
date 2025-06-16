@@ -125,23 +125,23 @@ async function genericPost(table, data, returnId = "userId") {
     }
 };
 
-// async function GenericPut(table, id, data) {
-//     try {
-//         const db = await dbPromise;
-//         const updateQuery = mysql.format(`
-//             UPDATE ?? 
-//             SET ? 
-//             WHERE id = ?
-//         `, [table, data, id]);
-//         await db.execute(updateQuery);
-//         const selectQuery = mysql.format(`SELECT * FROM ?? WHERE id = ?`, [table, id]);
-//         const [rows] = await db.execute(selectQuery);
-//         return rows[0] || null;
-//     } catch (error) {
-//         console.error('Error updating data:', error);
-//         throw error;
-//     }
-// }
+async function GenericPut(table, id, data) {
+    try {
+        const db = await dbPromise;
+        const updateQuery = mysql.format(`
+            UPDATE ?? 
+            SET ? 
+            WHERE id = ?
+        `, [table, data, id]);
+        await db.execute(updateQuery);
+        const selectQuery = mysql.format(`SELECT * FROM ?? WHERE id = ?`, [table, id]);
+        const [rows] = await db.execute(selectQuery);
+        return rows[0] || null;
+    } catch (error) {
+        console.error('Error updating data:', error);
+        throw error;
+    }
+}
 
 async function genericDelete(table, id,fieldName ) {
     try {
@@ -185,4 +185,4 @@ async function genericDelete(table, id,fieldName ) {
 //     const logQuery = mysql.format(`INSERT INTO logs SET ?`, [data]);
 //     await db.execute(logQuery);
 // }
-module.exports = { genericGet, genericPost,genericGetAll ,genericGetByColumnName,genericDelete};
+module.exports = { genericGet,GenericPut, genericPost,genericGetAll ,genericGetByColumnName,genericDelete};

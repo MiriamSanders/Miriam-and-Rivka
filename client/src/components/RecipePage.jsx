@@ -5,51 +5,174 @@ import RecipeReader from "./RecipeReader";
 import { useErrorMessage } from "./useErrorMessage";
 import RecipeDiscussion from "./RecipeDiscussion";
 import "../styles/RecipePage.css"; 
-import { getRequest } from "../Requests";
+import { getRequest, putRequest } from "../Requests";
 
 const RecipePage = () => {
   const { id } = useParams();
   const [recipeData, setRecipeData] = useState(null);
   const [loading, setLoading] = useState(true);
-      const [errorCode, setErrorCode] = useState(undefined);
+  const [errorCode, setErrorCode] = useState(undefined);
+  const [editMode, setEditMode] = useState(false);
+  const [editedRecipe, setEditedRecipe] = useState({});
+  const [originalRecipe, setOriginalRecipe] = useState({});
   const errorMessage = useErrorMessage(errorCode);
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
   useEffect(() => {
     const fetchRecipe = async () => {
-      
-        const requestResult = await getRequest(`recipes/${id}`);
-        if (requestResult.succeeded) {
-          setRecipeData(requestResult.data);
-              setErrorCode(undefined);
-        }
-        else{
-setErrorCode(requestResult.status);
-        }
-        setLoading(false);
+      const requestResult = await getRequest(`recipes/${id}`);
+      if (requestResult.succeeded) {
+        setRecipeData(requestResult.data);
+        setEditedRecipe({
+          ...requestResult.data.recipe,
+          ingredientsList: requestResult.data.ingredients?.map(i => `${i.quantity} ${i.name}`),
+          tags: requestResult.data.tags || []
+        });
+        setOriginalRecipe({
+          ...requestResult.data.recipe,
+          ingredientsList: requestResult.data.ingredients?.map(i => `${i.quantity} ${i.name}`),
+          tags: requestResult.data.tags || []
+        });
+        setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
+      }
+      setLoading(false);
     };
-
     fetchRecipe();
   }, [id]);
 
+  const handleEditToggle = () => setEditMode((prev) => !prev);
+
+  const handleCancel = () => {
+    setEditedRecipe(originalRecipe);
+    setEditMode(false);
+  };
+
+  const handleSave = async () => {
+    const updatedData = {
+      ...editedRecipe,
+      ingredientsList: editedRecipe.ingredientsList || [],
+      tags: editedRecipe.tags || []
+    };
+    const result = await putRequest(`recipes/${id}`, updatedData);
+    if (result.succeeded) {
+      setRecipeData((prev) => ({ ...prev, recipe: updatedData, tags: updatedData.tags }));
+      setOriginalRecipe(updatedData);
+      setEditMode(false);
+      setErrorCode(undefined);
+    } else {
+      setErrorCode(result.status);
+    }
+  };
+
   if (loading) return <div className="center-text">Loading...</div>;
   if (!recipeData) return <div className="center-text">Recipe not found.</div>;
- const { title, subtitle, chefName, prepTimeMinutes, difficulty, category, description, instructions, imageURL,ingredientsList } = recipeData.recipe || {};
+
+  const {
+    title,
+    subtitle,
+    chefName,
+    prepTimeMinutes,
+    difficulty,
+    category,
+    description,
+    instructions,
+    imageURL,
+    ingredientsList,
+    tags: tagList = []
+  } = editMode ? editedRecipe : recipeData.recipe || {};
+
   const ingredients = recipeData.ingredients || [];
-  const tags = recipeData.tags || [];
-console.log("Recipe Data:", recipeData); // Debugging line to check the fetched data
+  const tags = editMode ? editedRecipe.tags || [] : recipeData.tags || [];
+  const isEditable = currentUser?.userType === "Admin" || currentUser?.Id === recipeData.recipe.chefID;
+
   return (
     <div className="recipe-container">
-       {errorMessage && (
+      {errorMessage && (
         <div style={{ color: "red", marginBottom: "1rem" }}>
           ⚠️ {errorMessage}
         </div>
       )}
-      <h1 className="recipe-title">{title}</h1>
-      <h2 className="recipe-subtitle">{subtitle}</h2>
+
+      {isEditable && (
+        <div style={{ marginBottom: '1rem' }}>
+          {editMode ? (
+            <>
+              <button onClick={handleSave}>Save</button>
+              <button onClick={handleCancel} style={{ marginLeft: '8px' }}>Cancel</button>
+            </>
+          ) : (
+            <button onClick={handleEditToggle}>✏️ Edit</button>
+          )}
+        </div>
+      )}
+
+      <h1 className="recipe-title">
+        {editMode ? (
+          <input
+            value={title}
+            onChange={(e) => setEditedRecipe({ ...editedRecipe, title: e.target.value })}
+          />
+        ) : (
+          title
+        )}
+      </h1>
+
+      <h2 className="recipe-subtitle">
+        {editMode ? (
+          <input
+            value={subtitle}
+            onChange={(e) => setEditedRecipe({ ...editedRecipe, subtitle: e.target.value })}
+          />
+        ) : (
+          subtitle
+        )}
+      </h2>
+
       <p className="recipe-subtext">By: {chefName}</p>
-      <p className="recipe-subtext">
-        Prep Time: {prepTimeMinutes} min · Difficulty: {difficulty} · Category: {category}
-      </p>
-<RecipeReader recipeData={recipeData} />
+     <p className="recipe-subtext">
+  {editMode ? (
+    <>
+      Prep Time:
+      <input
+        type="number"
+        min={1}
+        value={prepTimeMinutes}
+        onChange={(e) =>
+          setEditedRecipe({ ...editedRecipe, prepTimeMinutes: parseInt(e.target.value) || 0 })
+        }
+        style={{ width: "60px", margin: "0 5px" }}
+      />
+      min · Difficulty:
+      <input
+        type="text"
+        value={difficulty}
+        onChange={(e) =>
+          setEditedRecipe({ ...editedRecipe, difficulty: e.target.value })
+        }
+        style={{ width: "100px", margin: "0 5px" }}
+      />
+      · Category:
+      <input
+        type="text"
+        value={category}
+        onChange={(e) =>
+          setEditedRecipe({ ...editedRecipe, category: e.target.value })
+        }
+        style={{ width: "100px", margin: "0 5px" }}
+      />
+    </>
+  ) : (
+    <>
+      Prep Time: {prepTimeMinutes} min · Difficulty: {difficulty} · Category: {category}
+    </>
+  )}
+</p>
+
+
+      <RecipeReader recipeData={recipeData} />
+
       {imageURL ? (
         <img src={imageURL} alt={title} className="recipe-image-style" />
       ) : (
@@ -61,44 +184,82 @@ console.log("Recipe Data:", recipeData); // Debugging line to check the fetched 
           </div>
         </div>
       )}
+
       <RatingCard recipeId={id} />
+
       <div className="recipe-content">
         <section>
           <h2 className="section-title">Description</h2>
-          <p>{description}</p>
+          {editMode ? (
+            <textarea
+              value={description}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, description: e.target.value })}
+              rows={4}
+            />
+          ) : (
+            <p>{description}</p>
+          )}
         </section>
 
-           <section>
+        <section>
           <h2 className="section-title">Ingredients</h2>
-          <ul className="ingredients-list">
-            {Array.isArray(ingredients) ? (
-              ingredients.map((item, index) => (
-                <li key={index}>
-                  {item.quantity} {item.name}
-                </li>
-              ))
-            ) : (
-              ingredientsList.map((item, index) => (
-                <li key={index}>{item.trim()}</li>
-              ))
-            )}
-          </ul>
+          {editMode ? (
+            <textarea
+              value={ingredientsList?.join("\n") || ""}
+              onChange={(e) =>
+                setEditedRecipe({ ...editedRecipe, ingredientsList: e.target.value.split("\n") })
+              }
+              rows={5}
+            />
+          ) : (
+            <ul className="ingredients-list">
+              {Array.isArray(ingredients)
+                ? ingredients.map((item, index) => (
+                    <li key={index}>
+                      {item.quantity} {item.name}
+                    </li>
+                  ))
+                : ingredientsList.map((item, index) => (
+                    <li key={index}>{item.trim()}</li>
+                  ))}
+            </ul>
+          )}
         </section>
-          <section>
+
+        <section>
           <h2 className="section-title">Instructions</h2>
-          <p className="instructions">{instructions}</p>
+          {editMode ? (
+            <textarea
+              value={instructions}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, instructions: e.target.value })}
+              rows={5}
+            />
+          ) : (
+            <p className="instructions">{instructions}</p>
+          )}
         </section>
 
         <section>
           <h2 className="section-title">Tags</h2>
-          <div className="tags-container">
-            {tags.map((tag,index) => (
-              <span key={index} className="tag">#{tag}</span>
-            ))}
-          </div>
+          {editMode ? (
+            <textarea
+              value={tags.join("\n")}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, tags: e.target.value.split("\n") })}
+              rows={3}
+            />
+          ) : (
+            <div className="tags-container">
+              {tags.map((tag, index) => (
+                <span key={index} className="tag">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
         </section>
       </div>
-      <RecipeDiscussion recipeId={id}/>
+
+      <RecipeDiscussion recipeId={id} />
     </div>
   );
 };

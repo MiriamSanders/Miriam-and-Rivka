@@ -77,7 +77,7 @@ exports.loginUser = async (req, res) => {
             maxAge: 1000 * 60 * 60 // שעה
         });
 
-        res.status(200).json({ id: user.userId, userName: user.userName, userType: user.userType });
+        res.status(200).json({ id: user.userId, userName: user.userName, userType: user.roleName });
 
 
     } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getRequest } from '../Requests';
+import {deleteRequest, getRequest } from '../Requests';
 import SearchFilterBar from './SearchBar';
 import { useErrorMessage } from "./useErrorMessage";
 import '../styles/Recipes.css';
@@ -11,11 +11,12 @@ function Recipes({ createMenu }) {
   const [hasMore, setHasMore] = useState(true);
       const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
+     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const isAdmin = currentUser?.userType === "Admin";
   const navigate = useNavigate();
   const limit = 10;
 
   const getRecipes = async () => {
-    
       const requestResult = await getRequest(`recipes?limit=${limit}&page=${page}`);
       if (requestResult.succeeded) {
         const newRecipes = requestResult.data;
@@ -24,6 +25,15 @@ function Recipes({ createMenu }) {
         }
         setRecipes((prev) => [...prev, ...newRecipes]);
             setErrorCode(undefined);
+      } else {
+        setErrorCode(requestResult.status);
+      }
+  };
+  const handleDeleteRecipe = async (recipeId) => {
+      const requestResult = await deleteRequest(`recipes/${recipeId}`);
+      if (requestResult.succeeded) {
+        setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
+          setErrorCode(undefined);
       } else {
         setErrorCode(requestResult.status);
       }
@@ -65,6 +75,17 @@ function Recipes({ createMenu }) {
                     Add to Menu
                   </button>
                 )}
+                    {(isAdmin ||currentUser.userId===recipe.userId)&& 
+             <button
+    onClick={() => handleDeleteRecipe(recipe.recipeId)}
+    style={{
+      color: "black",
+      marginLeft: "5px"
+    }}
+  >
+    🗑
+  </button>
+            }
                 <div className="recipe-overlay">
                   <h2>{recipe.title}</h2>
                   <p>{recipe.description}</p>
