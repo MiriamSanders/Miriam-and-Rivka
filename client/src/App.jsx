@@ -24,10 +24,11 @@ function App() {
   });
 
   const [createMenu, setCreateMenu] = useState(false);
-   const [menu, setMenu] = useState({
-    sideIds:[],
-    mainIds:[],
-    dessertIds:[]});
+  const [menu, setMenu] = useState({
+    sideIds: [],
+    mainIds: [],
+    dessertIds: []
+  });
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('currentUser')) || null;
     setUserType(user ? user.userType : "guest");
@@ -40,26 +41,26 @@ function App() {
 
       <Routes>
 
-        <Route path="/" element={<HomePage userType={userType}/>} />
+        <Route path="/" element={<HomePage userType={userType} />} />
 
         <Route path="login" element={<Login setUserType={setUserType} />} />
         <Route path="signup" element={<Signup setUserType={setUserType} />} />
 
         {/* Recipes */}
-        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu}/>} />
-        <Route path="chefs/:id/recipes`" element={<Recipes/>} />
+        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu} />} />
+        <Route path="chefs/:id/recipes`" element={<Recipes />} />
         <Route path="recipes/:id" element={<RecipePage />} />
 
- {/* Chefs */}
-        <Route path="chefs" element={<Chefs/>} />
+        {/* Chefs */}
+        <Route path="chefs" element={<Chefs />} />
         <Route path="chefs/:id" element={<ChefPage />} />
 
         {/* Articles */}
         <Route path="articles" element={<Articles />} />
         <Route path="articles/:id" element={<ArticlePage />} />
-   <Route path="chefs/:id/articles`" element={<Articles />} />
+        <Route path="chefs/:id/articles`" element={<Articles />} />
         {/* Personal Area */}
-        <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu}/>} />
+        <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu} />} />
         {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
 
         {/* Chef Area */}
