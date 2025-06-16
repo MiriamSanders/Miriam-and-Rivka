@@ -16,6 +16,8 @@ const articlesRouter = require('./routes/articlesRoutes');
 const ratingRouter = require('./routes/ratingRoutes');
 const commentsRouter = require('./routes/commentsRoutes');
 const chefRouter = require('./routes/chefRoutes');
+const tagRouter = require('./routes/tagRoutes');
+const menuRouter = require('./routes/menuRoutes');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -27,6 +29,8 @@ app.use('/',articlesRouter);
 app.use('/',ratingRouter);
 app.use('/', commentsRouter);
 app.use('/', chefRouter);
+app.use('/tags', tagRouter);
+app.use('/menu', menuRouter);
 app.listen(PORT, () => {
   console.log('http://localhost:3001');
 });

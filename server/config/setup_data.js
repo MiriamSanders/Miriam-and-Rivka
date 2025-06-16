@@ -16,7 +16,6 @@ const insertSampleData = async () => {
             ('regular'),
             ('chef'),
             ('Admin'),
-            ('Food Critic')
         `);
 
         // 2. Insert Difficulty Levels
@@ -31,21 +30,21 @@ const insertSampleData = async () => {
         // 3. Insert Users
         await connection.execute(`
             INSERT INTO users (userName, userType, email) VALUES 
-            ('ChefGordon', 1, 'gordon@example.com'),
-            ('ChefJulia', 1, 'julia@example.com'),
-            ('ChefMarco', 1, 'marco@example.com'),
-            ('ChefSarah', 1, 'sarah@example.com'),
-            ('ChefMike', 1, 'mike@example.com'),
-            ('FoodieAlex', 2, 'alex@example.com'),
-            ('CookingMom', 2, 'mom@example.com'),
-            ('TasteExplorer', 2, 'explorer@example.com'),
-            ('HomeBaker', 2, 'baker@example.com'),
+            ('ChefGordon', 2, 'gordon@example.com'),
+            ('ChefJulia', 2, 'julia@example.com'),
+            ('ChefMarco', 2, 'marco@example.com'),
+            ('ChefSarah', 2, 'sarah@example.com'),
+            ('ChefMike', 2, 'mike@example.com'),
+            ('FoodieAlex', 1, 'alex@example.com'),
+            ('CookingMom', 1, 'mom@example.com'),
+            ('TasteExplorer', 1, 'explorer@example.com'),
+            ('HomeBaker', 1, 'baker@example.com'),
             ('AdminUser', 3, 'admin@example.com'),
-            ('CriticJohn', 4, 'critic@example.com'),
-            ('HealthyEater', 2, 'healthy@example.com'),
-            ('VeggieLover', 2, 'veggie@example.com'),
-            ('MeatMaster', 2, 'meat@example.com'),
-            ('DessertQueen', 2, 'dessert@example.com')
+            ('CriticJohn', 1, 'critic@example.com'),
+            ('HealthyEater', 1, 'healthy@example.com'),
+            ('VeggieLover', 1, 'veggie@example.com'),
+            ('MeatMaster', 1, 'meat@example.com'),
+            ('DessertQueen', 1, 'dessert@example.com')
         `);
 
         // 4. Insert Chef Details

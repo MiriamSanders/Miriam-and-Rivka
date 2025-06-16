@@ -19,7 +19,7 @@ const BASE_URL = 'http://localhost:3001';
 // 1. Endpoint to receive chef join requests
 const joinReq = async (info) => {
   try {
-    const {guid, name, email, education, experienceYears, style, additionalInfo} = info;
+    const {guid, name, email,imageURL, education, experienceYears, style, additionalInfo} = info;
     
     if (!name || !email) {
       return res.status(400).json({
@@ -36,25 +36,87 @@ const joinReq = async (info) => {
     const rejectUrl = `${BASE_URL}/chef/reject/${guid}`;
     
     const emailHTML = `
-      <h2>New Chef Join Request - ${name}</h2>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Experience:</strong> ${experienceYears || 'N/A'} years</p>
-      <p><strong>Education:</strong> ${education || 'N/A'}</p>
-      <p><strong>Style:</strong> ${style || 'N/A'}</p>
-      <p><strong>Additional Info:</strong> ${additionalInfo || 'N/A'}</p>
+  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden;">
+    
+    <!-- Header -->
+    <div style="background: #000000; color: white; padding: 30px 40px; text-align: center;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 600;">New Chef Application</h1>
+    </div>
+    
+    <!-- Content -->
+    <div style="padding: 40px;">
       
-      <div style="margin: 20px 0;">
+      <!-- Chef Image -->
+      ${imageURL ? `
+        <div style="text-align: center; margin-bottom: 30px;">
+          <img src="${imageURL}" 
+               alt="Chef ${name}" 
+               style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        </div>
+      ` : ''}
+      
+      <!-- Chef Name -->
+      <h2 style="color: #000000; font-size: 28px; font-weight: 700; margin: 0 0 30px 0; text-align: center;">
+        ${name}
+      </h2>
+      
+      <!-- Details Grid -->
+      <div style="background: #f8f9fa; border-radius: 8px; padding: 30px; margin-bottom: 30px;">
+        
+        <div style="display: grid; gap: 20px;">
+          
+          <div style="border-bottom: 1px solid #e9ecef; padding-bottom: 15px;">
+            <strong style="color: #000000; font-weight: 600; display: block; margin-bottom: 5px;">Email:</strong>
+            <span style="color: #6c757d; font-size: 16px;">${email}</span>
+          </div>
+          
+          <div style="border-bottom: 1px solid #e9ecef; padding-bottom: 15px;">
+            <strong style="color: #000000; font-weight: 600; display: block; margin-bottom: 5px;">Experience:</strong>
+            <span style="color: #6c757d; font-size: 16px;">${experienceYears || 'N/A'} years</span>
+          </div>
+          
+          <div style="border-bottom: 1px solid #e9ecef; padding-bottom: 15px;">
+            <strong style="color: #000000; font-weight: 600; display: block; margin-bottom: 5px;">Education:</strong>
+            <span style="color: #6c757d; font-size: 16px;">${education || 'N/A'}</span>
+          </div>
+          
+          <div style="border-bottom: 1px solid #e9ecef; padding-bottom: 15px;">
+            <strong style="color: #000000; font-weight: 600; display: block; margin-bottom: 5px;">Cooking Style:</strong>
+            <span style="color: #6c757d; font-size: 16px;">${style || 'N/A'}</span>
+          </div>
+          
+          <div>
+            <strong style="color: #000000; font-weight: 600; display: block; margin-bottom: 5px;">Additional Information:</strong>
+            <span style="color: #6c757d; font-size: 16px; line-height: 1.5;">${additionalInfo || 'N/A'}</span>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div style="text-align: center; margin: 30px 0;">
         <a href="${approveUrl}" 
-           style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
-          ✅ APPROVE
+           style="background-color: #000000; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; margin-right: 15px; font-weight: 600; display: inline-block; min-width: 120px;">
+          APPROVE
         </a>
         
         <a href="${rejectUrl}" 
-           style="background-color: #f44336; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
-          ❌ REJECT
+           style="background-color: transparent; color: #000000; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; border: 2px solid #e5e5e5; display: inline-block; min-width: 120px;">
+          REJECT
         </a>
       </div>
-    `;
+      
+    </div>
+    
+    <!-- Footer -->
+    <div style="background: #f8f9fa; padding: 20px 40px; text-align: center; border-top: 1px solid #e5e5e5;">
+      <p style="margin: 0; color: #6c757d; font-size: 14px;">
+        Chef Management System
+      </p>
+    </div>
+    
+  </div>
+`;
     
     await transporter.sendMail({
       from: 'plateandplan@gmail.com',

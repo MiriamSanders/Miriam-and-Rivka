@@ -46,7 +46,7 @@ const AddRecipe = () => {
 
   const difficulties = ['Easy', 'Medium', 'Hard'];
   const categories = ['Meat', 'Dairy', 'Parve']; // Updated to match your ENUM values
-  const dishTypes = ['Main Course', 'Side Dish', 'Appetizer', 'Dessert', 'Snack', 'Beverage'];
+  const dishTypes = ['main', 'side', 'dessert'];
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];

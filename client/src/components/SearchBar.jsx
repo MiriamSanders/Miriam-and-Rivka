@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, X } from 'lucide-react';
-import '../styles/SearchBar.css'; // Assuming you have a CSS file for styling
+import { getRequest } from '../Requests';
+import '../styles/SearchBar.css';
 
-export default function SearchFilterBar() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('relevance');
+export default function SearchFilterBar({ setRecipes }) {
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [tags, setTags] = useState([]);
+  
+  // Centralized search state object
+  const [searchParams, setSearchParams] = useState({
+    title: '',
+    category: 'all',
+    sortBy: 'relevance',
+    tags: []
+  });
 
   const categories = [
     { value: 'all', label: 'All Categories' },
@@ -22,39 +28,147 @@ export default function SearchFilterBar() {
     { value: 'name-desc', label: 'Name Z-A' }
   ];
 
-  const availableTags = ['Featured', 'Popular', 'New', 'Sale', 'Premium'];
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getRequest('tags');
+        setTags(response.data);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+    fetchTags();
+  }, []);
 
-  const toggleTag = (tag) => {
-    setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+  // Generic function to build API call based on search params
+  const buildApiQuery = (params) => {
+    const queryParts = ['limit=10', 'page=1'];
+    
+    if (params.title && params.title.trim()) {
+      queryParts.push(`title=${encodeURIComponent(params.title.trim())}`);
+    }
+    
+    if (params.category && params.category !== 'all') {
+      queryParts.push(`category=${params.category}`);
+    }
+    
+    if (params.tags && params.tags.length > 0) {
+      queryParts.push(`anyTags=${params.tags.join(',')}`);
+    }
+    
+    if (params.sortBy && params.sortBy !== 'relevance') {
+      queryParts.push(`sortBy=${params.sortBy}`);
+    }
+    
+    return `recipes?${queryParts.join('&')}`;
   };
 
-  const clearSearch = () => setSearchTerm('');
+  // Generic function to execute search
+  const executeSearch = async (params = searchParams) => {
+    try {
+      const apiQuery = buildApiQuery(params);
+      console.log('API Query:', apiQuery);
+      const response = await getRequest(apiQuery);
+      console.log('Search Response:', response);
+      setRecipes(response.data);
+    } catch (error) {
+      console.error('Search error:', error);
+    }
+  };
+
+  // Generic function to update search params and trigger search
+  const updateSearchParam = (key, value) => {
+    const newParams = { ...searchParams, [key]: value };
+    setSearchParams(newParams);
+    executeSearch(newParams);
+  };
+
+  // Generic function to remove a search param value
+  const removeSearchParam = (key, value = null) => {
+    let newParams = { ...searchParams };
+    
+    if (key === 'tags' && value) {
+      // Remove specific tag
+      newParams.tags = newParams.tags.filter(tag => tag !== value);
+    } else if (key === 'title') {
+      newParams.title = '';
+    } else if (key === 'category') {
+      newParams.category = 'all';
+    } else if (key === 'sortBy') {
+      newParams.sortBy = 'relevance';
+    } else {
+      // Reset the entire key to default
+      switch (key) {
+        case 'title':
+          newParams.title = '';
+          break;
+        case 'category':
+          newParams.category = 'all';
+          break;
+        case 'sortBy':
+          newParams.sortBy = 'relevance';
+          break;
+        case 'tags':
+          newParams.tags = [];
+          break;
+        default:
+          break;
+      }
+    }
+    
+    setSearchParams(newParams);
+    executeSearch(newParams);
+  };
+
+  const toggleTag = (tagName) => {
+    const newTags = searchParams.tags.includes(tagName)
+      ? searchParams.tags.filter(tag => tag !== tagName)
+      : [...searchParams.tags, tagName];
+    
+    updateSearchParam('tags', newTags);
+  };
 
   const clearAllFilters = () => {
-    setSelectedCategory('all');
-    setSortBy('relevance');
-    setSelectedTags([]);
-    setSearchTerm('');
+    const defaultParams = {
+      title: '',
+      category: 'all',
+      sortBy: 'relevance',
+      tags: []
+    };
+    setSearchParams(defaultParams);
+    executeSearch(defaultParams);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = () => {
+    return searchParams.title || 
+           searchParams.category !== 'all' || 
+           searchParams.sortBy !== 'relevance' || 
+           searchParams.tags.length > 0;
   };
 
   return (
-    <div className="search-container" >
+    <div className="search-container">
       <div className="searchContainer">
         <div className="relative">
           <Search className="searchIcon" />
           <input
             type="text"
             placeholder="Search anything..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchParams.title}
+            onChange={(e) => setSearchParams(prev => ({ ...prev, title: e.target.value }))}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                executeSearch();
+              }
+            }}
             className="searchInput"
           />
-          {searchTerm && (
-            <button onClick={clearSearch} className="clearButton">
+          {searchParams.title && (
+            <button 
+              onClick={() => removeSearchParam('title')} 
+              className="clearButton"
+            >
               <X size={20} />
             </button>
           )}
@@ -64,8 +178,8 @@ export default function SearchFilterBar() {
       <div className="filterControls">
         <div className="selectWrapper">
           <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            value={searchParams.category}
+            onChange={(e) => updateSearchParam('category', e.target.value)}
             className="select"
           >
             {categories.map(cat => (
@@ -77,8 +191,8 @@ export default function SearchFilterBar() {
 
         <div className="selectWrapper">
           <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            value={searchParams.sortBy}
+            onChange={(e) => updateSearchParam('sortBy', e.target.value)}
             className="select"
           >
             {sortOptions.map(option => (
@@ -96,7 +210,7 @@ export default function SearchFilterBar() {
           Filters
         </button>
 
-        {(selectedCategory !== 'all' || sortBy !== 'relevance' || selectedTags.length > 0 || searchTerm) && (
+        {hasActiveFilters() && (
           <button onClick={clearAllFilters} className="clearAllButton">
             Clear all
           </button>
@@ -110,57 +224,55 @@ export default function SearchFilterBar() {
           <div className="filterGroup">
             <label className="filterLabel">Tags</label>
             <div className="tagsContainer">
-              {availableTags.map(tag => (
+              {tags.map(({ tagId, name }) => (
                 <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`tagButton ${selectedTags.includes(tag) ? 'tagButtonActive' : ''}`}
+                  key={tagId}
+                  onClick={() => toggleTag(name)}
+                  className={`tagButton ${searchParams.tags.includes(name) ? 'tagButtonActive' : ''}`}
                 >
-                  {tag}
+                  {name}
                 </button>
               ))}
-            </div>
-          </div>
-
-          <div className="dateInputs">
-            <div>
-              <label className="filterLabel">From Date</label>
-              <input type="date" className="dateInput" />
-            </div>
-            <div>
-              <label className="filterLabel">To Date</label>
-              <input type="date" className="dateInput" />
             </div>
           </div>
         </div>
       )}
 
-      {(selectedTags.length > 0 || selectedCategory !== 'all' || searchTerm) && (
+      {hasActiveFilters() && (
         <div className="activeFilters">
           <span className="activeFiltersLabel">Active filters:</span>
 
-          {searchTerm && (
+          {searchParams.title && (
             <span className="filterTag">
-              Search: "{searchTerm}"
-              <button onClick={clearSearch} className="filterTagRemove">
+              Search: "{searchParams.title}"
+              <button 
+                onClick={() => removeSearchParam('title')} 
+                className="filterTagRemove"
+              >
                 <X size={12} />
               </button>
             </span>
           )}
 
-          {selectedCategory !== 'all' && (
+          {searchParams.category !== 'all' && (
             <span className="filterTag">
-              {categories.find(c => c.value === selectedCategory)?.label}
-              <button onClick={() => setSelectedCategory('all')} className="filterTagRemove">
+              {categories.find(c => c.value === searchParams.category)?.label}
+              <button 
+                onClick={() => removeSearchParam('category')} 
+                className="filterTagRemove"
+              >
                 <X size={12} />
               </button>
             </span>
           )}
 
-          {selectedTags.map(tag => (
+          {searchParams.tags.map(tag => (
             <span key={tag} className="filterTag">
               {tag}
-              <button onClick={() => toggleTag(tag)} className="filterTagRemove">
+              <button 
+                onClick={() => removeSearchParam('tags', tag)} 
+                className="filterTagRemove"
+              >
                 <X size={12} />
               </button>
             </span>

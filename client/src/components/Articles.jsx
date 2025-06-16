@@ -53,7 +53,7 @@ const openArticle = (e) => {
 
 }
   return (
-    <div className="articlesrecipes-container">
+    <div className="articles-container">
       <h1>Articles</h1>
  {errorMessage && (
         <div style={{ color: "red", marginBottom: "1rem" }}>
