@@ -285,3 +285,167 @@ body {
     border-bottom-width: 26px;
   }
 }
+@media print {
+  /* Hide elements that shouldn't be printed */
+  .no-print,
+  .recipe-actions,
+  .print-button,
+  nav,
+  .nav,
+  .navbar,
+  .navigation,
+  .header,
+  .menu,
+  .sidebar,
+  .footer,
+  button:not(.print-only) {
+    display: none !important;
+  }
+  
+  /* Optimize layout for printing */
+  .recipe-container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  
+  .printable-content {
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  /* Ensure text is black for printing */
+  * {
+    color: black !important;
+    background: white !important;
+  }
+  
+  /* Recipe title styling */
+  .recipe-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+  }
+  
+  .recipe-subtitle {
+    font-size: 18px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  
+  .recipe-subtext {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  
+  /* Section headers */
+  .section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 3px;
+  }
+  
+  /* Ingredients list */
+  .ingredients-list {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .ingredients-list li {
+    margin-bottom: 5px;
+    line-height: 1.4;
+  }
+  
+  /* Instructions */
+  .instructions {
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  .instruction-step {
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  
+  /* Tags */
+  .tags-container {
+    margin-bottom: 15px;
+  }
+  
+  .tag {
+    display: inline-block;
+    margin-right: 8px;
+    margin-bottom: 5px;
+    padding: 2px 6px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  
+  /* Image handling */
+  .print-image {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+    page-break-inside: avoid;
+  }
+  
+  /* Page break controls */
+  .recipe-content section {
+    page-break-inside: avoid;
+    margin-bottom: 25px;
+  }
+  
+  /* Ensure good spacing */
+  p, li {
+    orphans: 2;
+    widows: 2;
+  }
+  
+  h1, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+}
+
+/* Screen styles for print button */
+.print-button {
+  position: fixed;
+  top: 10vh;
+  right: 20px;
+  background-color: #000;
+  color: white;
+  border: 2px solid #000;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.print-button:hover {
+  background-color: white;
+  color: #000;
+  border-color: #000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+
+.recipe-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}

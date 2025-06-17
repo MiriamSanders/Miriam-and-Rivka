@@ -17,7 +17,9 @@ function Login({ setUserType }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(form);
         const requestResult = await postRequest("auth/login", form);
+        
         if (requestResult.succeeded) {
             alert("login successfull!");
             console.log("Login successful:", requestResult.data);
@@ -28,7 +30,6 @@ function Login({ setUserType }) {
         } else {
              setErrorCode(requestResult.status);
         }
-        console.log(form);
     };
 
     return (
