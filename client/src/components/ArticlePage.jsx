@@ -39,7 +39,6 @@ function ArticlePage() {
 
   const { title, authorId, createdAt, content, authorName } = articleData;
   const formattedDate = new Date(createdAt).toLocaleDateString();
-
   const canEditOrDelete =
     currentUser &&
     (currentUser.userType === "Admin" || currentUser.userId === authorId);
@@ -65,7 +64,7 @@ function ArticlePage() {
           ⚠️ {errorMessage}
         </div>
       )}
-
+{console.log(articleData)}
       {isEditing ? (
         <input
           className="article-title-input"

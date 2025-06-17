@@ -101,9 +101,28 @@ async function deleteArticle(articleId) {
         return false;
       }
 }
+async function updateArticle(id, title, content) {
+  try {
+    const db = await dbPromise;
+
+    const updateQuery = `
+      UPDATE articles 
+      SET title = ?, content = ?
+      WHERE articleId  = ?
+    `;
+    await db.execute(updateQuery, [title, content, id]);
+
+    const [rows] = await db.execute(`SELECT * FROM articles WHERE articleId = ?`, [id]);
+    return rows[0] || null;
+  } catch (error) {
+    console.error('Error updating article:', error);
+    throw error;
+  }
+}
 module.exports = {
   articleGetAll,
   getArticleById,
   getArticlesByChefId,
-  deleteArticle
+  deleteArticle,
+  updateArticle
 };

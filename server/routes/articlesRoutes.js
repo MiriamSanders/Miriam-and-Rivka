@@ -11,4 +11,10 @@ router.delete('/articles/:id',async (req, res) => {
   }
 controller.deleteArticle(req,res);
 })
+router.put('/articles/:id',async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Must be logged in to update article" });
+  }
+controller.putArticle(req,res);
+})
 module.exports = router;

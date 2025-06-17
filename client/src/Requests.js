@@ -49,6 +49,7 @@ export async function postRequest(currentUrl, data) {
 }
 export async function putRequest(currentUrl, data) {
   try {
+    console.log(currentUrl)
     const response = await fetch(`http://localhost:3001/${currentUrl}`, {
       method: 'PUT',
       credentials: 'include',

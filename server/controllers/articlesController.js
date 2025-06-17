@@ -47,6 +47,17 @@ exports.postArticle= async(req,res)=>{
       res.status(500).json({error:"internal server error"});
     }
 };
+exports.putArticle= async(req,res)=>{
+   try{ 
+     const articleId = parseInt(req.params.id);
+    const { title, content } = req.body;
+    const articleResult=await articlesService.updateArticle(articleId,title,content);
+     res.status(201).json(articleResult);
+  }
+    catch(error){
+      res.status(500).json({error:"internal server error"});
+    }
+};
 exports.deleteArticle=async(req,res)=>{
  try {
    const articleId = parseInt(req.params.id);

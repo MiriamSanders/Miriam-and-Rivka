@@ -231,7 +231,8 @@ function Recipes({ createMenu,addToMenu,menu }) {
     setHasMore(true);
     getRecipes(1, false);
   };
-  const handleDeleteRecipe = async (recipeId) => {
+  const handleDeleteRecipe = async (e,recipeId) => {
+     e.stopPropagation();
       const requestResult = await deleteRequest(`recipes/${recipeId}`);
       if (requestResult.succeeded) {
         setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
@@ -239,6 +240,7 @@ function Recipes({ createMenu,addToMenu,menu }) {
       } else {
         setErrorCode(requestResult.status);
       }
+     
   };
   const currentSearchParams = getSearchParamsFromUrl();
 
@@ -403,7 +405,7 @@ function Recipes({ createMenu,addToMenu,menu }) {
                 {console.log(recipe)}
                     {(isAdmin ||currentUser.userId===recipe.userId)&& 
              <button
-    onClick={() => handleDeleteRecipe(recipe.recipeId)}
+    onClick={(e) => handleDeleteRecipe(e,recipe.recipeId)}
     style={{
       color: "black",
       marginLeft: "5px"

@@ -27,7 +27,8 @@ function Articles() {
        setErrorCode(requestResult.status);
     }
   };
-const handleDeleteArticle = async (articleId) => {
+const handleDeleteArticle = async (e,articleId) => {
+     e.stopPropagation();
       const requestResult = await deleteRequest(`articles/${articleId}`);
       if (requestResult.succeeded) {
         setArticles(prev => prev.filter(c => c.articleId !== articleId));
@@ -35,6 +36,7 @@ const handleDeleteArticle = async (articleId) => {
       } else {
         setErrorCode(requestResult.status);
       }
+     
   };
   useEffect(() => {
     getArticles();
@@ -73,7 +75,7 @@ const openArticle = (e) => {
                 {console.log(article.userId)}
                     {(isAdmin ||currentUser.userId===article.authorId)&& 
              <button
-    onClick={() => handleDeleteArticle(article.articleId)}
+    onClick={(e) => handleDeleteArticle(e,article.articleId)}
     style={{
       color: "black",
       marginLeft: "5px"
