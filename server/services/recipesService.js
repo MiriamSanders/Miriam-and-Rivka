@@ -62,7 +62,7 @@ async function getAllRecipes(limit, offset = 0) {
     r.imageURL, 
     r.category, 
     r.description, 
-    r.dishType,
+    r.chefId,
     r.dishType,
     u.userName, 
     GROUP_CONCAT(t.name) AS tags
@@ -115,6 +115,7 @@ async function getRecipesAdvanced(options = {}) {
         r.description,
         r.dishType,
         u.userName,
+        u.userId,
         GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags
       FROM recipes r
       JOIN users u ON r.chefId = u.userId
@@ -171,7 +172,7 @@ async function getRecipesAdvanced(options = {}) {
     }
 
     query += `
-      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType, u.userName
+      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType, u.userName,u.userId
       ORDER BY r.${validSortBy} ${validSortOrder}
       LIMIT ? OFFSET ?
     `;
@@ -193,6 +194,7 @@ async function getRecipesAdvanced(options = {}) {
       description: row.description,
       dishType: row.dishType,
       userName: row.userName,
+      userId: row.userId,
       tags: row.tags ? row.tags.split(',').map(tag => tag.trim()) : []
     }));
 
@@ -345,12 +347,13 @@ const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ update
     throw error;
   }
 }
-
-
 module.exports = {
-  getRecipeById,
-  getAllRecipes,
-  getRecipesAdvanced,
-  getBestRatedRecipes,
-  getRecipesByChefId
+    getRecipeById,
+    getAllRecipes,
+    getBestRatedRecipes,
+    getRecipesByChefId,
+    deleteRecipe,
+    putRecipe,
+    updateRecipeById,
+    getRecipesAdvanced
 };

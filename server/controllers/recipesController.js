@@ -3,7 +3,7 @@ const genericService = require('../services/genericService');
 const recipeService = require('../services/recipesService');
 exports.getAllRecipes = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = IdparseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 0;
     console.log(limit, page);
     const offset = page * limit - limit;
@@ -16,6 +16,7 @@ exports.getAllRecipes = async (req, res) => {
       category: req.query.category,
       chefName: req.query.chefName,
       title: req.query.title,
+      userId: req.query.userId,
       tags: req.query.tags ? req.query.tags.split(',') : [],
       anyTags: req.query.anyTags ? req.query.anyTags.split(',') : [],
       sortBy: req.query.sortBy || 'recipeId',

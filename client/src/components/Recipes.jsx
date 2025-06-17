@@ -400,13 +400,18 @@ function Recipes({ createMenu, addToMenu, menu }) {
                     Add to Menu
                   </button>
                 )}
-                {(isAdmin || currentUser.userId === recipe.userId) &&
-                  <button style={{ position: "absolute", top: "5px", right: "5px", backgroundColor: "transparent", border: "none" }}
-                    onClick={() => handleDeleteRecipe(recipe.recipeId)}
-                  >
-                    <Trash2 />
-                  </button>
-                }
+                {console.log(recipe)}
+                    {(isAdmin ||currentUser.userId===recipe.userId)&& 
+             <button
+    onClick={() => handleDeleteRecipe(recipe.recipeId)}
+    style={{
+      color: "black",
+      marginLeft: "5px"
+    }}
+  >
+    🗑
+  </button>
+            }
                 <div className="recipe-overlay">
                   <h2>{recipe.title}</h2>
                   <p>{recipe.description}</p>
