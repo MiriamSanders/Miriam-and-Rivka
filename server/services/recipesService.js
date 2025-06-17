@@ -13,13 +13,8 @@ async function getRecipeById(recipeId) {
        JOIN chefs c ON r.chefID = c.chefID
        JOIN users u ON c.chefID = u.userID
        JOIN difficulty d on d.difficultyId =r.difficulty
-<<<<<<< HEAD
        WHERE r.recipeId = ?`, 
        [recipeId]
-=======
-       WHERE r.recipeId = ?`,
-      [recipeId]
->>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
     );
     if (recipeRows.length === 0) {
       throw new Error('Recipe not found');
@@ -67,11 +62,8 @@ async function getAllRecipes(limit, offset = 0) {
     r.imageURL, 
     r.category, 
     r.description, 
-<<<<<<< HEAD
-    u.userID,
-=======
     r.dishType,
->>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
+    r.dishType,
     u.userName, 
     GROUP_CONCAT(t.name) AS tags
   FROM recipes r
@@ -356,19 +348,9 @@ const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ update
 
 
 module.exports = {
-<<<<<<< HEAD
-    getRecipeById,
-    getAllRecipes,
-    getBestRatedRecipes,
-    getRecipesByChefId,
-    deleteRecipe,
-    putRecipe,
-    updateRecipeById
-=======
   getRecipeById,
   getAllRecipes,
   getRecipesAdvanced,
   getBestRatedRecipes,
   getRecipesByChefId
->>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
 };

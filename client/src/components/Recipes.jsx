@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {deleteRequest, getRequest } from '../Requests';
+import { deleteRequest, getRequest } from '../Requests';
 import SearchFilterBar from './SearchBar';
-import { Search, Filter, ChevronDown, X } from 'lucide-react';
+import { Search, Filter, ChevronDown, X, Trash2 } from 'lucide-react';
 import { useErrorMessage } from "./useErrorMessage";
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
 import '../styles/Recipes.css';
 
-function Recipes({ createMenu,addToMenu,menu }) {
+function Recipes({ createMenu, addToMenu, menu }) {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -16,7 +16,7 @@ function Recipes({ createMenu,addToMenu,menu }) {
   const [tags, setTags] = useState([]);
 
   const errorMessage = useErrorMessage(errorCode);
-     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.userType === "Admin";
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,7 +35,7 @@ function Recipes({ createMenu,addToMenu,menu }) {
     { value: 'name-desc', label: 'Name Z-A' }
   ];
   const addRecipeToMenu = (recipeId, dishType) => {
-    if (createMenu) { 
+    if (createMenu) {
       addToMenu((prevMenu) => {
         const updatedMenu = { ...prevMenu };
         if (dishType === 'side') {
@@ -48,9 +48,9 @@ function Recipes({ createMenu,addToMenu,menu }) {
         return updatedMenu;
       });
     }
-  console.log("Recipe added to menu:", recipeId, "Dish Type:", dishType);
-  console.log("Current Menu State:", menu);
-  
+    console.log("Recipe added to menu:", recipeId, "Dish Type:", dishType);
+    console.log("Current Menu State:", menu);
+
   }
 
   // Parse URL parameters into search params object
@@ -114,14 +114,14 @@ function Recipes({ createMenu,addToMenu,menu }) {
       if (requestResult.succeeded) {
         const newRecipes = requestResult.data;
         console.log(newRecipes);
-        
+
         if (newRecipes.length < limit) {
           setHasMore(false);
         } else {
           setHasMore(true);
         }
         setRecipes((prev) => [...prev, ...newRecipes]);
-            setErrorCode(undefined);
+        setErrorCode(undefined);
       } else {
         setErrorCode(requestResult.status);
       }
@@ -232,13 +232,13 @@ function Recipes({ createMenu,addToMenu,menu }) {
     getRecipes(1, false);
   };
   const handleDeleteRecipe = async (recipeId) => {
-      const requestResult = await deleteRequest(`recipes/${recipeId}`);
-      if (requestResult.succeeded) {
-        setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
-          setErrorCode(undefined);
-      } else {
-        setErrorCode(requestResult.status);
-      }
+    const requestResult = await deleteRequest(`recipes/${recipeId}`);
+    if (requestResult.succeeded) {
+      setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
+      setErrorCode(undefined);
+    } else {
+      setErrorCode(requestResult.status);
+    }
   };
   const currentSearchParams = getSearchParamsFromUrl();
 
@@ -395,22 +395,18 @@ function Recipes({ createMenu,addToMenu,menu }) {
               <div className="recipe-image" style={{ backgroundImage: `url(${recipe.imageURL})` }}>
                 {createMenu && (
                   <button className="add-to-menu-button" onClick={(e) => {
-                    e.stopPropagation(); addRecipeToMenu(recipe.recipeId,recipe.dishType);
+                    e.stopPropagation(); addRecipeToMenu(recipe.recipeId, recipe.dishType);
                   }}>
                     Add to Menu
                   </button>
                 )}
-                    {(isAdmin ||currentUser.userId===recipe.userId)&& 
-             <button
-    onClick={() => handleDeleteRecipe(recipe.recipeId)}
-    style={{
-      color: "black",
-      marginLeft: "5px"
-    }}
-  >
-    🗑
-  </button>
-            }
+                {(isAdmin || currentUser.userId === recipe.userId) &&
+                  <button style={{ position: "absolute", top: "5px", right: "5px", backgroundColor: "transparent", border: "none" }}
+                    onClick={() => handleDeleteRecipe(recipe.recipeId)}
+                  >
+                    <Trash2 />
+                  </button>
+                }
                 <div className="recipe-overlay">
                   <h2>{recipe.title}</h2>
                   <p>{recipe.description}</p>
