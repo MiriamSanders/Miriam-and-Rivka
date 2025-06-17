@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { CookingPot, Newspaper } from "lucide-react";
 import { useErrorMessage } from "./useErrorMessage";
 import "../styles/ChefPage.css";
 import { getRequest } from "../Requests";
@@ -123,14 +124,14 @@ function ChefPage() {
             className="btn btn-primary"
             onClick={() => navigate(`/recipes?chefName=${userName}`)}
           >
-            <span className="btn-icon">🍽️</span>
+            <span className="btn-icon"><CookingPot/></span>
             View Recipes
           </button>
           <button 
             className="btn btn-secondary"
             onClick={() => navigate(`/chefs/${id}/articles`)}
           >
-            <span className="btn-icon">📄</span>
+            <span className="btn-icon"><Newspaper/></span>
             View Articles
           </button>
         </div>
