@@ -13,13 +13,8 @@ async function getRecipeById(recipeId) {
        JOIN chefs c ON r.chefID = c.chefID
        JOIN users u ON c.chefID = u.userID
        JOIN difficulty d on d.difficultyId =r.difficulty
-<<<<<<< HEAD
        WHERE r.recipeId = ?`, 
        [recipeId]
-=======
-       WHERE r.recipeId = ?`,
-      [recipeId]
->>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
     );
     if (recipeRows.length === 0) {
       throw new Error('Recipe not found');
@@ -67,11 +62,8 @@ async function getAllRecipes(limit, offset = 0) {
     r.imageURL, 
     r.category, 
     r.description, 
-<<<<<<< HEAD
-    u.userID,
-=======
+    r.chefId,
     r.dishType,
->>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
     u.userName, 
     GROUP_CONCAT(t.name) AS tags
   FROM recipes r
@@ -123,6 +115,7 @@ async function getRecipesAdvanced(options = {}) {
         r.description,
         r.dishType,
         u.userName,
+        u.userId,
         GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags
       FROM recipes r
       JOIN users u ON r.chefId = u.userId
@@ -179,7 +172,7 @@ async function getRecipesAdvanced(options = {}) {
     }
 
     query += `
-      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType, u.userName
+      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType, u.userName,u.userId
       ORDER BY r.${validSortBy} ${validSortOrder}
       LIMIT ? OFFSET ?
     `;
@@ -201,6 +194,7 @@ async function getRecipesAdvanced(options = {}) {
       description: row.description,
       dishType: row.dishType,
       userName: row.userName,
+      userId: row.userId,
       tags: row.tags ? row.tags.split(',').map(tag => tag.trim()) : []
     }));
 
@@ -353,22 +347,13 @@ const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ update
     throw error;
   }
 }
-
-
 module.exports = {
-<<<<<<< HEAD
     getRecipeById,
     getAllRecipes,
     getBestRatedRecipes,
     getRecipesByChefId,
     deleteRecipe,
     putRecipe,
-    updateRecipeById
-=======
-  getRecipeById,
-  getAllRecipes,
-  getRecipesAdvanced,
-  getBestRatedRecipes,
-  getRecipesByChefId
->>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
+    updateRecipeById,
+    getRecipesAdvanced
 };

@@ -400,6 +400,7 @@ function Recipes({ createMenu,addToMenu,menu }) {
                     Add to Menu
                   </button>
                 )}
+                {console.log(recipe)}
                     {(isAdmin ||currentUser.userId===recipe.userId)&& 
              <button
     onClick={() => handleDeleteRecipe(recipe.recipeId)}

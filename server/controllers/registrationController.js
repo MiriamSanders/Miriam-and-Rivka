@@ -75,12 +75,6 @@ exports.loginUser = async (req, res) => {
             sameSite: "Lax",
             maxAge: 1000 * 60 * 60 // שעה
         });
-<<<<<<< HEAD
-
-=======
-         console.log(user);
-         
->>>>>>> 2c2c2261a3d82b379a4d12fc76c6579e0e2127d0
         res.status(200).json({ id: user.userId, userName: user.userName, userType: user.roleName });
 
 
