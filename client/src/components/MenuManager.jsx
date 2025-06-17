@@ -5,7 +5,7 @@ import { postRequest } from '../Requests';
 import '../styles/MenuManager.css'; // Import your CSS styles
 
 
-const MenuManager = ({ createMenu,setCreateMenu,menu }) => {
+const MenuManager = ({ createMenu, setCreateMenu, menu }) => {
   //example initial menus
   const [menus, setMenus] = useState([
     {
@@ -28,26 +28,34 @@ const MenuManager = ({ createMenu,setCreateMenu,menu }) => {
   const handleDeleteMenu = (id) => {
     setMenus(menus.filter(menu => menu.id !== id));
   };
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
- async function createMenu(menu) {
-    const data={
+
+  async function createMenu(menu) {
+    const data = {
       userId: JSON.parse(localStorage.getItem('currentUser')).id,
-    sideIds:Array.isArray(menu.sideIds) ? menu.sideIds.join(', ') : menu.sideIds,
-    mainIds:Array.isArray(menu.mainIds) ? menu.mainIds.join(', ') : menu.mainIds,
-    dessertIds:Array.isArray(menu.dessertIds) ? menu.dessertIds.join(', ') : menu.dessertIds,
+      sideIds: Array.isArray(menu.sideIds) ? menu.sideIds.join(', ') : menu.sideIds,
+      mainIds: Array.isArray(menu.mainIds) ? menu.mainIds.join(', ') : menu.mainIds,
+      dessertIds: Array.isArray(menu.dessertIds) ? menu.dessertIds.join(', ') : menu.dessertIds,
     }
     console.log("Creating menu with data:", data);
-    
+
     const createdMenu = await postRequest('menu/meal-plan', data);
-    console.log("Created menu:", createdMenu);
-    
- }
+    const weeklyMenu = await createdMenu.data.menu.weeklyPlan;
+    console.log("Created menu:", weeklyMenu);
+    const formattedMenu = [];
+    weeklyMenu.forEach((menu) => {
+      formattedMenu.push({
+        id: menu.day,
+        date: menu.date,
+        items: [menu.side, menu.main, menu.dessert],
+        createdAt: new Date().toISOString()
+      });
+    });
+    setMenus(formattedMenu);
+    setCreateMenu(false);
+    console.log("Formatted menu:", formattedMenu);
+
+
+  }
 
   return (
     <div className="menu-container">
@@ -62,22 +70,22 @@ const MenuManager = ({ createMenu,setCreateMenu,menu }) => {
       <div className="menu-main">
 
         <div className="create-button-container">
-       <button
+          {<button
             className="create-button"
             onClick={() => { navigate('/recipes'); setCreateMenu(true) }}
           >
             <Plus className="create-button-icon" />
             Create New  Weekly Menu
+          </button>}
+
+          { <button
+            className="create-button"
+            onClick={() => { createMenu(menu) }}
+          >
+            <Plus className="create-button-icon" />
+            Click And Allow Us To Do The Rest
           </button>
-        
-            <button
-              className="create-button"
-              onClick={() => { createMenu(menu) }}
-            >
-              <Plus className="create-button-icon" />
-              Click And Allow Us To Do The Rest
-            </button>
-         
+          }
         </div>
 
         {/* Menus List */}
@@ -109,13 +117,13 @@ const MenuManager = ({ createMenu,setCreateMenu,menu }) => {
 
                   <div className="menu-date">
                     <Clock className="menu-date-icon" />
-                    <span>{formatDate(menu.date)}</span>
+                    <span>{menu.date}</span>
                   </div>
 
                   <div className="menu-items">
                     {menu.items.map((item, index) => (
-                      <div key={index} className="menu-item">
-                        {item}
+                      <div key={index} className="menu-item" onClick={() => navigate(`/recipes/${item.recipeId}`)}>
+                        {item.title}
                       </div>
                     ))}
                   </div>

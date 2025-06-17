@@ -307,7 +307,36 @@ const dbPromise = require('../services/dbConnection');
 // -----------------------------------------------------------------------------
 // 1. Data‑fetch helpers
 // -----------------------------------------------------------------------------
+function getWeekdayDates() {
+  const dates = [];
+  const currentDate = new Date();
+  let daysAdded = 0;
+  let dayOffset = 0;
 
+  while (daysAdded < 5) {
+    const date = new Date(currentDate);
+    date.setDate(currentDate.getDate() + dayOffset);
+    
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 5 = Friday, 6 = Saturday
+    
+    // Skip Friday (5) and Saturday (6) nights
+    if (dayOfWeek !== 5 && dayOfWeek !== 6) {
+      dates.push({
+        date: date,
+        formatted: date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          month: 'long', 
+          day: 'numeric' 
+        }),
+        dayNumber: daysAdded + 1
+      });
+      daysAdded++;
+    }
+    dayOffset++;
+  }
+
+  return dates;
+}
 async function getRecipeDetails(recipeIds = [], userId) {
   const db = await dbPromise;
   if (!recipeIds.length) return [];
@@ -454,7 +483,7 @@ function isKosherCombination(side, main, dessert) {
 
 function calculateMealScore(side, main, dessert) {
   const rating = (r) => (r.userRating > 0 ? r.userRating : r.avgRating);
-  let score = (rating(side) + rating(main) + rating(dessert)) * 10;
+  let score = (rating(side) + rating(main) + rating(dessert)) * 10|| 0;
 
   score += (calculateTagSimilarity(side, main) +
     calculateTagSimilarity(main, dessert) +
@@ -501,6 +530,8 @@ function findBestPairings(sides, mains, desserts) {
   const usedD = new Set();
 
   for (const c of combos) {
+    console.log(c);
+    
     if (selected.length === 5) break;
     if (usedS.has(c.sideIdx) || usedM.has(c.mainIdx) || usedD.has(c.dessertIdx)) continue;
     selected.push({
@@ -540,9 +571,10 @@ async function createWeeklyMealPlan(sideIds, mainIds, dessertIds, userId) {
 
   const { selectedMeals, remainingCombos } = findBestPairings(sides, mains, desserts);
   const { meals, replacements } = await fillMissingMeals(selectedMeals, sides, mains, desserts, userId);
-
+  const dates = getWeekdayDates();
   const simplifiedPlan = meals.map(m => ({
     day: m.day,
+    date: dates[m.day - 1].formatted|| `Day ${m.day}`,
     side: { recipeId: m.side.recipeId, title: m.side.title },
     main: { recipeId: m.main.recipeId, title: m.main.title },
     dessert: { recipeId: m.dessert.recipeId, title: m.dessert.title }
