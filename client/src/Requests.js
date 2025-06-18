@@ -63,7 +63,11 @@ export async function putRequest(currentUrl, data) {
     }
     const responseData = await response.json();
     return { succeeded: true, data: responseData };
-  } catch (status) {
+  } catch (error) {
+      let status = error;
+  if (error instanceof Error && !isNaN(Number(error.message))) {
+    status = Number(error.message);
+  }
     return { succeeded: false, status: status };
   }
 }

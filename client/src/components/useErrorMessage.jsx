@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
 const ERROR_MESSAGES = {
   400: 'Bad Request',
@@ -10,9 +10,15 @@ const ERROR_MESSAGES = {
 };
 
 export const useErrorMessage = (statusCode) => {
-  const message = useMemo(() => {
-    if (statusCode === undefined || statusCode === null) return '';
-    return ERROR_MESSAGES[statusCode] || 'Unknown error';
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (statusCode === undefined || statusCode === null) return;
+    const code = Number(statusCode);
+    const msg = ERROR_MESSAGES[code] || 'Unknown error';
+    setMessage(msg);
+    const timer = setTimeout(() => setMessage(''), 6000);
+    return () => clearTimeout(timer);
   }, [statusCode]);
 
   return message;
