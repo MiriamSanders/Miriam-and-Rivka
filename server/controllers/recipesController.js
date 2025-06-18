@@ -243,7 +243,7 @@ exports.deleteRecipe=async(req,res)=>{
     }
 }
 exports.putRecipe = async (req, res) => {
-  const recipeId = req.params.id;
+  const recipeId = parseInt(req.params.id);
   const {
     title,
     description,
@@ -253,98 +253,182 @@ exports.putRecipe = async (req, res) => {
     difficulty,
     category,
     dishType,
-    ingredientsList,
+    ingredients,
     tags
   } = req.body;
-
+ console.log(req.body);
+ 
+  // Validate required fields
   if (!title || !imageURL || !category || !description) {
+    console.log("error");
+    
     return res.status(400).json({ error: 'title, imageURL, category, and description are required' });
   }
 
   try {
-    // Find or create difficulty ID
-    let difficultyId = await genericService.genericGet("difficulty", "name", difficulty);
-    if (!difficultyId || !difficultyId[0]) {
-      difficultyId = await genericService.genericPost("difficulty", { name: difficulty }, "difficultyId");
-    } else {
-      difficultyId = difficultyId[0].difficultyId;
+    let difficultyId=await genericService.genericGet("difficulty","name",difficulty);
+    if(!difficultyId)
+    {
+     difficultyId=await recipeService.createDifficulty(difficulty);
     }
-
-    // Update recipe data
-    const updatedRecipeData = {
-      recipeId,
+    // First, create the recipe
+    const recipeData = {
       title,
       description,
       imageURL,
       instructions,
+      difficulty:difficultyId[0].difficultyId,
       prepTimeMinutes: prepTimeMinutes || null,
-      difficulty: difficultyId,
       category,
-      dishType
+      dishType,
     };
+    console.log(recipeData);
+    
+    const newRecipe = await recipeService.updateRecipeById(recipeId, recipeData);
+    console.log(newRecipe);
+    
+    // Handle ingredients if provided
+   await syncRecipeIngredients(recipeId,ingredients);
 
-  await recipeService.updateRecipeById(updatedRecipeData);
+    // Handle tags if provided
+   await syncRecipeTags(recipeId, tags);
 
-    // 🧽 ניקוי רכיבי המתכון הקודמים
-    await genericService.genericDelete('recipeTags', recipeId, 'recipeId');
-
-    // ➕ הכנסת רכיבים חדשים
-    if (Array.isArray(ingredientsList)) {
-      for (let i = 0; i < ingredientsList.length; i++) {
-        const ingredientText = ingredientsList[i].trim();
-        if (ingredientText) {
-          const { quantity, ingredientName } = parseIngredientText(ingredientText);
-          if (!ingredientName) continue;
-
-          let ingredientRow = await genericService.genericGet("ingredients", "name", ingredientName);
-          if (!ingredientRow || !ingredientRow[0]) {
-            ingredientRow = await genericService.genericPost("ingredients", {
-              Name: ingredientName,
-              CaloriesPer100g: null,
-              ProteinPer100g: null,
-              CarbsPer100g: null,
-              FatPer100g: null,
-              FiberPer100g: null
-            }, "ingredientId");
-          }
-
-          await genericService.genericPost("recipeIngredients", {
-            recipeId,
-            ingredientId: ingredientRow[0]?.ingredientID || ingredientRow.ingredientID,
-            quantity,
-            orderIndex: i + 1
-          }, "recipeId");
-        }
-      }
-    }
-
-    // 🧽 ניקוי טאגים קודמים
-    await genericService.genericDeleteByField("recipeTags", "recipeId", recipeId);
-
-    // ➕ הכנסת טאגים חדשים
-    if (Array.isArray(tags)) {
-      for (const tagName of tags.map(t => t.trim()).filter(Boolean)) {
-        let tag = await genericService.genericGet("tags", "name", tagName);
-        if (!tag || !tag[0]) {
-          tag = await genericService.genericPost("tags", tagName, "tagId");
-        } else {
-          tag = tag[0];
-        }
-
-        await genericService.genericPost("recipeTags", {
-          recipeId,
-          tagId: tag.tagId
-        }, "recipeId");
-      }
-    }
-
-    res.json({
+    res.status(201).json({
       success: true,
-      message: 'Recipe updated successfully'
+      message: 'Recipe created successfully',
+      recipe: newRecipe
     });
 
-  } catch (err) {
-    console.error("Error updating recipe:", err);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (error) {
+    console.error('Error creating recipe:', error);
+    res.status(500).json({ error: 'Something went wrong while creating the recipe' });
   }
 };
+async function syncRecipeIngredients(recipeId, ingredients) {
+  if (!Array.isArray(ingredients) || ingredients.length === 0) {
+    return;
+  }
+
+  // שלב 1: המרה לרשימת מרכיבים מעובדים עם quantity ו-name
+  const parsedIngredients = [];
+
+  for (let i = 0; i < ingredients.length; i++) {
+    const ingredientText = ingredients[i].trim();
+    if (!ingredientText) continue;
+
+    const { quantity, ingredientName } = parseIngredientText(ingredientText);
+    if (!ingredientName) continue;
+
+    let existingIngredient;
+
+    try {
+      // בדיקת קיום המרכיב במסד לפי שם (case-insensitive)
+      const searchResult = await genericService.genericGet('ingredients', "name", ingredientName);
+      existingIngredient = searchResult?.[0];
+    } catch (e) {
+      // התעלמות – ניצור אם לא נמצא
+    }
+
+    if (!existingIngredient) {
+      const newIngredientData = {
+        Name: ingredientName,
+        CaloriesPer100g: null,
+        ProteinPer100g: null,
+        CarbsPer100g: null,
+        FatPer100g: null,
+        FiberPer100g: null
+      };
+      existingIngredient = await genericService.genericPost('ingredients', newIngredientData, 'ingredientId');
+    }
+
+    parsedIngredients.push({
+      ingredientId: existingIngredient.ingredientID,
+      quantity,
+      orderIndex: i + 1
+    });
+  }
+
+  // שלב 2: קבלת רשימת מרכיבים קיימים שמקושרים למתכון
+  const existingIngredients = await recipeService.getRecipeIngredients(recipeId);
+  const existingMap = new Map();
+  existingIngredients.forEach(ing => {
+    existingMap.set(ing.ingredientId, {
+      quantity: ing.quantity,
+      orderIndex: ing.orderIndex
+    });
+  });
+
+  // שלב 3: השוואה והכנסה/עדכון
+  const incomingIds = new Set();
+
+  for (const ingredient of parsedIngredients) {
+    const existing = existingMap.get(ingredient.ingredientId);
+    incomingIds.add(ingredient.ingredientId);
+
+    if (existing) {
+      if (
+        existing.quantity !== ingredient.quantity ||
+        existing.orderIndex !== ingredient.orderIndex
+      ) {
+        await recipeService.updateRecipeIngredient(recipeId, ingredient);
+      }
+    } else {
+      await recipeService.insertRecipeIngredient(recipeId, {
+        recipeId,
+        ingredientId: ingredient.ingredientId,
+        quantity: ingredient.quantity,
+        orderIndex: ingredient.orderIndex
+      });
+    }
+  }
+
+  // שלב 4: מחיקת מרכיבים שהוסרו
+  for (const existingId of existingMap.keys()) {
+    if (!incomingIds.has(existingId)) {
+      await recipeService.deleteRecipeIngredient(recipeId, existingId);
+    }
+  }
+}
+
+
+async function syncRecipeTags(recipeId, tags) {
+    console.log("tag",tags);
+  if (!tags || !Array.isArray(tags)) return;
+
+  // שליפת תגיות קיימות למתכון
+  const existingTagsRows = await genericService.genericGet('recipeTags', 'recipeId', recipeId);
+  const existingTagIds = new Set(existingTagsRows.map(row => row.tagId));
+
+  // שמירה של כל התגיות החדשות שנקבל
+  const newTagIds = new Set();
+
+  for (let tagName of tags) {
+    tagName = tagName.trim();
+    if (!tagName) continue;
+
+    let tag = (await genericService.genericGet('tags', 'name', tagName))?.[0];
+
+    if (!tag) {
+      tag = await genericService.genericPost('tags', { name: tagName }, 'tagId');
+    }
+
+    newTagIds.add(tag.tagId);
+
+    // אם התגית לא מקושרת – צור קישור
+    if (!existingTagIds.has(tag.tagId)) {
+      await genericService.genericPost('recipeTags', {
+        recipeId: recipeId,
+        tagId: tag.tagId
+      }, 'recipeId');
+    }
+  }
+
+  // מחיקת תגיות שכבר לא קיימות
+  for (const oldTagId of existingTagIds) {
+    if (!newTagIds.has(oldTagId)) {
+      await recipeService.deleteRecipeTag(recipeId,oldTagId);
+    }
+  }
+}
+
+

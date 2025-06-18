@@ -7,7 +7,7 @@ async function getRecipeById(recipeId) {
     // 1. Get the recipe itself with the chef name
     const [recipeRows] = await db.execute(
       `SELECT r.recipeId, r.title, r.description, r.imageURL, r.instructions,c.chefID,
-              r.prepTimeMinutes, d.name, r.category, r.dishType,
+              r.prepTimeMinutes, d.name AS difficulty, r.category, r.dishType,
               u.userName AS chefName
        FROM recipes r
        JOIN chefs c ON r.chefID = c.chefID
@@ -311,7 +311,7 @@ async function putRecipe(recipeId, updatedData) {
     console.error("Update error:", err);
     return { succeeded: false, error: err.message };}
 }
-async function updateRecipeById(updatedRecipeData) {
+async function updateRecipeById(id,updatedRecipeData) {
   try {
     const db = await dbPromise;
 
@@ -335,11 +335,10 @@ async function updateRecipeById(updatedRecipeData) {
       updatedRecipeData.difficulty,
       updatedRecipeData.category,
       updatedRecipeData.dishType,
-      updatedRecipeData.recipeId
+      id
     ]);
-
     await db.execute(updateQuery);
-const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ updatedRecipeData.recipeId]);
+const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ id]);
     const [rows] = await db.execute(newQuery);
     return rows[0] || null;
   } catch (error) {
@@ -347,6 +346,71 @@ const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ update
     throw error;
   }
 }
+async function getRecipeIngredients(recipeId) {
+  const db = await dbPromise;
+  const [rows] = await db.execute(
+    `SELECT ingredientId, quantity, orderIndex FROM recipeingredients WHERE recipeId = ?`,
+    [recipeId]
+  );
+  return rows;
+}
+
+async function insertRecipeIngredient(recipeId, ingredient) {
+  const db = await dbPromise;
+  await db.execute(
+    `INSERT INTO recipeingredients (recipeId, ingredientId, quantity, orderIndex)
+     VALUES (?, ?, ?, ?)`,
+    [recipeId, ingredient.ingredientId, ingredient.quantity, ingredient.orderIndex]
+  );
+}
+
+async function updateRecipeIngredient(recipeId, ingredient) {
+  const db = await dbPromise;
+  await db.execute(
+    `UPDATE recipeingredients SET quantity = ?, orderIndex = ?
+     WHERE recipeId = ? AND ingredientId = ?`,
+    [ingredient.quantity, ingredient.orderIndex, recipeId, ingredient.ingredientId]
+  );
+}
+
+async function deleteRecipeIngredient(recipeId, ingredientId) {
+  const db = await dbPromise;
+  await db.execute(
+    `DELETE FROM recipeingredients WHERE recipeId = ? AND ingredientId = ?`,
+    [recipeId, ingredientId]
+  );
+}
+async function deleteRecipeTag(recipeId, tagId) {
+  try {
+    const db = await dbPromise;
+    const query = `
+      DELETE FROM recipeTags
+      WHERE recipeId = ? AND tagId = ?
+    `;
+    const [result] = await db.execute(query, [recipeId, tagId]);
+    return result.affectedRows;
+  } catch (error) {
+    console.error('Error deleting recipe tag:', error);
+    throw error;
+  }
+}
+async function createDifficulty(name) {
+  try {
+    const db = await dbPromise;
+
+    const insertQuery = `
+      INSERT INTO difficulty (name)
+      VALUES (?)
+    `;
+    const [result] = await db.execute(insertQuery, [name]);
+
+    return result.insertId; // מחזיר את ה־difficultyId שנוצר
+  } catch (error) {
+    console.error("Error creating difficulty:", error);
+    throw error;
+  }
+}
+
 module.exports = {
     getRecipeById,
     getAllRecipes,
@@ -355,5 +419,11 @@ module.exports = {
     deleteRecipe,
     putRecipe,
     updateRecipeById,
-    getRecipesAdvanced
+    getRecipesAdvanced,
+     getRecipeIngredients,
+  insertRecipeIngredient,
+  updateRecipeIngredient,
+  deleteRecipeIngredient,
+  deleteRecipeTag,
+  createDifficulty
 };

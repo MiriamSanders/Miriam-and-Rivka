@@ -64,7 +64,6 @@ function ArticlePage() {
           ⚠️ {errorMessage}
         </div>
       )}
-{console.log(articleData)}
       {isEditing ? (
         <input
           className="article-title-input"
