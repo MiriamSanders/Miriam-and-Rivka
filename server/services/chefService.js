@@ -35,9 +35,20 @@ async function addChef(chefData) {
     console.log("Chef added:", result);
     return result;
 }
-
+async function getFeaturedChefs()
+{
+  const db=await dbPromise;
+  const query=`SELECT  c.chefId,c.imageURL,u.userName FROM chefs c JOIN users u ON c.chefId = u.userId WHERE c.chefId IN (SELECT chefId FROM recipes GROUP BY chefId HAVING count(*)>4) LIMIT 6`
+  const chefs= await db.execute(mysql.format(query));
+    console.log("Chefs fetched:", chefs);
+    if (chefs.length === 0) {
+        return null;
+    }
+    return chefs[0];
+}
 module.exports = {
     getAllChefs,
     addChef,
-    getChef
+    getChef,
+    getFeaturedChefs
 };

@@ -10,6 +10,7 @@ exports.getAllRecipes = async (req, res) => {
      if (Object.keys(req.query).length === 0) {
     const recipes = await recipeService.getAllRecipes(limit, offset)
     return res.json(recipes);}
+    //addd dishType 
     const options = {
       limit: limit,
       offset: offset,

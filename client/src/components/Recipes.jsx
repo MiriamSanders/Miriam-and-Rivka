@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { deleteRequest, getRequest } from '../Requests';
-
 import { Search, Filter, ChevronDown, X, Trash2 } from 'lucide-react';
 import { useErrorMessage } from "./useErrorMessage";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -14,7 +13,6 @@ function Recipes({ createMenu, addToMenu, menu }) {
   const [errorCode, setErrorCode] = useState(undefined);
   const [showFilters, setShowFilters] = useState(false);
   const [tags, setTags] = useState([]);
-
   const errorMessage = useErrorMessage(errorCode);
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.userType === "Admin";
@@ -171,6 +169,8 @@ function Recipes({ createMenu, addToMenu, menu }) {
   };
 
   // Remove search param
+  //need to add chefFilter tab...
+
   const removeSearchParam = (key, value = null) => {
     const currentParams = getSearchParamsFromUrl();
     let newParams = { ...currentParams };
@@ -178,6 +178,9 @@ function Recipes({ createMenu, addToMenu, menu }) {
     if (key === 'tags' && value) {
       newParams.tags = newParams.tags.filter(tag => tag !== value);
     } else if (key === 'title') {
+      newParams.title = '';
+    }
+    else if (key === 'chefName') {
       newParams.title = '';
     } else if (key === 'category') {
       newParams.category = 'all';
@@ -376,6 +379,17 @@ function Recipes({ createMenu, addToMenu, menu }) {
                 </button>
               </span>
             )}
+            {currentSearchParams.chefName && (
+              <span className="filterTag">
+                {currentSearchParams.chefName}
+                <button
+                  onClick={() => removeSearchParam('chefName')}
+                  className="filterTagRemove"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
 
             {currentSearchParams.tags.map(tag => (
               <span key={tag} className="filterTag">
@@ -407,10 +421,10 @@ function Recipes({ createMenu, addToMenu, menu }) {
                     Add to Menu
                   </button>
                 )}
-                {(isAdmin || currentUser.userId === recipe.userId) &&
+                {(isAdmin ||(currentUser&& currentUser.userId === recipe.userId)) &&
                   <button
                     onClick={(e) => handleDeleteRecipe(e, recipe.recipeId)}
-                   style={{background:"transparent"}}
+                    style={{ background: "transparent" }}
                   >
                     <Trash2 />
                   </button>

@@ -149,3 +149,11 @@ exports.rejectReq = async (req, res) => {
         res.status(500).json({ error: 'There was an error rejecting the chef request. Please try again.' });
     }
 }
+exports.getFeaturedChefs=async(req,res)=>{
+    const result = await chefService.getFeaturedChefs();
+    if (result) {
+        res.status(200).json(result);
+    } else {
+        res.status(500).json({ error: 'Failed to retrieve chefs' });
+    } 
+}

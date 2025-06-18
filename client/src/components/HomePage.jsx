@@ -27,7 +27,7 @@ const HomePage = ({ userType }) => {
       }
     }
     const fetchFeaturedChefs = async () => {
-      const response = await getRequest('chefs');
+      const response = await getRequest('chefs/featured-chefs');
       if (response.succeeded) {
         setFeaturedChefs(response.data);
       } else {

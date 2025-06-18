@@ -55,10 +55,10 @@ function Navigation({ userType = "guest", onLogout }) {
   let links = [...navOptions.guest];
   
   // Add user-specific links if logged in
-  if (isLoggedIn && (userType === "regular" || userType === "chef")) {
+  if (isLoggedIn && (userType === "regular" || userType === "chef"|| userType === "admin")) {
     links = links.concat(navOptions.regular);
   }
-  if (isLoggedIn && userType === "chef") {
+  if (isLoggedIn && (userType === "chef"||userType === "admin")) {
     links = links.concat(navOptions.chef);
   }
   

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import React, { useState } from 'react';
 import Navigation from './components/Navigation';
@@ -60,13 +60,20 @@ function App() {
         <Route path="articles/:id" element={<ArticlePage />} />
         <Route path="chefs/:id/articles`" element={<Articles />} />
         {/* Personal Area */}
-        <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu} />} />
+
+        {userType != "guest" && <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu} />} />}
         {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
 
         {/* Chef Area */}
-        <Route path="/chef-area" element={<ChefArea />} />
-        <Route path="/chef-area/recipe-manager" element={<RecipeManager />} />
-        <Route path="/chef-area/article-manager" element={<ArticleManager />} />
+
+        {(userType === "admin" || userType === "chef") && (
+          <>
+            <Route path="/chef-area" element={<ChefArea />} />
+            <Route path="/chef-area/recipe-manager" element={<RecipeManager />} />
+            <Route path="/chef-area/article-manager" element={<ArticleManager />} />
+          </>
+        )}
+      <Route path="*" element={<Navigate to="/" replace />} />
 
 
       </Routes>
