@@ -393,12 +393,16 @@ async function syncRecipeIngredients(recipeId, ingredients) {
 
 
 async function syncRecipeTags(recipeId, tags) {
-    console.log("tag",tags);
+  console.log("tag", tags);
   if (!tags || !Array.isArray(tags)) return;
+
+  let existingTagIds = new Set();
 
   // שליפת תגיות קיימות למתכון
   const existingTagsRows = await genericService.genericGet('recipeTags', 'recipeId', recipeId);
-  const existingTagIds = new Set(existingTagsRows.map(row => row.tagId));
+  if (existingTagsRows && existingTagsRows.length > 0) {
+    existingTagIds = new Set(existingTagsRows.map(row => row.tagId));
+  }
 
   // שמירה של כל התגיות החדשות שנקבל
   const newTagIds = new Set();
@@ -427,7 +431,7 @@ async function syncRecipeTags(recipeId, tags) {
   // מחיקת תגיות שכבר לא קיימות
   for (const oldTagId of existingTagIds) {
     if (!newTagIds.has(oldTagId)) {
-      await recipeService.deleteRecipeTag(recipeId,oldTagId);
+      await recipeService.deleteRecipeTag(recipeId, oldTagId);
     }
   }
 }
