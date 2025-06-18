@@ -200,7 +200,7 @@ exports.getbestRatedRecipes=async(req,res) =>{
   
 }
 // Helper function to parse ingredient text and extract quantity and ingredient name
-function parseבIngredientText(ingredientText) {
+function parseIngredientText(ingredientText) {
   // Common patterns for ingredient parsing
   const patterns = [
     // Pattern: "2 cups flour" or "1 cup sugar"
