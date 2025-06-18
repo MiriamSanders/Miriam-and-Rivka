@@ -6,7 +6,7 @@ import { useErrorMessage } from "./useErrorMessage";
 import RecipeDiscussion from "./RecipeDiscussion";
 import "../styles/RecipePage.css"; 
 import { getRequest, putRequest } from "../Requests";
-import { Printer } from "lucide-react";
+import { Edit, Printer } from "lucide-react";
 
 const RecipePage = () => {
   const { id } = useParams();
@@ -113,8 +113,9 @@ function validateRecipeFields(recipe) {
 
   const ingredients = recipeData.ingredients || [];
   const tags = editMode ? editedRecipe.tags || [] : recipeData.tags || [];
-  const isEditable = currentUser?.userType === "Admin" || currentUser?.Id === recipeData.recipe.chefID;
-
+  const isEditable =currentUser&&( currentUser?.userType === "admin" || currentUser?.id === recipeData.recipe.chefId);
+  console.log(isEditable);
+  
   return (
     <div className="recipe-container">
       {errorMessage && (
@@ -125,19 +126,27 @@ function validateRecipeFields(recipe) {
 
       {/* Fixed position print button */}
       <button onClick={handlePrint} className="print-button no-print">
-        <Printer/>
+        <Printer size={18} />
+        Print
       </button>
 
       {/* Edit controls */}
       {isEditable && (
-        <div className="recipe-actions no-print" style={{ marginBottom: '1rem' }}>
+        <>
           {editMode ? (
-            <>
-              <button onClick={handleSave}>Save</button>
-              <button onClick={handleCancel} style={{ marginLeft: '8px' }}>Cancel</button>
-            </>
+            <div className="recipe-actions no-print">
+              <button onClick={handleSave} className="edit-save-button">
+                Save Changes
+              </button>
+              <button onClick={handleCancel} className="edit-cancel-button">
+                Cancel
+              </button>
+            </div>
           ) : (
-            <button onClick={handleEditToggle}>✏️ Edit</button>
+            <button onClick={handleEditToggle} className="edit-button no-print">
+              <Edit size={18} />
+              Edit
+            </button>
           )}
         </div>
       )}{console.log(recipeData)}
@@ -147,47 +156,69 @@ function validateRecipeFields(recipe) {
           {editMode ? (<>
           title:
             <input
-              value={title}
+              className="edit-title-input"
+              value={title || ''}
               onChange={(e) => setEditedRecipe({ ...editedRecipe, title: e.target.value })}
+              placeholder="Recipe Title"
             /></>
           ) : (
             title
           )}
         </h1>
 
+        <h2 className="recipe-subtitle">
+          {editMode ? (
+            <input
+              className="edit-subtitle-input"
+              value={subtitle || ''}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, subtitle: e.target.value })}
+              placeholder="Recipe subtitle or description"
+            />
+          ) : (
+            subtitle
+          )}
+        </h2>
+
         <p className="recipe-subtext">By: {chefName}</p>
+        
         <p className="recipe-subtext">
           {editMode ? (
-            <>
-              Prep Time:
+            <div className="edit-meta-container">
+              <span>Prep Time:</span>
               <input
                 type="number"
                 min={1}
-                value={prepTimeMinutes}
+                className="edit-meta-input"
+                value={prepTimeMinutes || ''}
                 onChange={(e) =>
                   setEditedRecipe({ ...editedRecipe, prepTimeMinutes: parseInt(e.target.value) || 0 })
                 }
-                style={{ width: "60px", margin: "0 5px" }}
+                placeholder="30"
               />
-              min · Difficulty:
+              <span>min</span>
+              <span>·</span>
+              <span>Difficulty:</span>
               <input
                 type="text"
-                value={difficulty}
+                className="edit-meta-input wide"
+                value={difficulty || ''}
                 onChange={(e) =>
                   setEditedRecipe({ ...editedRecipe, difficulty: e.target.value })
                 }
-                style={{ width: "100px", margin: "0 5px" }}
+                placeholder="Easy"
               />
-              · Category:
+              <span>·</span>
+              <span>Category:</span>
               <input
                 type="text"
-                value={category}
+                className="edit-meta-input wide"
+                value={category || ''}
                 onChange={(e) =>
                   setEditedRecipe({ ...editedRecipe, category: e.target.value })
                 }
-                style={{ width: "100px", margin: "0 5px" }}
+                placeholder="Main Course"
               />
-            </>
+            </div>
           ) : (
             <>
               Prep Time: {prepTimeMinutes} min · Difficulty: {difficulty} · Category: {category}
@@ -208,8 +239,10 @@ function validateRecipeFields(recipe) {
             <h2 className="section-title">Description</h2>
             {editMode ? (
               <textarea
-                value={description}
+                className="edit-description-textarea"
+                value={description || ''}
                 onChange={(e) => setEditedRecipe({ ...editedRecipe, description: e.target.value })}
+                placeholder="Describe your recipe here..."
                 rows={4}
               />
             ) : (
@@ -221,11 +254,13 @@ function validateRecipeFields(recipe) {
             <h2 className="section-title">Ingredients</h2>
             {editMode ? (
               <textarea
+                className="edit-ingredients-textarea"
                 value={ingredientsList?.join("\n") || ""}
                 onChange={(e) =>
                   setEditedRecipe({ ...editedRecipe, ingredientsList: e.target.value.split("\n") })
                 }
-                rows={5}
+                placeholder="2 cups flour&#10;1 tsp salt&#10;3 eggs"
+                rows={8}
               />
             ) : (
               <ul className="ingredients-list">
@@ -235,7 +270,7 @@ function validateRecipeFields(recipe) {
                         {item.quantity} {item.name}
                       </li>
                     ))
-                  : ingredientsList.map((item, index) => (
+                  : ingredientsList?.map((item, index) => (
                       <li key={index}>{item.trim()}</li>
                     ))}
               </ul>
@@ -246,28 +281,34 @@ function validateRecipeFields(recipe) {
             <h2 className="section-title">Instructions</h2>
             {editMode ? (
               <textarea
-                value={instructions}
+                className="edit-instructions-textarea"
+                value={instructions || ''}
                 onChange={(e) => setEditedRecipe({ ...editedRecipe, instructions: e.target.value })}
-                rows={5}
+                placeholder="Step 1: Preheat oven to 350°F&#10;Step 2: Mix dry ingredients&#10;Step 3: Add wet ingredients..."
+                rows={10}
               />
             ) : (
               <div className="instructions">
                 {instructions?.split('\n').map((step, index) => (
-                  <p key={index} className="instruction-step">
-                    {step.trim() && `${index + 1}. ${step.trim()}`}
-                  </p>
-                ))}
+                  step.trim() && (
+                    <p key={index} className="instruction-step">
+                      {step.trim().match(/^\d+\./) ? step.trim() : `${index + 1}. ${step.trim()}`}
+                    </p>
+                  )
+                )).filter(Boolean)}
               </div>
             )}
           </section>
 
           <section>
-            <h2 className="section-title no-print">Tags</h2>
+            <h2 className="section-title">Tags</h2>
             {editMode ? (
               <textarea
+                className="edit-tags-textarea"
                 value={tags.join("\n")}
-                onChange={(e) => setEditedRecipe({ ...editedRecipe, tags: e.target.value.split("\n") })}
-                rows={3}
+                onChange={(e) => setEditedRecipe({ ...editedRecipe, tags: e.target.value.split("\n").filter(tag => tag.trim()) })}
+                placeholder="vegetarian&#10;quick&#10;healthy"
+                rows={4}
               />
             ) : (
               <div className="tags-container">

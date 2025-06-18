@@ -38,28 +38,6 @@ const HomePage = ({ userType }) => {
     fetchFeaturedChefs();
   }, []);
 
-  // Example API call functions (uncomment and modify for your endpoints)
-  /*
-  const fetchPopularRecipes = async () => {
-    try {
-      const response = await fetch('/api/recipes/popular');
-      const data = await response.json();
-      setPopularRecipes(data);
-    } catch (error) {
-      console.error('Error fetching popular recipes:', error);
-    }
-  };
-
-  const fetchFeaturedChefs = async () => {
-    try {
-      const response = await fetch('/api/chefs/featured');
-      const data = await response.json();
-      setFeaturedChefs(data);
-    } catch (error) {
-      console.error('Error fetching featured chefs:', error);
-    }
-  };
-  */
 
   return (
     <div className="homepage">
