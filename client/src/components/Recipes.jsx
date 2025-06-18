@@ -15,7 +15,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
   const [tags, setTags] = useState([]);
   const errorMessage = useErrorMessage(errorCode);
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-  const isAdmin = currentUser?.userType === "Admin";
+  const isAdmin = currentUser?.userType === "admin";
   const navigate = useNavigate();
   const location = useLocation();
   const limit = 12;
@@ -32,6 +32,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
     { value: 'name-asc', label: 'Name A-Z' },
     { value: 'name-desc', label: 'Name Z-A' }
   ];
+
   const addRecipeToMenu = (recipeId, dishType) => {
     if (createMenu) {
       addToMenu((prevMenu) => {
@@ -48,7 +49,6 @@ function Recipes({ createMenu, addToMenu, menu }) {
     }
     console.log("Recipe added to menu:", recipeId, "Dish Type:", dishType);
     console.log("Current Menu State:", menu);
-
   }
 
   // Parse URL parameters into search params object
@@ -168,9 +168,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
     updateUrl(newParams);
   };
 
-  // Remove search param
-  //need to add chefFilter tab...
-
+  // Remove search param - FIXED THE BUG HERE
   const removeSearchParam = (key, value = null) => {
     const currentParams = getSearchParamsFromUrl();
     let newParams = { ...currentParams };
@@ -179,9 +177,8 @@ function Recipes({ createMenu, addToMenu, menu }) {
       newParams.tags = newParams.tags.filter(tag => tag !== value);
     } else if (key === 'title') {
       newParams.title = '';
-    }
-    else if (key === 'chefName') {
-      newParams.title = '';
+    } else if (key === 'chefName') {
+      newParams.chefName = ''; // FIXED: was setting title = '' instead of chefName = ''
     } else if (key === 'category') {
       newParams.category = 'all';
     } else if (key === 'sortBy') {
@@ -206,10 +203,11 @@ function Recipes({ createMenu, addToMenu, menu }) {
     navigate(location.pathname, { replace: true });
   };
 
-  // Check if any filters are active
+  // Check if any filters are active - ADDED chefName check
   const hasActiveFilters = () => {
     const params = getSearchParamsFromUrl();
     return params.title ||
+      params.chefName ||  // ADDED this line
       params.category !== 'all' ||
       params.sortBy !== 'relevance' ||
       params.tags.length > 0;
@@ -233,12 +231,25 @@ function Recipes({ createMenu, addToMenu, menu }) {
     navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true });
   };
 
+  // NEW: Handle chef name input change
+  // const handleChefNameInputChange = (e) => {
+  //   const currentParams = getSearchParamsFromUrl();
+  //   const urlParams = new URLSearchParams(location.search);
+  //   if (e.target.value) {
+  //     urlParams.set('chefName', e.target.value);
+  //   } else {
+  //     urlParams.delete('chefName');
+  //   }
+  //   navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true });
+  // };
+
   const handleSearchSubmit = () => {
     // Force a new search when Enter is pressed
     setPage(1);
     setHasMore(true);
     getRecipes(1, false);
   };
+
   const handleDeleteRecipe = async (e, recipeId) => {
     e.stopPropagation();
     const requestResult = await deleteRequest(`recipes/${recipeId}`);
@@ -248,8 +259,8 @@ function Recipes({ createMenu, addToMenu, menu }) {
     } else {
       setErrorCode(requestResult.status);
     }
-
   };
+
   const currentSearchParams = getSearchParamsFromUrl();
 
   return (
@@ -268,7 +279,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
             <Search className="searchIcon" />
             <input
               type="text"
-              placeholder="Search anything..."
+              placeholder="Search recipes..."
               value={currentSearchParams.title}
               onChange={handleSearchInputChange}
               onKeyDown={(e) => {
@@ -287,6 +298,30 @@ function Recipes({ createMenu, addToMenu, menu }) {
               </button>
             )}
           </div>
+
+          {/* NEW: Chef Name Search Input */}
+          {/* <div className="relative">
+            <input
+              type="text"
+              placeholder="Search by chef..."
+              value={currentSearchParams.chefName}
+              onChange={handleChefNameInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearchSubmit();
+                }
+              }}
+              className="searchInput"
+            />
+            {currentSearchParams.chefName && (
+              <button
+                onClick={() => removeSearchParam('chefName')}
+                className="clearButton"
+              >
+                <X size={20} />
+              </button>
+            )}
+          </div> */}
         </div>
 
         <div className="filterControls">
@@ -368,22 +403,24 @@ function Recipes({ createMenu, addToMenu, menu }) {
               </span>
             )}
 
-            {currentSearchParams.category !== 'all' && (
+            {/* FIXED: Now properly shows chef name filter */}
+            {currentSearchParams.chefName && (
               <span className="filterTag">
-                {categories.find(c => c.value === currentSearchParams.category)?.label}
+                Chef: "{currentSearchParams.chefName}"
                 <button
-                  onClick={() => removeSearchParam('category')}
+                  onClick={() => removeSearchParam('chefName')}
                   className="filterTagRemove"
                 >
                   <X size={12} />
                 </button>
               </span>
             )}
-            {currentSearchParams.chefName && (
+
+            {currentSearchParams.category !== 'all' && (
               <span className="filterTag">
-                {currentSearchParams.chefName}
+                {categories.find(c => c.value === currentSearchParams.category)?.label}
                 <button
-                  onClick={() => removeSearchParam('chefName')}
+                  onClick={() => removeSearchParam('category')}
                   className="filterTagRemove"
                 >
                   <X size={12} />
@@ -421,7 +458,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
                     Add to Menu
                   </button>
                 )}
-                {(isAdmin ||(currentUser&& currentUser.userId === recipe.userId)) &&
+                {(isAdmin || (currentUser && currentUser.userId === recipe.userId)) &&
                   <button
                     onClick={(e) => handleDeleteRecipe(e, recipe.recipeId)}
                     style={{ background: "transparent" }}

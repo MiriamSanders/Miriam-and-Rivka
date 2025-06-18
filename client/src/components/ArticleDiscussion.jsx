@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useErrorMessage } from "./useErrorMessage";
 import { deleteRequest,postRequest, getRequest } from "../Requests"; // הוספתי גם getRequest שהיה חסר
+import { Trash2 } from "lucide-react";
 
 const ArticleDiscussion = ({ articleId }) => {
   const [comments, setComments] = useState([]);
@@ -10,7 +11,7 @@ const ArticleDiscussion = ({ articleId }) => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-  const isAdmin = currentUser?.userType === "Admin";
+  const isAdmin = currentUser?.userType === "admin";
   const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
   const commentsRef = useRef(null);
@@ -131,15 +132,16 @@ const handleDeleteComment = async (commentId) => {
           <div key={comment.commentId} className="comment">
             <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
             {console.log(comment.userId)}
-            {(isAdmin ||currentUser.userId===comment.userId)&& 
+            {(isAdmin ||(currentUser&&currentUser.userId===comment.userId))&& 
              <button
     onClick={() => handleDeleteComment(comment.commentId)}
     style={{
       color: "black",
-      marginLeft: "5px"
+      marginLeft: "5px",
+      background:'transparent'
     }}
   >
-    🗑
+  <Trash2/>
   </button>
             }
           </div>

@@ -4,6 +4,7 @@ import '../styles/ArticlePage.css';
 import ArticleDiscussion from './ArticleDiscussion';
 import { useErrorMessage } from "./useErrorMessage";
 import { getRequest, putRequest } from '../Requests';
+import { Edit, X } from 'lucide-react';
 
 function ArticlePage() {
   const { id } = useParams();
@@ -41,7 +42,7 @@ function ArticlePage() {
   const formattedDate = new Date(createdAt).toLocaleDateString();
   const canEditOrDelete =
     currentUser &&
-    (currentUser.userType === "Admin" || currentUser.userId === authorId);
+    (currentUser.userType === "admin" || currentUser.userId === authorId);
 
   const handleSave = async () => {
     const updatedArticle = {
@@ -64,7 +65,19 @@ function ArticlePage() {
           ⚠️ {errorMessage}
         </div>
       )}
-{console.log(articleData)}
+      {console.log(articleData)}
+      {canEditOrDelete && (
+        <div className="article-edit-controls">
+          {isEditing ? (
+            <>
+              <button onClick={handleSave} className='edit-save-button'>Save Changes</button>
+              <button onClick={() => setIsEditing(false)} className='edit-cancel-button'>Cancel</button>
+            </>
+          ) : (
+            <button onClick={() => setIsEditing(true)} className='edit-button'><Edit /></button>
+          )}
+        </div>
+      )}
       {isEditing ? (
         <input
           className="article-title-input"
@@ -96,18 +109,7 @@ function ArticlePage() {
         )}
       </div>
 
-      {canEditOrDelete && (
-        <div className="article-edit-controls">
-          {isEditing ? (
-            <>
-              <button onClick={handleSave}>💾 Save</button>
-              <button onClick={() => setIsEditing(false)}>❌ Cancel</button>
-            </>
-          ) : (
-            <button onClick={() => setIsEditing(true)}>✏️ Edit</button>
-          )}
-        </div>
-      )}
+
 
       <ArticleDiscussion articleId={id} />
     </div>

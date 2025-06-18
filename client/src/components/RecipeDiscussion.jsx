@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
 import { deleteRequest,getRequest, postRequest } from "../Requests";
 import { useErrorMessage } from "./useErrorMessage";
+import { Trash2 } from "lucide-react";
 const RecipeDiscussion = ({ recipeId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
@@ -10,7 +11,7 @@ const RecipeDiscussion = ({ recipeId }) => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
      const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-  const isAdmin = currentUser?.userType === "Admin";
+  const isAdmin = currentUser?.userType === "admin";
   const commentsRef = useRef(null);
   const loadMoreRef = useRef(null);
   const hasStarted = useRef(false);
@@ -125,15 +126,16 @@ const handleDeleteComment = async (commentId) => {
           {comments.map((comment) => (
             <div key={comment.commentId} className="comment">
               <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
-                  {(isAdmin ||currentUser.userId===comment.userId)&& 
+                  {(isAdmin ||(currentUser&&currentUser.userId===comment.userId))&& 
              <button
     onClick={() => handleDeleteComment(comment.commentId)}
     style={{
       color: "black",
-      marginLeft: "5px"
+      marginLeft: "5px",
+      background:"transparent"
     }}
   >
-    🗑
+   <Trash2/>
   </button>
             }
             </div>
