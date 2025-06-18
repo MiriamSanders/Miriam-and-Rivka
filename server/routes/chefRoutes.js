@@ -5,5 +5,6 @@ router.post('/chef-application', controller.joinReq);
  router.get('/chef/approve/:guid', controller.approveReq);
  router.get('/chef/reject/guid', controller.rejectReq);
 router.get('/chefs', controller.getAllChefs);
+router.get('/chefs/featured-chefs',controller.getFeaturedChefs);
 router.get('/chefs/:chefId', controller.getChef);
 module.exports = router;

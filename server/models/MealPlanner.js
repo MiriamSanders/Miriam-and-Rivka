@@ -1,12 +1,18 @@
-/*
-   ---------------------------------------------------------
-   All logic is encapsulated in plain async/utility functions.
-   The caller supplies an existing mysql2/promise connection or
-   pool (e.g. `const db = await dbPromise`).
-   --------------------------------------------------------- */
+
+
 const mysql = require('mysql2/promise');
 const dbPromise = require('../services/dbConnection');
+const { genericPost } = require('../services/genericService');
+function addToDb(weeklyMenu,id)
+{
+  //add to databaase
+  //orginizee this codeeeeeeeeeee!!!!!!!!!!1
+weeklyMenu.forEach(async m=>{
+  let menuDay=await genericPost("dailymenus",{userId:id,date:m.date});
 
+
+})
+}
 // -----------------------------------------------------------------------------
 // 1. Data‑fetch helpers
 // -----------------------------------------------------------------------------

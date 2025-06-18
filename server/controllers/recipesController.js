@@ -10,6 +10,7 @@ exports.getAllRecipes = async (req, res) => {
      if (Object.keys(req.query).length === 0) {
     const recipes = await recipeService.getAllRecipes(limit, offset)
     return res.json(recipes);}
+    //addd dishType 
     const options = {
       limit: limit,
       offset: offset,
@@ -199,7 +200,7 @@ exports.getbestRatedRecipes=async(req,res) =>{
   
 }
 // Helper function to parse ingredient text and extract quantity and ingredient name
-function parseIngredientText(ingredientText) {
+function parseבIngredientText(ingredientText) {
   // Common patterns for ingredient parsing
   const patterns = [
     // Pattern: "2 cups flour" or "1 cup sugar"

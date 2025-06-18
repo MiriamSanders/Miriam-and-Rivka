@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { parseRecipeDocument, readRecipeFile } from '../RecipeParser';
 import { Upload, Plus, Minus, Clock, Star, Tag } from 'lucide-react';
 import { postRequest } from "../Requests";
+import RecipeFormatGuide from './RecipeFormatGuide';
 // Move ArrayInput outside the component to prevent re-creation
 const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addArrayItem, removeArrayItem }) => (
   <div className="array-section">
@@ -173,7 +174,7 @@ const AddRecipe = () => {
           </div>
         </div>
       </div>
-
+     <RecipeFormatGuide/>
       <div className="form-grid">
         <div className="form-section">
           <h3 className="section-title">Basic Information</h3>
@@ -200,7 +201,7 @@ const AddRecipe = () => {
             <label className="label">Image URL:</label>
             <input 
               type="url" 
-              value={recipe.ImageURL} 
+              value={recipe.imageURL} 
               onChange={(e) => handleInputChange('imageURL', e.target.value)} 
               placeholder="https://example.com/image.jpg" 
               className="input" 

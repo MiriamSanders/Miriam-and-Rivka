@@ -22,12 +22,13 @@ export const parseRecipeDocument = (text) => {
     } else if (cleanLine.toLowerCase().includes('description:')) {
       if (cleanLine.split(':')[1]?.trim()) {
         parsedRecipe.description = cleanLine.split(':')[1].trim();
-      } else if (i + 1 < lines.length && lines[i+1] && !lines[i+1].match(/^[a-zA-Z\s]+:/)) {
+      } else if (i + 1 < lines.length && lines[i + 1] && !lines[i + 1].match(/^[a-zA-Z\s]+:/)) {
         parsedRecipe.description = lines[i + 1].trim();
         i++;
       }
     } else if (cleanLine.toLowerCase().includes('image:')) {
-      parsedRecipe.image = cleanLine.split(':')[1]?.trim() || '';
+      const parts = cleanLine.split(':');
+      parsedRecipe.image = (parts[1]?.trim() || '') + (parts[2]?.trim() || '');
     } else if (cleanLine.toLowerCase().includes('prep time:')) {
       parsedRecipe.prepTime = cleanLine.split(':')[1]?.trim() || '';
     } else if (cleanLine.toLowerCase().includes('difficulty:')) {

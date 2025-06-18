@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { deleteRequest, getRequest } from '../Requests';
-import SearchFilterBar from './SearchBar';
 import { Search, Filter, ChevronDown, X, Trash2 } from 'lucide-react';
 import { useErrorMessage } from "./useErrorMessage";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -14,7 +13,6 @@ function Recipes({ createMenu, addToMenu, menu }) {
   const [errorCode, setErrorCode] = useState(undefined);
   const [showFilters, setShowFilters] = useState(false);
   const [tags, setTags] = useState([]);
-
   const errorMessage = useErrorMessage(errorCode);
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.userType === "Admin";
@@ -120,7 +118,12 @@ function Recipes({ createMenu, addToMenu, menu }) {
         } else {
           setHasMore(true);
         }
-        setRecipes((prev) => [...prev, ...newRecipes]);
+        if (currentPage == 1) {
+          setRecipes(newRecipes);
+        }
+        else {
+          setRecipes((prev) => [...prev, ...newRecipes]);
+        }
         setErrorCode(undefined);
       } else {
         setErrorCode(requestResult.status);
@@ -166,6 +169,8 @@ function Recipes({ createMenu, addToMenu, menu }) {
   };
 
   // Remove search param
+  //need to add chefFilter tab...
+
   const removeSearchParam = (key, value = null) => {
     const currentParams = getSearchParamsFromUrl();
     let newParams = { ...currentParams };
@@ -173,6 +178,9 @@ function Recipes({ createMenu, addToMenu, menu }) {
     if (key === 'tags' && value) {
       newParams.tags = newParams.tags.filter(tag => tag !== value);
     } else if (key === 'title') {
+      newParams.title = '';
+    }
+    else if (key === 'chefName') {
       newParams.title = '';
     } else if (key === 'category') {
       newParams.category = 'all';
@@ -231,16 +239,16 @@ function Recipes({ createMenu, addToMenu, menu }) {
     setHasMore(true);
     getRecipes(1, false);
   };
-  const handleDeleteRecipe = async (e,recipeId) => {
-     e.stopPropagation();
-      const requestResult = await deleteRequest(`recipes/${recipeId}`);
-      if (requestResult.succeeded) {
-        setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
-          setErrorCode(undefined);
-      } else {
-        setErrorCode(requestResult.status);
-      }
-     
+  const handleDeleteRecipe = async (e, recipeId) => {
+    e.stopPropagation();
+    const requestResult = await deleteRequest(`recipes/${recipeId}`);
+    if (requestResult.succeeded) {
+      setRecipes(prev => prev.filter(c => c.recipeId !== recipeId));
+      setErrorCode(undefined);
+    } else {
+      setErrorCode(requestResult.status);
+    }
+
   };
   const currentSearchParams = getSearchParamsFromUrl();
 
@@ -371,6 +379,17 @@ function Recipes({ createMenu, addToMenu, menu }) {
                 </button>
               </span>
             )}
+            {currentSearchParams.chefName && (
+              <span className="filterTag">
+                {currentSearchParams.chefName}
+                <button
+                  onClick={() => removeSearchParam('chefName')}
+                  className="filterTagRemove"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
 
             {currentSearchParams.tags.map(tag => (
               <span key={tag} className="filterTag">
@@ -402,18 +421,14 @@ function Recipes({ createMenu, addToMenu, menu }) {
                     Add to Menu
                   </button>
                 )}
-                {console.log(recipe)}
-                    {(isAdmin ||currentUser.userId===recipe.userId)&& 
-             <button
-    onClick={(e) => handleDeleteRecipe(e,recipe.recipeId)}
-    style={{
-      color: "black",
-      marginLeft: "5px"
-    }}
-  >
-    🗑
-  </button>
-            }
+                {(isAdmin ||(currentUser&& currentUser.userId === recipe.userId)) &&
+                  <button
+                    onClick={(e) => handleDeleteRecipe(e, recipe.recipeId)}
+                    style={{ background: "transparent" }}
+                  >
+                    <Trash2 />
+                  </button>
+                }
                 <div className="recipe-overlay">
                   <h2>{recipe.title}</h2>
                   <p>{recipe.description}</p>

@@ -7,7 +7,7 @@ function Articles() {
   const [articles, setArticles] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.userType === "Admin";
   const navigate = useNavigate();
   const limit = 8;
@@ -73,7 +73,7 @@ const openArticle = (e) => {
                   <p>Written by:{article.userName}</p>
                 </div>
                 {console.log(article.userId)}
-                    {(isAdmin ||currentUser.userId===article.authorId)&& 
+                    {(isAdmin ||(currentUser&&currentUser.userId===article.authorId))&& 
              <button
     onClick={(e) => handleDeleteArticle(e,article.articleId)}
     style={{
