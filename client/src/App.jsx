@@ -11,7 +11,7 @@ import Articles from './components/Articles'
 import ArticlePage from './components/ArticlePage'
 import MenuManager from './components/MenuManager'
 import ChefPage from './components/ChefPage'
-import ChefArea from './components/ChefArea'
+import  ChefCommentsDashboard from './components/ChefCommentsDashboard'
 import Chefs from './components/Chefs'
 import RecipeManager from './components/RecipeManager';
 import ArticleManager from './components/ArticleManager';
@@ -68,7 +68,7 @@ function App() {
 
         {(userType === "admin" || userType === "chef") && (
           <>
-            <Route path="/chef-area" element={<ChefArea />} />
+            <Route path="/chef-area" element={<ChefCommentsDashboard/>} />
             <Route path="/chef-area/recipe-manager" element={<RecipeManager />} />
             <Route path="/chef-area/article-manager" element={<ArticleManager />} />
           </>

@@ -7,9 +7,10 @@ exports.getAllRecipes = async (req, res) => {
     const page = parseInt(req.query.page) || 0;
     console.log(limit, page);
     const offset = page * limit - limit;
-     if (Object.keys(req.query).length === 0) {
-    const recipes = await recipeService.getAllRecipes(limit, offset)
-    return res.json(recipes);}
+    if (Object.keys(req.query).length === 0) {
+      const recipes = await recipeService.getAllRecipes(limit, offset)
+      return res.json(recipes);
+    }
     //addd dishType 
     const options = {
       limit: limit,
@@ -66,20 +67,19 @@ exports.createRecipe = async (req, res) => {
     ingredients,
     tags
   } = req.body;
- console.log(req.body);
- 
+  console.log(req.body);
+
   // Validate required fields
   if (!chefId || !title || !imageURL || !category || !description) {
     console.log("error");
-    
+
     return res.status(400).json({ error: 'chefId, title, imageURL, category, and description are required' });
   }
 
   try {
-    let difficultyId=await genericService.genericGet("difficulty","name",difficulty);
-    if(!difficultyId)
-    {
-     difficultyId=await genericService.genericPost("difficulty",{name:difficulty},"difficultyId")
+    let difficultyId = await genericService.genericGet("difficulty", "name", difficulty);
+    if (!difficultyId) {
+      difficultyId = await genericService.genericPost("difficulty", { name: difficulty }, "difficultyId")
     }
     // First, create the recipe
     const recipeData = {
@@ -88,17 +88,17 @@ exports.createRecipe = async (req, res) => {
       description,
       imageURL,
       instructions,
-      difficulty:difficultyId[0].difficultyId,
+      difficulty: difficultyId[0].difficultyId,
       prepTimeMinutes: prepTimeMinutes || null,
       category,
       dishType
     };
     console.log(recipeData);
-    
+
     const newRecipe = await genericService.genericPost('recipes', recipeData, 'recipeId');
     const recipeId = newRecipe.recipeId;
     console.log(newRecipe);
-    
+
     // Handle ingredients if provided
     if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
       for (let i = 0; i < ingredients.length; i++) {
@@ -117,7 +117,7 @@ exports.createRecipe = async (req, res) => {
                 // Assuming GenericGet returns an array
                 existingIngredient = searchResult[0];
                 console.log(existingIngredient);
-                
+
               } catch (error) {
                 // Ingredient doesn't exist, create it
                 const newIngredientData = {
@@ -158,7 +158,7 @@ exports.createRecipe = async (req, res) => {
           let existingTag;
 
           existingTag = await genericService.genericGet('tags', "name", tagName);
-          existingTag=existingTag[0];
+          existingTag = existingTag[0];
           if (!existingTag) {
             // Tag doesn't exist, create it
             existingTag = await genericService.genericPost('tags', { name: tagName }, 'tagId');
@@ -189,7 +189,7 @@ exports.createRecipe = async (req, res) => {
     res.status(500).json({ error: 'Something went wrong while creating the recipe' });
   }
 };
-exports.getbestRatedRecipes=async(req,res) =>{
+exports.getbestRatedRecipes = async (req, res) => {
   try {
     const bestRatedRecipes = await recipeService.getBestRatedRecipes();
     res.json(bestRatedRecipes);
@@ -197,7 +197,7 @@ exports.getbestRatedRecipes=async(req,res) =>{
     console.error('Error fetching best rated recipes:', error);
     res.status(500).json({ error: 'Something went wrong while fetching best rated recipes' });
   }
-  
+
 }
 // Helper function to parse ingredient text and extract quantity and ingredient name
 function parseIngredientText(ingredientText) {
@@ -233,15 +233,15 @@ function parseIngredientText(ingredientText) {
     ingredientName: ingredientText
   };
 }
-exports.deleteRecipe=async(req,res)=>{
-   try {
-     const recipeId = parseInt(req.params.id);
-      const result= await recipeService.deleteRecipe(recipeId);
-       res.json(result);
-    } catch (error) {
-      console.error('Error delet recipe:', error);
-      res.status(500).json({ error: 'somthing went wrong' });
-    }
+exports.deleteRecipe = async (req, res) => {
+  try {
+    const recipeId = parseInt(req.params.id);
+    const result = await recipeService.deleteRecipe(recipeId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error delet recipe:', error);
+    res.status(500).json({ error: 'somthing went wrong' });
+  }
 }
 exports.putRecipe = async (req, res) => {
   const recipeId = parseInt(req.params.id);
@@ -257,20 +257,19 @@ exports.putRecipe = async (req, res) => {
     ingredients,
     tags
   } = req.body;
- console.log(req.body);
- 
+  console.log(req.body);
+
   // Validate required fields
   if (!title || !imageURL || !category || !description) {
     console.log("error");
-    
+
     return res.status(400).json({ error: 'title, imageURL, category, and description are required' });
   }
 
   try {
-    let difficultyId=await genericService.genericGet("difficulty","name",difficulty);
-    if(!difficultyId)
-    {
-     difficultyId=await recipeService.createDifficulty(difficulty);
+    let difficultyId = await genericService.genericGet("difficulty", "name", difficulty);
+    if (!difficultyId) {
+      difficultyId = await recipeService.createDifficulty(difficulty);
     }
     // First, create the recipe
     const recipeData = {
@@ -278,21 +277,21 @@ exports.putRecipe = async (req, res) => {
       description,
       imageURL,
       instructions,
-      difficulty:difficultyId[0].difficultyId,
+      difficulty: difficultyId[0].difficultyId,
       prepTimeMinutes: prepTimeMinutes || null,
       category,
       dishType,
     };
     console.log(recipeData);
-    
+
     const newRecipe = await recipeService.updateRecipeById(recipeId, recipeData);
     console.log(newRecipe);
-    
+
     // Handle ingredients if provided
-   await syncRecipeIngredients(recipeId,ingredients);
+    await syncRecipeIngredients(recipeId, ingredients);
 
     // Handle tags if provided
-   await syncRecipeTags(recipeId, tags);
+    await syncRecipeTags(recipeId, tags);
 
     res.status(201).json({
       success: true,

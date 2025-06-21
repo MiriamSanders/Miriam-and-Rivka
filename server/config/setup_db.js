@@ -87,15 +87,17 @@ const createTables = async () => {
   )`,
 
     // 9. Comments (references recipes and users)
-    `CREATE TABLE IF NOT EXISTS comments (
-    commentId INT AUTO_INCREMENT PRIMARY KEY,
-    recipeId INT NOT NULL,
-    userId INT NOT NULL,
-    commentText TEXT,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
-  )`,
+  `CREATE TABLE IF NOT EXISTS recipeComments (
+  commentId INT AUTO_INCREMENT PRIMARY KEY,
+  recipeId INT NOT NULL,
+  userId INT NOT NULL,
+  parentCommentId INT DEFAULT NULL,
+  commentText TEXT,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE,
+  FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
+  FOREIGN KEY (parentCommentId) REFERENCES recipeComments(commentId) ON DELETE CASCADE
+)`,
 
     // 10. Articles (references users)
     `CREATE TABLE IF NOT EXISTS articles (

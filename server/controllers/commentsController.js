@@ -27,12 +27,38 @@ exports.getArticleComments = async (req, res) => {
     res.status(500).json({ error: 'somthing went wrong' });
   }
 };
+exports.getAllChefRecipeComments = async (req, res) => {
+  try {
+    const chefId = parseInt(req.params.chefId);
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const offset = page * limit - limit;
+    const comments = await commentsService.getAllChefRecipeComments(chefId, limit, offset);
+    res.json(comments);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'somthing went wrong' });
+  }
+}
 exports.postRecipeComments = async (req, res) => {
   try {
     const recipeId = req.body.recipeId;
     const userId = req.body.userId;
     const commentText = req.body.commentText;
     const commentId = await commentsService.postRecipeComments(recipeId, userId, commentText);
+    res.json(commentId);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'somthing went wrong' });
+  }
+}
+exports.postChefRecipeComment = async (req, res) => {
+  try {
+    const chefId = parseInt(req.params.chefId);
+    const recipeId = req.body.recipeId;
+    const commentText = req.body.commentText;
+    const parentCommentId= req.body.parentCommentId;
+    const commentId = await commentsService.postChefRecipeComment(chefId, recipeId, commentText,parentCommentId);
     res.json(commentId);
   } catch (error) {
     console.error('Error fetching comments:', error);
