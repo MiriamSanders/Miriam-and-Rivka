@@ -1,8 +1,318 @@
+// import React, { useState } from 'react';
+// import { parseRecipeDocument, readRecipeFile } from '../RecipeParser';
+// import { Upload, Plus, Minus, Clock, Star, Tag } from 'lucide-react';
+// import { postRequest } from "../Requests";
+// import RecipeFormatGuide from './RecipeFormatGuide';
+// // Move ArrayInput outside the component to prevent re-creation
+// const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addArrayItem, removeArrayItem }) => (
+//   <div className="array-section">
+//     <label className="label">{label}:</label>
+//     {recipe[field].map((item, index) => (
+//       <div key={index} className="array-input-group">
+//         <input
+//           type="text" 
+//           value={item}
+//           onChange={(e) => handleArrayChange(field, index, e.target.value)}
+//           placeholder={placeholder} 
+//           className="input"
+//         />
+//         <button
+//           onClick={() => removeArrayItem(field, index)}
+//           disabled={recipe[field].length === 1}
+//           className="button remove-button"
+//         ><Minus size={16} color='black' /></button>
+//         {index === recipe[field].length - 1 && (
+//           <button onClick={() => addArrayItem(field)} className="button add-button">
+//             <Plus size={16} color='black'  />
+//           </button>
+//         )}
+//       </div>
+//     ))}
+//   </div>
+// );
+
+// const AddRecipe = () => {
+//   const [recipe, setRecipe] = useState({
+//     title: '', // Changed from 'name' // Changed from 'chef' - this should be a number/ID
+//     description: '', 
+//     imageURL: '', // Changed from 'image'
+//     prepTimeMinutes: '', // Changed from 'prepTime'
+//     difficulty: 'Easy', // Changed from 'difficulty'
+//     category: '', // Changed from 'category'
+//     dishType: '', // Changed from 'dishType'
+//     instructions: '', // Changed from 'instructions'
+//     ingredients: [''], // Keep for ingredients handling
+//     tags: [''] // Keep for tags handling
+//   });
+
+//   const difficulties = ['Easy', 'Medium', 'Hard'];
+//   const categories = ['Meat', 'Dairy', 'Parve']; // Updated to match your ENUM values
+//   const dishTypes = ['main', 'side', 'dessert'];
+
+//   const handleFileUpload = async (event) => {
+//     const file = event.target.files[0];
+//     try {
+//       const text = await readRecipeFile(file);
+//       const parsedRecipe = parseRecipeDocument(text);
+//       // Map parsed recipe to correct field names
+//       setRecipe({
+//         title: parsedRecipe.name || '',
+//         description: parsedRecipe.description || '',
+//         imageURL: parsedRecipe.image || '',
+//         prepTimeMinutes: parsedRecipe.prepTime || '',
+//         difficulty: parsedRecipe.difficulty || 'Easy',
+//         category: parsedRecipe.category || '',
+//         dishType: parsedRecipe.dishType || '',
+//         instructions: parsedRecipe.instructions || '',
+//         ingredients: parsedRecipe.ingredients || [''],
+//         tags: parsedRecipe.tags || ['']
+//       });
+//     } catch (error) {
+//       alert(error.message);
+//       console.error(error);
+//     } finally {
+//       event.target.value = null;
+//     }
+//   };
+
+//   const handleInputChange = (field, value) => {
+//     setRecipe(prev => ({ ...prev, [field]: value }));
+//   };
+
+//   const handleArrayChange = (field, index, value) => {
+//     setRecipe(prev => ({
+//       ...prev,
+//       [field]: prev[field].map((item, i) => i === index ? value : item)
+//     }));
+//   };
+
+//   const addArrayItem = (field) => {
+//     setRecipe(prev => ({ ...prev, [field]: [...prev[field], ''] }));
+//   };
+
+//   const removeArrayItem = (field, index) => {
+//     if (recipe[field].length > 1) {
+//       setRecipe(prev => ({
+//         ...prev,
+//         [field]: prev[field].filter((_, i) => i !== index)
+//       }));
+//     }
+//   };
+
+//   const saveRecipe = () => {
+//     if (!recipe.title.trim()) {
+//       alert('Please enter a recipe title');
+//       return;
+//     }
+//     if (!recipe.category) {
+//       alert('Please select a category');
+//       return;
+//     }
+//     if (!recipe.imageURL.trim()) {
+//       alert('Please enter an image URL');
+//       return;
+//     }
+//     if (!recipe.description.trim()) {
+//       alert('Please enter a description');
+//       return;
+//     }
+
+//     // Prepare the recipe data for the backend
+//     const cleanRecipe = {
+//       chefId: JSON.parse(localStorage.getItem("currentUser")).id, // Ensure it's a number
+//       title: recipe.title,
+//       description: recipe.description,
+//       imageURL: recipe.imageURL,
+//       instructions: recipe.instructions,
+//       prepTimeMinutes: recipe.prepTimeMinutes ? parseInt(recipe.prepTimeMinutes) : null,
+//       difficulty: recipe.difficulty,
+//       category: recipe.category,
+//       dishType: recipe.dishType,
+//       // Note: ingredients and tags will need separate handling since they're in different tables
+//       ingredients: recipe.ingredients.filter(item => item.trim()),
+//       tags: recipe.tags.filter(item => item.trim())
+//     };
+//     console.log('Clean Recipe Data:', cleanRecipe); // Debugging line to check the data being sent
+
+//    postRequest('recipes', cleanRecipe)
+//     // Send the recipe data to the backend
+
+
+//     // Reset form
+//     setRecipe({
+//       title: '',
+//       description: '',
+//       imageURL: '',
+//       prepTimeMinutes: '',
+//       difficulty: 'Easy',
+//       category: '',
+//       dishType: '',
+//       instructions: '',
+//       ingredients: [''],
+//       tags: ['']
+//     });
+//     alert('Recipe saved successfully!');
+//   };
+
+//   return (
+//     <div>
+//       <div className="upload-area">
+//         <div className="upload-content">
+//           <Upload size={48} color="#9ca3af" />
+//           <div>
+//             <label htmlFor="file-upload" className="upload-text" style={{cursor: 'pointer'}}>
+//               Upload a recipe document
+//             </label>
+//             <div className="upload-subtext">
+//               Supports .docx, .txt files
+//             </div>
+//             <input
+//               id="file-upload" type="file" style={{ display: 'none' }}
+//               accept=".docx,.txt"
+//               onChange={handleFileUpload}
+//             />
+//           </div>
+//         </div>
+//       </div>
+//      <RecipeFormatGuide/>
+//       <div className="form-grid">
+//         <div className="form-section">
+//           <h3 className="section-title">Basic Information</h3>
+//           <div className="form-group">
+//             <label className="label">Recipe Title:</label>
+//             <input 
+//               type="text" 
+//               value={recipe.title} 
+//               onChange={(e) => handleInputChange('title', e.target.value)} 
+//               placeholder="Enter recipe title" 
+//               className="input" 
+//             />
+//           </div>
+//           <div className="form-group">
+//             <label className="label">Description:</label>
+//             <textarea 
+//               value={recipe.description} 
+//               onChange={(e) => handleInputChange('description', e.target.value)} 
+//               placeholder="Brief description of the dish" 
+//               className="textarea" 
+//             />
+//           </div>
+//           <div className="form-group">
+//             <label className="label">Image URL:</label>
+//             <input 
+//               type="url" 
+//               value={recipe.imageURL} 
+//               onChange={(e) => handleInputChange('imageURL', e.target.value)} 
+//               placeholder="https://example.com/image.jpg" 
+//               className="input" 
+//             />
+//           </div>
+//         </div>
+
+//         <div className="form-section">
+//           <h3 className="section-title">Recipe Details</h3>
+//           <div className="form-group">
+//             <label className="label">
+//               <Clock size={16} className="inline-icon" /> Prep Time (Minutes):
+//             </label>
+//             <input 
+//               type="number" 
+//               value={recipe.prepTimeMinutes} 
+//               onChange={(e) => handleInputChange('prepTimeMinutes', e.target.value)} 
+//               placeholder="e.g., 30" 
+//               className="input" 
+//             />
+//           </div>
+//           <div className="form-group">
+//             <label className="label">
+//               <Star size={16} className="inline-icon" /> Difficulty:
+//             </label>
+//             <select 
+//               value={recipe.difficulty} 
+//               onChange={(e) => handleInputChange('difficulty', e.target.value)} 
+//               className="select"
+//             >
+//               {difficulties.map(diff => (
+//                 <option key={diff} value={diff}>{diff}</option>
+//               ))}
+//             </select>
+//           </div>
+//           <div className="form-group">
+//             <label className="label">Category:</label>
+//             <select 
+//               value={recipe.category} 
+//               onChange={(e) => handleInputChange('category', e.target.value)} 
+//               className="select"
+//             >
+//               <option value="">Select category</option>
+//               {categories.map(cat => (
+//                 <option key={cat} value={cat}>{cat}</option>
+//               ))}
+//             </select>
+//           </div>
+//           <div className="form-group">
+//             <label className="label">Dish Type:</label>
+//             <select 
+//               value={recipe.dishType} 
+//               onChange={(e) => handleInputChange('dishType', e.target.value)} 
+//               className="select"
+//             >
+//               <option value="">Select dish type</option>
+//               {dishTypes.map(type => (
+//                 <option key={type} value={type}>{type}</option>
+//               ))}
+//             </select>
+//           </div>
+//         </div>
+//       </div>
+
+//       <ArrayInput 
+//         field="ingredients" 
+//         label="Ingredients" 
+//         placeholder="e.g., 2 salmon fillets" 
+//         recipe={recipe}
+//         handleArrayChange={handleArrayChange}
+//         addArrayItem={addArrayItem}
+//         removeArrayItem={removeArrayItem}
+//       />
+
+//       <div className="form-section">
+//         <h3 className="section-title">Instructions</h3>
+//         <div className="form-group">
+//           <label className="label">Instructions:</label>
+//           <textarea 
+//             value={recipe.instructions} 
+//             onChange={(e) => handleInputChange('instructions', e.target.value)} 
+//             placeholder="Write step-by-step instructions here..." 
+//             className="textarea instructions-textarea" 
+//           />
+//         </div>
+//       </div>
+
+//       <ArrayInput 
+//         field="tags" 
+//         label="Tags" 
+//         placeholder="e.g., Japanese, Dinner, Fish" 
+//         recipe={recipe}
+//         handleArrayChange={handleArrayChange}
+//         addArrayItem={addArrayItem}
+//         removeArrayItem={removeArrayItem}
+//       />
+
+//       <div className="save-button-container">
+//         <button onClick={saveRecipe} className="save-button">Save Recipe</button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default AddRecipe;
 import React, { useState } from 'react';
 import { parseRecipeDocument, readRecipeFile } from '../RecipeParser';
-import { Upload, Plus, Minus, Clock, Star, Tag } from 'lucide-react';
+import { Upload, Plus, Minus, Clock, Star, Tag, Image } from 'lucide-react';
 import { postRequest } from "../Requests";
 import RecipeFormatGuide from './RecipeFormatGuide';
+
 // Move ArrayInput outside the component to prevent re-creation
 const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addArrayItem, removeArrayItem }) => (
   <div className="array-section">
@@ -10,20 +320,22 @@ const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addA
     {recipe[field].map((item, index) => (
       <div key={index} className="array-input-group">
         <input
-          type="text" 
+          type="text"
           value={item}
           onChange={(e) => handleArrayChange(field, index, e.target.value)}
-          placeholder={placeholder} 
+          placeholder={placeholder}
           className="input"
         />
         <button
           onClick={() => removeArrayItem(field, index)}
           disabled={recipe[field].length === 1}
           className="button remove-button"
-        ><Minus size={16} color='black' /></button>
+        >
+          <Minus size={16} color="black" />
+        </button>
         {index === recipe[field].length - 1 && (
           <button onClick={() => addArrayItem(field)} className="button add-button">
-            <Plus size={16} color='black'  />
+            <Plus size={16} color="black" />
           </button>
         )}
       </div>
@@ -33,28 +345,32 @@ const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addA
 
 const AddRecipe = () => {
   const [recipe, setRecipe] = useState({
-    title: '', // Changed from 'name' // Changed from 'chef' - this should be a number/ID
-    description: '', 
-    imageURL: '', // Changed from 'image'
-    prepTimeMinutes: '', // Changed from 'prepTime'
-    difficulty: 'Easy', // Changed from 'difficulty'
-    category: '', // Changed from 'category'
-    dishType: '', // Changed from 'dishType'
-    instructions: '', // Changed from 'instructions'
-    ingredients: [''], // Keep for ingredients handling
-    tags: [''] // Keep for tags handling
+    title: '',
+    description: '',
+    imageURL: '',
+    prepTimeMinutes: '',
+    difficulty: 'Easy',
+    category: '',
+    dishType: '',
+    instructions: '',
+    ingredients: [''],
+    tags: ['']
   });
 
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const difficulties = ['Easy', 'Medium', 'Hard'];
-  const categories = ['Meat', 'Dairy', 'Parve']; // Updated to match your ENUM values
+  const categories = ['Meat', 'Dairy', 'Parve'];
   const dishTypes = ['main', 'side', 'dessert'];
 
+  // ---------- File & Image helpers ---------- //
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     try {
       const text = await readRecipeFile(file);
       const parsedRecipe = parseRecipeDocument(text);
-      // Map parsed recipe to correct field names
       setRecipe({
         title: parsedRecipe.name || '',
         description: parsedRecipe.description || '',
@@ -75,137 +391,184 @@ const AddRecipe = () => {
     }
   };
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+      return;
+    }
+
+    // Validate size (max 5 MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('Image file is too large. Please select a file under 5 MB.');
+      return;
+    }
+
+    setSelectedImage(file);
+
+    // Preview
+    const reader = new FileReader();
+    reader.onload = (e) => setImagePreview(e.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  /**
+   * Upload the selected image to the server and return the URL that the API returns.
+   * Expects a backend route POST /api/upload-image that responds with { url: string }
+   */
+  const uploadImageToServer = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    setUploadingImage(true);
+    try {
+      const res = await fetch('http://localhost:3001/upload-image', {
+        method: 'POST',
+        body: formData
+      });
+      if (!res.ok) throw new Error('Image upload failed');
+      const { url } = await res.json();
+      return url;
+    } catch (err) {
+      console.error('Image upload error:', err);
+      alert('Failed to upload image. Please try again.');
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  // ---------- Form helpers ---------- //
   const handleInputChange = (field, value) => {
-    setRecipe(prev => ({ ...prev, [field]: value }));
+    setRecipe((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleArrayChange = (field, index, value) => {
-    setRecipe(prev => ({
+    setRecipe((prev) => ({
       ...prev,
-      [field]: prev[field].map((item, i) => i === index ? value : item)
+      [field]: prev[field].map((item, i) => (i === index ? value : item))
     }));
   };
 
   const addArrayItem = (field) => {
-    setRecipe(prev => ({ ...prev, [field]: [...prev[field], ''] }));
+    setRecipe((prev) => ({ ...prev, [field]: [...prev[field], ''] }));
   };
 
   const removeArrayItem = (field, index) => {
     if (recipe[field].length > 1) {
-      setRecipe(prev => ({
+      setRecipe((prev) => ({
         ...prev,
         [field]: prev[field].filter((_, i) => i !== index)
       }));
     }
   };
 
-  const saveRecipe = () => {
-    if (!recipe.title.trim()) {
-      alert('Please enter a recipe title');
-      return;
-    }
-    if (!recipe.category) {
-      alert('Please select a category');
-      return;
-    }
-    if (!recipe.imageURL.trim()) {
-      alert('Please enter an image URL');
-      return;
-    }
-    if (!recipe.description.trim()) {
-      alert('Please enter a description');
-      return;
+  // ---------- Save ---------- //
+  const saveRecipe = async () => {
+    if (!recipe.title.trim()) return alert('Please enter a recipe title');
+    if (!recipe.category) return alert('Please select a category');
+    if (!selectedImage && !recipe.imageURL.trim()) return alert('Please upload an image or enter an image URL');
+    if (!recipe.description.trim()) return alert('Please enter a description');
+
+    // Upload image if a new one was selected
+    let imagePath = recipe.imageURL;
+    if (selectedImage) {
+      imagePath = await uploadImageToServer(selectedImage);
+      if (!imagePath) return; // Upload failed
     }
 
-    // Prepare the recipe data for the backend
     const cleanRecipe = {
-      chefId: JSON.parse(localStorage.getItem("currentUser")).id, // Ensure it's a number
+      chefId: JSON.parse(localStorage.getItem('currentUser')).id,
       title: recipe.title,
       description: recipe.description,
-      imageURL: recipe.imageURL,
+      imageURL: imagePath,
       instructions: recipe.instructions,
-      prepTimeMinutes: recipe.prepTimeMinutes ? parseInt(recipe.prepTimeMinutes) : null,
+      prepTimeMinutes: recipe.prepTimeMinutes ? parseInt(recipe.prepTimeMinutes, 10) : null,
       difficulty: recipe.difficulty,
       category: recipe.category,
       dishType: recipe.dishType,
-      // Note: ingredients and tags will need separate handling since they're in different tables
-      ingredients: recipe.ingredients.filter(item => item.trim()),
-      tags: recipe.tags.filter(item => item.trim())
+      ingredients: recipe.ingredients.filter((i) => i.trim()),
+      tags: recipe.tags.filter((t) => t.trim())
     };
-    console.log('Clean Recipe Data:', cleanRecipe); // Debugging line to check the data being sent
-    
-   postRequest('recipes', cleanRecipe)
-    // Send the recipe data to the backend
 
-    
-    // Reset form
-    setRecipe({
-      title: '',
-      description: '',
-      imageURL: '',
-      prepTimeMinutes: '',
-      difficulty: 'Easy',
-      category: '',
-      dishType: '',
-      instructions: '',
-      ingredients: [''],
-      tags: ['']
-    });
-    alert('Recipe saved successfully!');
+    try {
+      await postRequest('recipes', cleanRecipe);
+      // Reset form
+      setRecipe({
+        title: '',
+        description: '',
+        imageURL: '',
+        prepTimeMinutes: '',
+        difficulty: 'Easy',
+        category: '',
+        dishType: '',
+        instructions: '',
+        ingredients: [''],
+        tags: ['']
+      });
+      setSelectedImage(null);
+      setImagePreview(null);
+      alert('Recipe saved successfully!');
+    } catch (err) {
+      console.error('Error saving recipe:', err);
+      alert('Failed to save recipe. Please try again.');
+    }
   };
 
+  // ---------- UI ---------- //
   return (
     <div>
+      {/* Upload Docx / Txt */}
       <div className="upload-area">
         <div className="upload-content">
           <Upload size={48} color="#9ca3af" />
           <div>
-            <label htmlFor="file-upload" className="upload-text" style={{cursor: 'pointer'}}>
+            <label htmlFor="file-upload" className="upload-text" style={{ cursor: 'pointer' }}>
               Upload a recipe document
             </label>
-            <div className="upload-subtext">
-              Supports .docx, .txt files
-            </div>
-            <input
-              id="file-upload" type="file" style={{ display: 'none' }}
-              accept=".docx,.txt"
-              onChange={handleFileUpload}
-            />
+            <div className="upload-subtext">Supports .docx, .txt files</div>
+            <input id="file-upload" type="file" style={{ display: 'none' }} accept=".docx,.txt" onChange={handleFileUpload} />
           </div>
         </div>
       </div>
-     <RecipeFormatGuide/>
+
+      <RecipeFormatGuide />
+
+      {/* Basic Info & Details */}
       <div className="form-grid">
         <div className="form-section">
           <h3 className="section-title">Basic Information</h3>
           <div className="form-group">
             <label className="label">Recipe Title:</label>
-            <input 
-              type="text" 
-              value={recipe.title} 
-              onChange={(e) => handleInputChange('title', e.target.value)} 
-              placeholder="Enter recipe title" 
-              className="input" 
-            />
+            <input type="text" value={recipe.title} onChange={(e) => handleInputChange('title', e.target.value)} placeholder="Enter recipe title" className="input" />
           </div>
           <div className="form-group">
             <label className="label">Description:</label>
-            <textarea 
-              value={recipe.description} 
-              onChange={(e) => handleInputChange('description', e.target.value)} 
-              placeholder="Brief description of the dish" 
-              className="textarea" 
-            />
+            <textarea value={recipe.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Brief description of the dish" className="textarea" />
           </div>
           <div className="form-group">
-            <label className="label">Image URL:</label>
-            <input 
-              type="url" 
-              value={recipe.imageURL} 
-              onChange={(e) => handleInputChange('imageURL', e.target.value)} 
-              placeholder="https://example.com/image.jpg" 
-              className="input" 
-            />
+            <label className="label">
+              <Image size={16} className="inline-icon" /> Recipe Image:
+            </label>
+            <div className="image-upload-section">
+              <input id="image-upload" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+              <label htmlFor="image-upload" className="image-upload-button" style={{ cursor: 'pointer' }}>
+                {selectedImage ? 'Change Image' : 'Upload Image'}
+              </label>
+              {imagePreview && (
+                <div className="image-preview">
+                  <img src={imagePreview} alt="Recipe preview" style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', marginTop: '10px' }} />
+                </div>
+              )}
+              <div className="upload-subtext" style={{ marginTop: '5px' }}>
+                Supports JPEG, PNG, GIF, WebP (max 5MB)
+              </div>
+            </div>
           </div>
         </div>
 
@@ -215,92 +578,65 @@ const AddRecipe = () => {
             <label className="label">
               <Clock size={16} className="inline-icon" /> Prep Time (Minutes):
             </label>
-            <input 
-              type="number" 
-              value={recipe.prepTimeMinutes} 
-              onChange={(e) => handleInputChange('prepTimeMinutes', e.target.value)} 
-              placeholder="e.g., 30" 
-              className="input" 
-            />
+            <input type="number" value={recipe.prepTimeMinutes} onChange={(e) => handleInputChange('prepTimeMinutes', e.target.value)} placeholder="e.g., 30" className="input" />
           </div>
           <div className="form-group">
             <label className="label">
               <Star size={16} className="inline-icon" /> Difficulty:
             </label>
-            <select 
-              value={recipe.difficulty} 
-              onChange={(e) => handleInputChange('difficulty', e.target.value)} 
-              className="select"
-            >
-              {difficulties.map(diff => (
-                <option key={diff} value={diff}>{diff}</option>
+            <select value={recipe.difficulty} onChange={(e) => handleInputChange('difficulty', e.target.value)} className="select">
+              {difficulties.map((diff) => (
+                <option key={diff} value={diff}>
+                  {diff}
+                </option>
               ))}
             </select>
           </div>
           <div className="form-group">
             <label className="label">Category:</label>
-            <select 
-              value={recipe.category} 
-              onChange={(e) => handleInputChange('category', e.target.value)} 
-              className="select"
-            >
+            <select value={recipe.category} onChange={(e) => handleInputChange('category', e.target.value)} className="select">
               <option value="">Select category</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </select>
           </div>
           <div className="form-group">
             <label className="label">Dish Type:</label>
-            <select 
-              value={recipe.dishType} 
-              onChange={(e) => handleInputChange('dishType', e.target.value)} 
-              className="select"
-            >
+            <select value={recipe.dishType} onChange={(e) => handleInputChange('dishType', e.target.value)} className="select">
               <option value="">Select dish type</option>
-              {dishTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
+              {dishTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
               ))}
             </select>
           </div>
         </div>
       </div>
 
-      <ArrayInput 
-        field="ingredients" 
-        label="Ingredients" 
-        placeholder="e.g., 2 salmon fillets" 
-        recipe={recipe}
-        handleArrayChange={handleArrayChange}
-        addArrayItem={addArrayItem}
-        removeArrayItem={removeArrayItem}
-      />
-      
+      {/* Ingredients */}
+      <ArrayInput field="ingredients" label="Ingredients" placeholder="e.g., 2 salmon fillets" recipe={recipe} handleArrayChange={handleArrayChange} addArrayItem={addArrayItem} removeArrayItem={removeArrayItem} />
+
+      {/* Instructions */}
       <div className="form-section">
         <h3 className="section-title">Instructions</h3>
         <div className="form-group">
           <label className="label">Instructions:</label>
-          <textarea 
-            value={recipe.instructions} 
-            onChange={(e) => handleInputChange('instructions', e.target.value)} 
-            placeholder="Write step-by-step instructions here..." 
-            className="textarea instructions-textarea" 
-          />
+          <textarea value={recipe.instructions} onChange={(e) => handleInputChange('instructions', e.target.value)} placeholder="Write step-by-step instructions here..." className="textarea instructions-textarea" />
         </div>
       </div>
 
-      <ArrayInput 
-        field="tags" 
-        label="Tags" 
-        placeholder="e.g., Japanese, Dinner, Fish" 
-        recipe={recipe}
-        handleArrayChange={handleArrayChange}
-        addArrayItem={addArrayItem}
-        removeArrayItem={removeArrayItem}
-      />
+      {/* Tags */}
+      <ArrayInput field="tags" label="Tags" placeholder="e.g., Japanese, Dinner, Fish" recipe={recipe} handleArrayChange={handleArrayChange} addArrayItem={addArrayItem} removeArrayItem={removeArrayItem} />
 
+      {/* Save */}
       <div className="save-button-container">
-        <button onClick={saveRecipe} className="save-button">Save Recipe</button>
+        <button onClick={saveRecipe} className="save-button" disabled={uploadingImage}>
+          {uploadingImage ? 'Uploading Image...' : 'Save Recipe'}
+        </button>
       </div>
     </div>
   );

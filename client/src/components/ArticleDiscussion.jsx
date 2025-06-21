@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useErrorMessage } from "./useErrorMessage";
-import { deleteRequest,postRequest, getRequest } from "../Requests"; // הוספתי גם getRequest שהיה חסר
+import { deleteRequest, postRequest, getRequest } from "../Requests"; // הוספתי גם getRequest שהיה חסר
 import { Trash2 } from "lucide-react";
 
 const ArticleDiscussion = ({ articleId }) => {
@@ -10,7 +10,7 @@ const ArticleDiscussion = ({ articleId }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.userType === "admin";
   const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
@@ -61,14 +61,14 @@ const ArticleDiscussion = ({ articleId }) => {
       setNewComment("");
     }
   };
-const handleDeleteComment = async (commentId) => {
-      const requestResult = await deleteRequest(`articlecomments/${commentId}`);
-      if (requestResult.succeeded) {
-        setComments(prev => prev.filter(c => c.commentId !== commentId));
-          setErrorCode(undefined);
-      } else {
-        setErrorCode(requestResult.status);
-      }
+  const handleDeleteComment = async (commentId) => {
+    const requestResult = await deleteRequest(`articlecomments/${commentId}`);
+    if (requestResult.succeeded) {
+      setComments(prev => prev.filter(c => c.commentId !== commentId));
+      setErrorCode(undefined);
+    } else {
+      setErrorCode(requestResult.status);
+    }
   };
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -117,7 +117,7 @@ const handleDeleteComment = async (commentId) => {
     };
   }, [commentsLoaded, page, hasMore, loading]);
 
-   return (
+  return (
     <div className="discussion-container">
       <h2 className="section-title">Questions & Responses</h2>
 
@@ -132,17 +132,17 @@ const handleDeleteComment = async (commentId) => {
           <div key={comment.commentId} className="comment">
             <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
             {console.log(comment.userId)}
-            {(isAdmin ||(currentUser&&currentUser.userId===comment.userId))&& 
-             <button
-    onClick={() => handleDeleteComment(comment.commentId)}
-    style={{
-      color: "black",
-      marginLeft: "5px",
-      background:'transparent'
-    }}
-  >
-  <Trash2/>
-  </button>
+            {(isAdmin || (currentUser && currentUser.id === comment.userId)) &&
+              <button
+                onClick={() => handleDeleteComment(comment.commentId)}
+                style={{
+                  color: "black",
+                  marginLeft: "5px",
+                  background: 'transparent'
+                }}
+              >
+                <Trash2 />
+              </button>
             }
           </div>
         ))}

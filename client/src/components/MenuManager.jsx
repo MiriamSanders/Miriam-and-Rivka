@@ -39,8 +39,8 @@ const MenuManager = ({ createMenu, setCreateMenu, menu }) => {
     console.log("Creating menu with data:", data);
 
     const createdMenu = await postRequest('menu/meal-plan', data);
+     console.log("Created menu:", createdMenu);
     const weeklyMenu = await createdMenu.data.menu.weeklyPlan;
-    console.log("Created menu:", weeklyMenu);
     const formattedMenu = [];
     weeklyMenu.forEach((menu) => {
       formattedMenu.push({

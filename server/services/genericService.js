@@ -45,30 +45,6 @@ catch(error) {
     }
 }
 
-// async function GenericGetIn(table, fieldName, fieldValues, fields = ['*']) {
-//     try {
-//         if (!Array.isArray(fieldValues) || fieldValues.length === 0) {
-//             return [];
-//         }
-
-//         const db = await dbPromise;
-
-//         const query = `
-//       SELECT ${fields.map(() => '??').join(', ')}
-//       FROM ??
-//       WHERE ?? IN (${fieldValues.map(() => '?').join(', ')})
-//     `;
-
-//         const params = [...fields, table, fieldName, ...fieldValues];
-//         const [rows] = await db.execute(mysql.format(query, params));
-
-//         return rows;
-//     } catch (error) {
-//         console.error('Error fetching data with IN:', error);
-//         throw error;
-//     }
-// }
-
 async function genericGetAll(table, limit, offset) {
     try {
         const db = await dbPromise;     
@@ -158,31 +134,5 @@ async function genericDelete(table, id,fieldName ) {
     }
 }
 
-// async function CascadeDelete(table, id, foreignKeyTable, foreignKeyColumn) {
-//     try {
-//         const db = await dbPromise;
-//         const mainQuery = mysql.format(`
-//             UPDATE ?? 
-//             SET is_deleted = 1 
-//             WHERE id = ?
-//         `, [table, id]);
-//         await db.execute(mainQuery);
-//         const cascadeQuery = mysql.format(`
-//             UPDATE ?? 
-//             SET is_deleted = 1 
-//             WHERE ?? = ?
-//         `, [foreignKeyTable, foreignKeyColumn, id]);
-//         await db.execute(cascadeQuery);
 
-//         return true;
-//     } catch (error) {
-//         console.error('Error performing cascade delete:', error);
-//         throw error;
-//     }
-// }
-// async function writeToLog(data) {
-//     const db = await dbPromise;
-//     const logQuery = mysql.format(`INSERT INTO logs SET ?`, [data]);
-//     await db.execute(logQuery);
-// }
 module.exports = { genericGet,GenericPut, genericPost,genericGetAll ,genericGetByColumnName,genericDelete};

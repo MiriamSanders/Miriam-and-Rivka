@@ -11,7 +11,7 @@ function Articles() {
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.userType === "admin";
   const navigate = useNavigate();
-  const limit = 8;
+  const limit = 9;
   const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
 

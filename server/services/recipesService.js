@@ -1,90 +1,72 @@
 const mysql = require('mysql2/promise');
-const dbPromise = require("./dbConnection");
+const dbPromise = require('./dbConnection');
+
 async function getRecipeById(recipeId) {
   try {
-    const result = {};
     const db = await dbPromise;
-    // 1. Get the recipe itself with the chef name
     const [recipeRows] = await db.execute(
-      `SELECT r.recipeId, r.title, r.description, r.imageURL, r.instructions,c.chefID,
+      `SELECT r.recipeId, r.title, r.description, r.imageURL, r.instructions, c.chefID,
               r.prepTimeMinutes, d.name AS difficulty, r.category, r.dishType,
               u.userName AS chefName
        FROM recipes r
-       JOIN chefs c ON r.chefID = c.chefID
-       JOIN users u ON c.chefID = u.userID
-       JOIN difficulty d on d.difficultyId =r.difficulty
-       WHERE r.recipeId = ?`, 
-       [recipeId]
+       JOIN chefs c  ON r.chefID = c.chefID
+       JOIN users u  ON c.chefID = u.userID
+       JOIN difficulty d ON d.difficultyId = r.difficulty
+       WHERE r.recipeId = ?`,
+      [recipeId]
     );
-    if (recipeRows.length === 0) {
-      throw new Error('Recipe not found');
-    }
+    if (!recipeRows.length) throw new Error('Recipe not found');
 
-    result.recipe = recipeRows[0];
-
-    // 2. Get ingredients
     const [ingredients] = await db.execute(
       `SELECT i.name, ri.quantity, ri.orderIndex
        FROM recipeIngredients ri
        JOIN ingredients i ON ri.ingredientID = i.ingredientID
        WHERE ri.recipeId = ?
-       ORDER BY ri.orderIndex`, [recipeId]
+       ORDER BY ri.orderIndex`,
+      [recipeId]
     );
-    console.log("Ingredients:", ingredients);
 
-    result.ingredients = ingredients;
-
-    // 3. Get tags
     const [tags] = await db.execute(
       `SELECT t.name
        FROM recipeTags rt
        JOIN tags t ON rt.tagId = t.tagId
-       WHERE rt.recipeId = ?`, [recipeId]
+       WHERE rt.recipeId = ?`,
+      [recipeId]
     );
 
-    result.tags = tags.map(t => t.name); // simplify to array of strings
-    console.log("Tags:", result.tags);
-
-    return result;
-
+    return {
+      recipe: recipeRows[0],
+      ingredients,
+      tags: tags.map(t => t.name)
+    };
   } catch (err) {
-    console.error("Error:", err.message);
+    console.error('getRecipeById - DB error:', err);
     throw err;
   }
 }
+
 async function getAllRecipes(limit, offset = 0) {
   try {
     const db = await dbPromise;
     const query = `
-  SELECT 
-    r.recipeId, 
-    r.title, 
-    r.imageURL, 
-    r.category, 
-    r.description, 
-    r.chefId,
-    r.dishType,
-    u.userName, 
-    GROUP_CONCAT(t.name) AS tags
-  FROM recipes r
-  JOIN users u ON r.chefId = u.userId
-  LEFT JOIN recipetags p ON r.recipeId = p.recipeId
-  LEFT JOIN tags t ON p.tagId = t.tagId
-  GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, u.userName
-  LIMIT ${limit}
-  OFFSET ${offset}
-`;
-
+      SELECT r.recipeId, r.title, r.imageURL, r.category, r.description, r.chefId,
+             r.dishType, u.userName,
+             GROUP_CONCAT(t.name) AS tags
+      FROM recipes r
+      JOIN users u ON r.chefId = u.userId
+      LEFT JOIN recipetags p ON r.recipeId = p.recipeId
+      LEFT JOIN tags t       ON p.tagId    = t.tagId
+      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, u.userName
+      LIMIT ${limit}
+      OFFSET ${offset}`;
     const [rows] = await db.execute(query);
-    console.log("All Recipes:", rows);
-
     return rows;
-
   } catch (error) {
-    console.error('Error fetching recipes:', error);
+    console.error('getAllRecipes - DB error:', error);
     throw error;
   }
 }
+
 async function getRecipesAdvanced(options = {}) {
   const {
     limit = 10,
@@ -98,329 +80,283 @@ async function getRecipesAdvanced(options = {}) {
     sortOrder = 'DESC'
   } = options;
 
-  // Validate sortBy to prevent SQL injection
   const allowedSortFields = ['title', 'category', 'userName'];
   const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'recipeId';
-  const validSortOrder = ['ASC', 'DESC'].includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+  const validSortOrder = ['ASC', 'DESC'].includes(sortOrder.toUpperCase())
+    ? sortOrder.toUpperCase()
+    : 'DESC';
 
   try {
     const db = await dbPromise;
-
     let query = `
-      SELECT 
-        r.recipeId,
-        r.title,
-        r.imageURL,
-        r.category,
-        r.description,
-        r.dishType,
-        u.userName,
-        u.userId,
-        GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags
+      SELECT r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType,
+             u.userName, u.userId,
+             GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags
       FROM recipes r
-      JOIN users u ON r.chefId = u.userId
+      JOIN users u        ON r.chefId   = u.userId
       LEFT JOIN recipetags p ON r.recipeId = p.recipeId
-      LEFT JOIN tags t ON p.tagId = t.tagId
-    `;
+      LEFT JOIN tags t       ON p.tagId    = t.tagId`;
 
     const conditions = [];
     const params = [];
 
-    if (category) {
-      conditions.push('r.category = ?');
-      params.push(category);
-    }
+    if (category) { conditions.push('r.category = ?'); params.push(category); }
+    if (chefName) { conditions.push('u.userName LIKE ?'); params.push(`%${chefName}%`); }
+    if (title) { conditions.push('r.title LIKE ?'); params.push(`%${title}%`); }
 
-    if (chefName) {
-      conditions.push('u.userName LIKE ?');
-      params.push(`%${chefName}%`);
-    }
-
-    if (title) {
-      conditions.push('r.title LIKE ?');
-      params.push(`%${title}%`);
-    }
-
-    // Specific tags (AND logic) - must have ALL tags
-    if (tags.length > 0) {
-      const tagPlaceholders = tags.map(() => '?').join(',');
+    if (tags.length) {
+      const ph = tags.map(() => '?').join(',');
       conditions.push(`r.recipeId IN (
-        SELECT rt.recipeId 
-        FROM recipetags rt 
-        JOIN tags tg ON rt.tagId = tg.tagId 
-        WHERE tg.name IN (${tagPlaceholders})
-        GROUP BY rt.recipeId 
-        HAVING COUNT(DISTINCT tg.name) = ?
-      )`);
+        SELECT rt.recipeId
+        FROM recipetags rt
+        JOIN tags tg ON rt.tagId = tg.tagId
+        WHERE tg.name IN (${ph})
+        GROUP BY rt.recipeId
+        HAVING COUNT(DISTINCT tg.name) = ?)`);
       params.push(...tags, tags.length);
     }
 
-    // Any tags (OR logic) - must have ANY of these tags
-    if (anyTags.length > 0) {
-      const tagPlaceholders = anyTags.map(() => '?').join(',');
+    if (anyTags.length) {
+      const ph = anyTags.map(() => '?').join(',');
       conditions.push(`r.recipeId IN (
-        SELECT DISTINCT rt.recipeId 
-        FROM recipetags rt 
-        JOIN tags tg ON rt.tagId = tg.tagId 
-        WHERE tg.name IN (${tagPlaceholders})
-      )`);
+        SELECT DISTINCT rt.recipeId
+        FROM recipetags rt
+        JOIN tags tg ON rt.tagId = tg.tagId
+        WHERE tg.name IN (${ph}))`);
       params.push(...anyTags);
     }
 
-    if (conditions.length > 0) {
-      query += ` WHERE ${conditions.join(' AND ')}`;
-    }
+    if (conditions.length) query += ` WHERE ${conditions.join(' AND ')}`;
 
     query += `
-      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType, u.userName,u.userId
+      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description,
+               r.dishType, u.userName, u.userId
       ORDER BY r.${validSortBy} ${validSortOrder}
-      LIMIT ? OFFSET ?
-    `;
+      LIMIT ? OFFSET ?`;
 
     params.push(limit, offset);
-
-    console.log('Executing query:', query);
-    console.log('With params:', params);
-
-    // Execute query - MySQL2 returns [rows, fields]
     const [rows] = await db.execute(mysql.format(query, params));
 
-    // Transform the results
-    const results = rows.map(row => ({
-      recipeId: row.recipeId,
-      title: row.title,
-      imageURL: row.imageURL,
-      category: row.category,
-      description: row.description,
-      dishType: row.dishType,
-      userName: row.userName,
-      userId: row.userId,
-      tags: row.tags ? row.tags.split(',').map(tag => tag.trim()) : []
+    return rows.map(r => ({
+      recipeId: r.recipeId,
+      title: r.title,
+      imageURL: r.imageURL,
+      category: r.category,
+      description: r.description,
+      dishType: r.dishType,
+      userName: r.userName,
+      userId: r.userId,
+      tags: r.tags ? r.tags.split(',').map(t => t.trim()) : []
     }));
-
-    return results;
-
   } catch (error) {
-    console.error('Error fetching recipes:', error);
-    //  console.error('Query:', query);
-    //  console.error('Params:', params);
+    console.error('getRecipesAdvanced - DB error:', error);
     throw error;
   }
 }
+
 async function getBestRatedRecipes(limit = 4) {
-  const db = await dbPromise;
-  const [rows] = await db.execute(
-    `SELECT recipeId, AVG(rating) as avgRating 
-         FROM reciperatings 
-         GROUP BY recipeId 
-         ORDER BY avgRating DESC 
-         LIMIT 4`
-  );
-  console.log(rows);
-
-  let recipeIds = rows.map(row => row.recipeId);
-  console.log(recipeIds);
-
-  let recipes = [];
-  for (let row of recipeIds) {
-    const recipe = await db.execute(
-      `SELECT r.recipeId, r.title, r.imageURL, r.description, u.userName AS chefName
-             FROM recipes r
-             JOIN users u ON r.chefId = u.userId
-             WHERE r.recipeId = ?`, [row]
+  try {
+    const db = await dbPromise;
+    const [ratingRows] = await db.execute(
+      `SELECT recipeId, AVG(rating) AS avgRating
+       FROM reciperatings
+       GROUP BY recipeId
+       ORDER BY avgRating DESC
+       LIMIT ?`, [limit]
     );
-    recipes.push(recipe[0][0]); // Assuming recipe[0][0] is the recipe object
+
+    const ids = ratingRows.map(r => r.recipeId);
+    const recipes = [];
+
+    for (const id of ids) {
+      const [rRows] = await db.execute(
+        `SELECT r.recipeId, r.title, r.imageURL, r.description,
+                u.userName AS chefName
+         FROM recipes r
+         JOIN users u ON r.chefId = u.userId
+         WHERE r.recipeId = ?`, [id]
+      );
+      if (rRows.length) recipes.push(rRows[0]);
+    }
+    return recipes;
+  } catch (error) {
+    console.error('getBestRatedRecipes - DB error:', error);
+    throw error;
   }
-  return recipes;
 }
+
 async function getRecipesByChefId(chefId) {
   try {
     const db = await dbPromise;
     const [rows] = await db.execute(
-      `SELECT r.recipeId, r.title, r.imageURL, r.description, u.userName AS chefName
-             FROM recipes r
-             JOIN users u ON r.chefId = u.userId
-             WHERE r.chefId = ?`, [chefId]
+      `SELECT r.recipeId, r.title, r.imageURL, r.description,
+              u.userName AS chefName
+       FROM recipes r
+       JOIN users u ON r.chefId = u.userId
+       WHERE r.chefId = ?`, [chefId]
     );
-    console.log("Recipes by Chef ID:", rows);
-
     return rows;
   } catch (error) {
-    console.error('Error fetching recipes by chef ID:', error);
+    console.error('getRecipesByChefId - DB error:', error);
     throw error;
   }
 }
+
 async function deleteRecipe(recipeId) {
-   try{
-         const db = await dbPromise;
-          const query = `DELETE FROM recipes WHERE recipeId = ?`;
-          const [result] = await db.execute(query, [recipeId]);
-          return result.affectedRows > 0;
-        } catch (err) {
-          console.error("Error deleting recipe:", err);
-          return false;
-        }
-}
-async function putRecipe(recipeId, updatedData) {
-  const db = await dbPromise;
   try {
-    // עדכון מתכון ראשי
+    const db = await dbPromise;
+    const [res] = await db.execute('DELETE FROM recipes WHERE recipeId = ?', [recipeId]);
+    return res.affectedRows > 0;
+  } catch (err) {
+    console.error('deleteRecipe - DB error:', err);
+    return false;
+  }
+}
+
+async function putRecipe(recipeId, updated) {
+  try {
+    const db = await dbPromise;
     await db.execute(
       `UPDATE recipes
        SET title = ?, description = ?, imageURL = ?, instructions = ?,
            prepTimeMinutes = ?, difficulty = ?, category = ?, dishType = ?
        WHERE recipeId = ?`,
       [
-        updatedData.title,
-        updatedData.description,
-        updatedData.imageURL,
-        updatedData.instructions,
-        updatedData.prepTimeMinutes,
-        updatedData.difficulty,
-        updatedData.category,
-        updatedData.dishType,
-        recipeId,
+        updated.title, updated.description, updated.imageURL, updated.instructions,
+        updated.prepTimeMinutes, updated.difficulty, updated.category,
+        updated.dishType, recipeId
       ]
     );
+    await db.execute('DELETE FROM recipeTags WHERE recipeId = ?', [recipeId]);
 
-    // מחיקת תגיות קיימות
-    await db.execute(`DELETE FROM recipeTags WHERE recipeId = ?`, [recipeId]);
-
-    // הוספת תגיות חדשות
-    if (Array.isArray(updatedData.tags)) {
-      for (const tagName of updatedData.tags) {
-        // בדיקה אם התגית כבר קיימת
-        const [tagRows] = await db.execute(`SELECT tagId FROM tags WHERE name = ?`, [tagName]);
-        let tagId;
-
-        if (tagRows.length > 0) {
-          tagId = tagRows[0].tagId;
-        } else {
-          // אם לא קיימת, יוצרים תגית חדשה
-          const [insertResult] = await db.execute(`INSERT INTO tags (name) VALUES (?)`, [tagName]);
-          tagId = insertResult.insertId;
+    if (Array.isArray(updated.tags)) {
+      for (const tag of updated.tags) {
+        const [tagRows] = await db.execute('SELECT tagId FROM tags WHERE name = ?', [tag]);
+        let tagId = tagRows.length ? tagRows[0].tagId : null;
+        if (!tagId) {
+          const [ins] = await db.execute('INSERT INTO tags (name) VALUES (?)', [tag]);
+          tagId = ins.insertId;
         }
-
-        // הכנסת הקשר בין מתכון לתגית
-        await db.execute(`INSERT INTO recipeTags (recipeId, tagId) VALUES (?, ?)`, [recipeId, tagId]);
+        await db.execute('INSERT INTO recipeTags (recipeId, tagId) VALUES (?, ?)', [recipeId, tagId]);
       }
     }
-
     return { succeeded: true };
   } catch (err) {
-    console.error("Update error:", err);
-    return { succeeded: false, error: err.message };}
-}
-async function updateRecipeById(id,updatedRecipeData) {
-  try {
-    const db = await dbPromise;
-
-    const updateQuery = mysql.format(`
-      UPDATE recipes SET
-        title = ?,
-        description = ?,
-        imageURL = ?,
-        instructions = ?,
-        prepTimeMinutes = ?,
-        difficulty = ?,
-        category = ?,
-        dishType = ?
-      WHERE recipeId = ?
-    `, [
-      updatedRecipeData.title,
-      updatedRecipeData.description,
-     updatedRecipeData. imageURL,
-      updatedRecipeData.instructions,
-      updatedRecipeData.prepTimeMinutes,
-      updatedRecipeData.difficulty,
-      updatedRecipeData.category,
-      updatedRecipeData.dishType,
-      id
-    ]);
-    await db.execute(updateQuery);
-const newQuery=mysql.format(`SELECT * FROM recipes WHERE recipeId = ?`, [ id]);
-    const [rows] = await db.execute(newQuery);
-    return rows[0] || null;
-  } catch (error) {
-    console.error("Error updating recipe:", error);
-    throw error;
+    console.error('putRecipe - DB error:', err);
+    return { succeeded: false, error: err.message };
   }
 }
+
+async function updateRecipeById(id, data) {
+  try {
+    const db = await dbPromise;
+    const q = mysql.format(
+      `UPDATE recipes SET title=?, description=?, imageURL=?, instructions=?,
+       prepTimeMinutes=?, difficulty=?, category=?, dishType=? WHERE recipeId=?`,
+      [
+        data.title, data.description, data.imageURL, data.instructions,
+        data.prepTimeMinutes, data.difficulty, data.category, data.dishType, id
+      ]
+    );
+    await db.execute(q);
+    const [rows] = await db.execute('SELECT * FROM recipes WHERE recipeId = ?', [id]);
+    return rows[0] || null;
+  } catch (err) {
+    console.error('updateRecipeById - DB error:', err);
+    throw err;
+  }
+}
+
 async function getRecipeIngredients(recipeId) {
-  const db = await dbPromise;
-  const [rows] = await db.execute(
-    `SELECT ingredientId, quantity, orderIndex FROM recipeingredients WHERE recipeId = ?`,
-    [recipeId]
-  );
-  return rows;
+  try {
+    const db = await dbPromise;
+    const [rows] = await db.execute(
+      'SELECT ingredientId, quantity, orderIndex FROM recipeingredients WHERE recipeId = ?',
+      [recipeId]
+    );
+    return rows;
+  } catch (err) {
+    console.error('getRecipeIngredients - DB error:', err);
+    throw err;
+  }
 }
 
-async function insertRecipeIngredient(recipeId, ingredient) {
-  const db = await dbPromise;
-  await db.execute(
-    `INSERT INTO recipeingredients (recipeId, ingredientId, quantity, orderIndex)
-     VALUES (?, ?, ?, ?)`,
-    [recipeId, ingredient.ingredientId, ingredient.quantity, ingredient.orderIndex]
-  );
+async function insertRecipeIngredient(recipeId, ing) {
+  try {
+    const db = await dbPromise;
+    await db.execute(
+      `INSERT INTO recipeingredients (recipeId, ingredientId, quantity, orderIndex)
+       VALUES (?, ?, ?, ?)`,
+      [recipeId, ing.ingredientId, ing.quantity, ing.orderIndex]
+    );
+  } catch (err) {
+    console.error('insertRecipeIngredient - DB error:', err);
+    throw err;
+  }
 }
 
-async function updateRecipeIngredient(recipeId, ingredient) {
-  const db = await dbPromise;
-  await db.execute(
-    `UPDATE recipeingredients SET quantity = ?, orderIndex = ?
-     WHERE recipeId = ? AND ingredientId = ?`,
-    [ingredient.quantity, ingredient.orderIndex, recipeId, ingredient.ingredientId]
-  );
+async function updateRecipeIngredient(recipeId, ing) {
+  try {
+    const db = await dbPromise;
+    await db.execute(
+      `UPDATE recipeingredients SET quantity = ?, orderIndex = ?
+       WHERE recipeId = ? AND ingredientId = ?`,
+      [ing.quantity, ing.orderIndex, recipeId, ing.ingredientId]
+    );
+  } catch (err) {
+    console.error('updateRecipeIngredient - DB error:', err);
+    throw err;
+  }
 }
 
 async function deleteRecipeIngredient(recipeId, ingredientId) {
-  const db = await dbPromise;
-  await db.execute(
-    `DELETE FROM recipeingredients WHERE recipeId = ? AND ingredientId = ?`,
-    [recipeId, ingredientId]
-  );
+  try {
+    const db = await dbPromise;
+    await db.execute(
+      'DELETE FROM recipeingredients WHERE recipeId = ? AND ingredientId = ?',
+      [recipeId, ingredientId]
+    );
+  } catch (err) {
+    console.error('deleteRecipeIngredient - DB error:', err);
+    throw err;
+  }
 }
+
 async function deleteRecipeTag(recipeId, tagId) {
   try {
     const db = await dbPromise;
-    const query = `
-      DELETE FROM recipeTags
-      WHERE recipeId = ? AND tagId = ?
-    `;
-    const [result] = await db.execute(query, [recipeId, tagId]);
-    return result.affectedRows;
-  } catch (error) {
-    console.error('Error deleting recipe tag:', error);
-    throw error;
+    const [res] = await db.execute(
+      'DELETE FROM recipeTags WHERE recipeId = ? AND tagId = ?',
+      [recipeId, tagId]
+    );
+    return res.affectedRows;
+  } catch (err) {
+    console.error('deleteRecipeTag - DB error:', err);
+    throw err;
   }
 }
+
 async function createDifficulty(name) {
   try {
     const db = await dbPromise;
-
-    const insertQuery = `
-      INSERT INTO difficulty (name)
-      VALUES (?)
-    `;
-    const [result] = await db.execute(insertQuery, [name]);
-
-    return result.insertId; // מחזיר את ה־difficultyId שנוצר
-  } catch (error) {
-    console.error("Error creating difficulty:", error);
-    throw error;
+    const [res] = await db.execute('INSERT INTO difficulty (name) VALUES (?)', [name]);
+    return res.insertId;
+  } catch (err) {
+    console.error('createDifficulty - DB error:', err);
+    throw err;
   }
 }
 
 module.exports = {
-    getRecipeById,
-    getAllRecipes,
-    getBestRatedRecipes,
-    getRecipesByChefId,
-    deleteRecipe,
-    putRecipe,
-    updateRecipeById,
-    getRecipesAdvanced,
-     getRecipeIngredients,
+  getRecipeById,
+  getAllRecipes,
+  getBestRatedRecipes,
+  getRecipesByChefId,
+  deleteRecipe,
+  putRecipe,
+  updateRecipeById,
+  getRecipesAdvanced,
+  getRecipeIngredients,
   insertRecipeIngredient,
   updateRecipeIngredient,
   deleteRecipeIngredient,

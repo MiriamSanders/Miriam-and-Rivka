@@ -26,7 +26,7 @@ const navOptions = {
   ],
 };
 
-function Navigation({ userType = "guest", onLogout }) {
+function Navigation({ userType = "guest",setUserType, onLogout }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -45,7 +45,8 @@ function Navigation({ userType = "guest", onLogout }) {
     // localStorage.removeItem('userToken'); // or whatever you store
     
     setIsLoggedIn(false);
-    localStorage.removeItem('currentUser'); // Clear user data from localStorage
+    localStorage.removeItem('currentUser');
+    setUserType('guest');// Clear user data from localStorage
     if (onLogout) {
       onLogout();
     }

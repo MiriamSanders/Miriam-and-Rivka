@@ -1,4 +1,5 @@
-const {pairMealsForWeek}= require('../models/MealPlanner');
+const {pairMealsForWeek}= require('./menuPlaner');
+const mealPlanService= require('../services/mealPlanService')
 exports.createMealPlan = async (req, res) => {
   try {
   const {userId,sideIds,mainIds, dessertIds} = req.body;
@@ -16,4 +17,15 @@ catch (error) {
     console.error('Error creating meal plan:', error);
     res.status(500).json({ error: 'Something went wrong while creating the meal plan' });
   } 
+}
+exports.getMenusByUserId= async(req,res)=>{
+  const userId= req.params.id;
+  try{
+    const result =await mealPlanService.getMenuByUserId(userId);
+     res.status(200).json(result);
+  }
+  catch(error){
+    console.error(error);
+    res.status(500).json({error:"unable to fetch menus"});
+  }
 }

@@ -37,7 +37,7 @@ function App() {
 
   return (
     <>
-      <Navigation userType={userType} />
+      <Navigation userType={userType} setUserType={setUserType} />
 
       <Routes>
 

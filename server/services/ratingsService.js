@@ -1,43 +1,48 @@
 const mysql = require('mysql2/promise');
-const dbPromise = require("./dbConnection"); 
-async function getRatings(recipeId)
-{
-    const db=await dbPromise;
-    const rating= await db.execute(`select avg(rating) from reciperatings where recipeId=?`,[recipeId]);
-    console.log(rating); 
-    if (!rating || !rating[0] || rating[0].length === 0) {
-        return 0;
-    }
-    // Ensure avgRating is a number
-    const avg = rating[0][0]['avg(rating)'];
-    const avgRating = avg !== null ? parseFloat(avg) : 0;
-    return avgRating;
-    //return rating; // Return average rating or 0 if no ratings exist
-}
-async function postRatings(recipeId, rating, userId) {
-    const db = await dbPromise;
-    // Check if the user has already rated this recipe
-    const [existingRating] = await db.execute(
-        `SELECT * FROM reciperatings WHERE recipeId = ? AND userId = ?`,
-        [recipeId, userId]
-    );
+const dbPromise = require('./dbConnection');
 
-    if (existingRating.length > 0) {
-        // Update existing rating
-        await db.execute(
-            `UPDATE reciperatings SET rating = ? WHERE recipeID = ? AND userId = ?`,
-            [rating, recipeId, userId]
+async function getRatings(recipeId) {
+    try {
+        const db = await dbPromise;
+        const [rows] = await db.execute(
+            'SELECT AVG(rating) AS avgRating FROM reciperatings WHERE recipeId = ?',
+            [recipeId]
         );
-    } else {
-        // Insert new rating
-        await db.execute(
-            `INSERT INTO reciperatings (recipeId, userId, rating,createdAt) VALUES (?, ?, ?,?)`,
-            [recipeId, userId, rating,new Date()]
+        if (!rows || rows.length === 0) return 0;
+        const avgRating = rows[0].avgRating !== null ? parseFloat(rows[0].avgRating) : 0;
+        return avgRating;
+    } catch (error) {
+        console.error('getRatings - DB error:', error);
+        throw error;
+    }
+}
+
+async function postRatings(recipeId, rating, userId) {
+    try {
+        const db = await dbPromise;
+        const [existing] = await db.execute(
+            'SELECT 1 FROM reciperatings WHERE recipeId = ? AND userId = ?',
+            [recipeId, userId]
         );
+
+        if (existing.length) {
+            await db.execute(
+                'UPDATE reciperatings SET rating = ? WHERE recipeId = ? AND userId = ?',
+                [rating, recipeId, userId]
+            );
+        } else {
+            await db.execute(
+                'INSERT INTO reciperatings (recipeId, userId, rating, createdAt) VALUES (?, ?, ?, ?)',
+                [recipeId, userId, rating, new Date()]
+            );
+        }
+    } catch (error) {
+        console.error('postRatings - DB error:', error);
+        throw error;
     }
 }
 
 module.exports = {
     getRatings,
     postRatings
-};  
+};

@@ -27,10 +27,12 @@ function Recipes({ createMenu, addToMenu, menu }) {
     { value: 'dairy', label: 'Dairy' }
   ];
 
+  // Updated sort options to separate sortBy and sortOrder
   const sortOptions = [
-    { value: 'rating', label: 'Rating' },
-    { value: 'name-asc', label: 'Name A-Z' },
-    { value: 'name-desc', label: 'Name Z-A' }
+    { value: '', label: 'Default', sortBy: '', sortOrder: '' },
+    { value: 'rating', label: 'Rating', sortBy: 'rating', sortOrder: 'DESC' },
+    { value: 'title-asc', label: 'Title A-Z', sortBy: 'title', sortOrder: 'ASC' },
+    { value: 'title-desc', label: 'Title Z-A', sortBy: 'title', sortOrder: 'DESC' }
   ];
 
   const addRecipeToMenu = (recipeId, dishType) => {
@@ -58,7 +60,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
       title: urlParams.get('title') || '',
       chefName: urlParams.get('chefName') || '',
       category: urlParams.get('category') || 'all',
-      sortBy: urlParams.get('sortBy') || 'relevance',
+      sort: urlParams.get('sort') || '', // No default sort
       tags: urlParams.get('tags') ? urlParams.get('tags').split(',') : []
     };
   };
@@ -70,7 +72,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
     if (searchParams.title) urlParams.set('title', searchParams.title);
     if (searchParams.chefName) urlParams.set('chefName', searchParams.chefName);
     if (searchParams.category !== 'all') urlParams.set('category', searchParams.category);
-    if (searchParams.sortBy !== 'relevance') urlParams.set('sortBy', searchParams.sortBy);
+    if (searchParams.sort) urlParams.set('sort', searchParams.sort);
     if (searchParams.tags.length > 0) urlParams.set('tags', searchParams.tags.join(','));
 
     const newUrl = `${location.pathname}?${urlParams.toString()}`;
@@ -95,8 +97,13 @@ function Recipes({ createMenu, addToMenu, menu }) {
       queryParts.push(`anyTags=${searchParams.tags.join(',')}`);
     }
 
-    if (searchParams.sortBy && searchParams.sortBy !== 'relevance') {
-      queryParts.push(`sortBy=${searchParams.sortBy}`);
+    // Convert sort option to separate sortBy and sortOrder parameters
+    if (searchParams.sort) {
+      const sortOption = sortOptions.find(option => option.value === searchParams.sort);
+      if (sortOption && sortOption.sortBy) {
+        queryParts.push(`sortBy=${sortOption.sortBy}`);
+        queryParts.push(`sortOrder=${sortOption.sortOrder}`);
+      }
     }
 
     return `recipes?${queryParts.join('&')}`;
@@ -168,7 +175,7 @@ function Recipes({ createMenu, addToMenu, menu }) {
     updateUrl(newParams);
   };
 
-  // Remove search param - FIXED THE BUG HERE
+  // Remove search param
   const removeSearchParam = (key, value = null) => {
     const currentParams = getSearchParamsFromUrl();
     let newParams = { ...currentParams };
@@ -178,11 +185,11 @@ function Recipes({ createMenu, addToMenu, menu }) {
     } else if (key === 'title') {
       newParams.title = '';
     } else if (key === 'chefName') {
-      newParams.chefName = ''; // FIXED: was setting title = '' instead of chefName = ''
+      newParams.chefName = '';
     } else if (key === 'category') {
       newParams.category = 'all';
-    } else if (key === 'sortBy') {
-      newParams.sortBy = 'relevance';
+    } else if (key === 'sort') {
+      newParams.sort = '';
     } else if (key === 'tags') {
       newParams.tags = [];
     }
@@ -203,13 +210,13 @@ function Recipes({ createMenu, addToMenu, menu }) {
     navigate(location.pathname, { replace: true });
   };
 
-  // Check if any filters are active - ADDED chefName check
+  // Check if any filters are active
   const hasActiveFilters = () => {
     const params = getSearchParamsFromUrl();
     return params.title ||
-      params.chefName ||  // ADDED this line
+      params.chefName ||
       params.category !== 'all' ||
-      params.sortBy !== 'relevance' ||
+      params.sort ||
       params.tags.length > 0;
   };
 
@@ -230,18 +237,6 @@ function Recipes({ createMenu, addToMenu, menu }) {
     }
     navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true });
   };
-
-  // NEW: Handle chef name input change
-  // const handleChefNameInputChange = (e) => {
-  //   const currentParams = getSearchParamsFromUrl();
-  //   const urlParams = new URLSearchParams(location.search);
-  //   if (e.target.value) {
-  //     urlParams.set('chefName', e.target.value);
-  //   } else {
-  //     urlParams.delete('chefName');
-  //   }
-  //   navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true });
-  // };
 
   const handleSearchSubmit = () => {
     // Force a new search when Enter is pressed
@@ -298,30 +293,6 @@ function Recipes({ createMenu, addToMenu, menu }) {
               </button>
             )}
           </div>
-
-          {/* NEW: Chef Name Search Input */}
-          {/* <div className="relative">
-            <input
-              type="text"
-              placeholder="Search by chef..."
-              value={currentSearchParams.chefName}
-              onChange={handleChefNameInputChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearchSubmit();
-                }
-              }}
-              className="searchInput"
-            />
-            {currentSearchParams.chefName && (
-              <button
-                onClick={() => removeSearchParam('chefName')}
-                className="clearButton"
-              >
-                <X size={20} />
-              </button>
-            )}
-          </div> */}
         </div>
 
         <div className="filterControls">
@@ -340,8 +311,8 @@ function Recipes({ createMenu, addToMenu, menu }) {
 
           <div className="selectWrapper">
             <select
-              value={currentSearchParams.sortBy}
-              onChange={(e) => updateSearchParam('sortBy', e.target.value)}
+              value={currentSearchParams.sort}
+              onChange={(e) => updateSearchParam('sort', e.target.value)}
               className="select"
             >
               {sortOptions.map(option => (
@@ -403,7 +374,6 @@ function Recipes({ createMenu, addToMenu, menu }) {
               </span>
             )}
 
-            {/* FIXED: Now properly shows chef name filter */}
             {currentSearchParams.chefName && (
               <span className="filterTag">
                 Chef: "{currentSearchParams.chefName}"
@@ -421,6 +391,18 @@ function Recipes({ createMenu, addToMenu, menu }) {
                 {categories.find(c => c.value === currentSearchParams.category)?.label}
                 <button
                   onClick={() => removeSearchParam('category')}
+                  className="filterTagRemove"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+
+            {currentSearchParams.sort && (
+              <span className="filterTag">
+                Sort: {sortOptions.find(s => s.value === currentSearchParams.sort)?.label}
+                <button
+                  onClick={() => removeSearchParam('sort')}
                   className="filterTagRemove"
                 >
                   <X size={12} />
