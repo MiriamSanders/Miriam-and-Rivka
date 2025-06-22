@@ -15,7 +15,7 @@ const insertSampleData = async () => {
             INSERT INTO roles (roleName) VALUES 
             ('regular'),
             ('chef'),
-            ('Admin'),
+            ('admin')
         `);
 
         // 2. Insert Difficulty Levels
@@ -213,24 +213,24 @@ const insertSampleData = async () => {
 
         // 12. Insert Comments on Recipes
         await connection.execute(`
-            INSERT INTO comments (recipeId, userId, commentText) VALUES 
-            (1, 6, 'This grilled chicken recipe is amazing! The herbs really make a difference.'),
-            (1, 7, 'Made this last night for my family. Everyone loved it!'),
-            (2, 8, 'The French onion soup was perfect for a cold winter evening.'),
-            (2, 9, 'Took a while to caramelize the onions properly, but worth the wait!'),
-            (3, 6, 'Love homemade pasta! This marinara sauce is so flavorful.'),
-            (4, 12, 'Great healthy option. The herb crust adds amazing flavor to the salmon.'),
-            (5, 13, 'Quick and easy weeknight dinner. My kids actually ate their vegetables!'),
-            (6, 11, 'Challenging recipe but the results are restaurant-quality. Impressive!'),
-            (7, 15, 'Best chocolate soufflé I have ever made. Light and decadent!'),
-            (8, 6, 'Risotto requires patience but this recipe is foolproof.'),
-            (9, 12, 'Perfect summer salad. Fresh and light.'),
-            (10, 14, 'Authentic flavors! Reminds me of my trip to Thailand.'),
-            (11, 7, 'Creamy and delicious. The mushroom flavor really shines through.'),
-            (12, 8, 'Elegant dessert that is surprisingly achievable at home.'),
-            (13, 9, 'Classic pizza done right. The dough recipe is fantastic.'),
-            (14, 6, 'Best Caesar salad dressing I have ever tasted!'),
-            (15, 13, 'Sweet and savory balance is perfect in this teriyaki chicken.')
+            INSERT INTO recipecomments (recipeId, userId, parentCommentId, commentText) VALUES 
+            (1, 6,null, 'This grilled chicken recipe is amazing! The herbs really make a difference.'),
+            (1, 7,null, 'Made this last night for my family. Everyone loved it!'),
+            (2, 8,null, 'The French onion soup was perfect for a cold winter evening.'),
+            (2, 9,null, 'Took a while to caramelize the onions properly, but worth the wait!'),
+            (3, 6,null, 'Love homemade pasta! This marinara sauce is so flavorful.'),
+            (4, 12,null, 'Great healthy option. The herb crust adds amazing flavor to the salmon.'),
+            (5, 13,null, 'Quick and easy weeknight dinner. My kids actually ate their vegetables!'),
+            (6, 11,null, 'Challenging recipe but the results are restaurant-quality. Impressive!'),
+            (7, 15,null, 'Best chocolate soufflé I have ever made. Light and decadent!'),
+            (8, 6,null, 'Risotto requires patience but this recipe is foolproof.'),
+            (9, 12,null, 'Perfect summer salad. Fresh and light.'),
+            (10, 14,null, 'Authentic flavors! Reminds me of my trip to Thailand.'),
+            (11, 7,null, 'Creamy and delicious. The mushroom flavor really shines through.'),
+            (12, 8,null, 'Elegant dessert that is surprisingly achievable at home.'),
+            (13, 9,null, 'Classic pizza done right. The dough recipe is fantastic.'),
+            (14, 6,null, 'Best Caesar salad dressing I have ever tasted!'),
+            (15, 13,null, 'Sweet and savory balance is perfect in this teriyaki chicken.')
         `);
 
         // 13. Insert Article Comments

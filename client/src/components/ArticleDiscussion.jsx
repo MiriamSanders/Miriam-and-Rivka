@@ -144,6 +144,11 @@ const ArticleDiscussion = ({ articleId }) => {
                 <Trash2 />
               </button>
             }
+                {comment.chefReplyText && (
+              <div className="ml-4 p-2 bg-gray-100 border-l-4 border-green-500 rounded">
+                <strong>Chef's answer:</strong> <span>{comment.chefReplyText}</span>
+              </div>
+            )}
           </div>
         ))}
 

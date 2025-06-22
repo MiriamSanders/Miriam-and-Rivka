@@ -1,0 +1,105 @@
+/* רווח מהטופ – מתחת לשורת הניווט */
+
+.chef-dashboard-container {
+  padding: 6rem 1rem 1rem; /* כאן הגדלתי מ-2rem ל-6rem כדי לוודא רווח מעל */
+  max-width: 800px;
+  margin: 0 auto;
+}
+/* כפתורי מעבר טאבים */
+.tab-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tab-buttons button:hover {
+  background-color: #ccc;
+}
+
+.tab-buttons button:disabled {
+  background-color: #aaa;
+  cursor: default;
+}
+
+/* כרטיס תגובה */
+.comment-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fafafa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.comment-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.comment-text {
+  margin-bottom: 0.5rem;
+}
+
+.comment-reply {
+  background-color: #f0f0f0;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #1976d2;
+  color: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-right: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #1565c0;
+}
+
+button.cancel {
+  background-color: #888;
+}
+
+button.cancel:hover {
+  background-color: #666;
+}
+
+.loading-message,
+.empty-message,
+.error-message {
+  text-align: center;
+  color: #666;
+  padding: 1rem;
+}
+
+.error-message {
+  color: red;
+}

@@ -241,7 +241,7 @@ exports.deleteRecipe = async (req, res) => {
     const result = await recipeService.deleteRecipe(recipeId);
     res.json(result);
   } catch (error) {
-    console.error('Error delet recipe:', error);
+    console.error('Error delete recipe:', error);
     res.status(500).json({ error: 'somthing went wrong' });
   }
 }
