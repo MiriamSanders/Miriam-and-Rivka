@@ -1,105 +1,326 @@
-/* רווח מהטופ – מתחת לשורת הניווט */
-
+/* Modern Black & White Chef Comments Dashboard */
 .chef-dashboard-container {
-  padding: 6rem 1rem 1rem; /* כאן הגדלתי מ-2rem ל-6rem כדי לוודא רווח מעל */
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 1200px;
+  margin: 5% auto;
+  padding: 2rem;
+  background: #ffffff;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1a1a1a;
 }
-/* כפתורי מעבר טאבים */
+
+/* Tab Navigation */
 .tab-buttons {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0;
+  margin-bottom: 3rem;
+  border-bottom: 2px solid #f0f0f0;
+  position: relative;
 }
 
 .tab-buttons button {
-  padding: 0.5rem 1rem;
+  background: transparent;
   border: none;
-  background-color: #e0e0e0;
-  border-radius: 6px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #666;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
 }
 
-.tab-buttons button:hover {
-  background-color: #ccc;
+.tab-buttons button:hover:not(:disabled) {
+  color: #1a1a1a;
+  background: #f8f8f8;
 }
 
 .tab-buttons button:disabled {
-  background-color: #aaa;
+  color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
+  background: #ffffff;
   cursor: default;
 }
 
-/* כרטיס תגובה */
-.comment-card {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  background-color: #fafafa;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+.tab-buttons button:disabled::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #1a1a1a;
 }
 
-.comment-title {
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.comment-text {
-  margin-bottom: 0.5rem;
-}
-
-.comment-reply {
-  background-color: #f0f0f0;
-  border-radius: 6px;
-  padding: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-textarea {
-  width: 100%;
-  min-height: 60px;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-family: inherit;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  background-color: #1976d2;
-  color: white;
-  cursor: pointer;
-  font-size: 0.95rem;
-  margin-right: 0.5rem;
-  transition: background-color 0.2s;
-}
-
-button:hover {
-  background-color: #1565c0;
-}
-
-button.cancel {
-  background-color: #888;
-}
-
-button.cancel:hover {
-  background-color: #666;
-}
-
-.loading-message,
-.empty-message,
+/* Error Message */
 .error-message {
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Loading State */
+.loading-message {
   text-align: center;
+  padding: 3rem 1rem;
   color: #666;
-  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
-.error-message {
-  color: red;
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #999;
+  font-size: 1.1rem;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Comment Cards */
+.comment-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.comment-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1a1a1a 0%, #666 100%);
+}
+
+.comment-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Comment Header */
+.comment-header {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Comment Content */
+.comment-content {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.comment-content strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+/* Chef Reply */
+.chef-reply {
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  position: relative;
+}
+
+.chef-reply::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 1.5rem;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #1a1a1a;
+}
+
+.chef-reply strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Reply Form */
+.reply-form {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.reply-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 1rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s ease;
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+.reply-textarea:focus {
+  outline: none;
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+}
+
+.reply-textarea::placeholder {
+  color: #999;
+}
+
+/* Buttons */
+.btn {
+  background: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #666;
+  border: 1px solid #d0d0d0;
+}
+
+.btn-secondary:hover {
+  background: #f8f8f8;
+  color: #1a1a1a;
+  border-color: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+.btn-reply {
+  background: transparent;
+  color: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.btn-reply:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* Button Groups */
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chef-dashboard-container {
+    padding: 1rem;
+  }
+  
+  .tab-buttons {
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+  
+  .tab-buttons button {
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+  
+  .comment-card {
+    padding: 1.5rem;
+  }
+  
+  .comment-header {
+    font-size: 1.1rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn {
+    justify-content: center;
+  }
+}
+
+/* Smooth Scrolling and Performance */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus States for Accessibility */
+.btn:focus,
+.reply-textarea:focus,
+.tab-buttons button:focus {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 2px;
+}
+
+/* Animation for Loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.comment-card {
+  animation: fadeIn 0.5s ease-out;
 }
