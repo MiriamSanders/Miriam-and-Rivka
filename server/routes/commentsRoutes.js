@@ -9,12 +9,23 @@ router.get('/recipecomments/chef/:chefId', async (req, res) => {
   controller.getAllChefRecipeComments(req, res);
 });
 router.get('/recipecomments/:id', controller.getRecipeComments);
+router.get('/articlecomments/chef/:chefId', async (req, res) => {
+  // if (!req.user) {
+  //   return res.status(401).json({ error: "Must be logged in to view comments" });
+  // }
+  controller.getAllChefArticleComments(req, res);
+});
 router.get('/articlecomments/:id', controller.getArticleComments);
+router.post('/articlecomments/chef/:chefId',async (req, res) => {
+  // if (!req.user) {
+  //   return res.status(401).json({ error: "Must be logged in to comment" });
+  // }
+controller.postChefArticleComment(req,res);
+});
 router.post('/recipecomments/chef/:chefId',async (req, res) => {
-  console.log("in");
-  if (!req.user) {
-    return res.status(401).json({ error: "Must be logged in to comment" });
-  }
+  // if (!req.user) {
+  //   return res.status(401).json({ error: "Must be logged in to comment" });
+  // }
 controller.postChefRecipeComment(req,res);
 });
 router.post('/recipecomments',async (req, res) => {

@@ -114,10 +114,13 @@ const createTables = async () => {
     commentId INT AUTO_INCREMENT PRIMARY KEY,
     articleId INT NOT NULL,
     userId INT NOT NULL,
+   parentCommentId INT DEFAULT NULL,
     commentText TEXT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (articleId) REFERENCES articles(articleId) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
+    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
+    FOREIGN KEY (parentCommentId) REFERENCES articleComments(commentId) ON DELETE CASCADE
+
   )`,
 
     // 12. Tags (no dependencies)

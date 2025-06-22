@@ -33,14 +33,21 @@ async function getArticleComments(articleId, limit, offset) {
   try {
     const db = await dbPromise;
 
-    const query = `
-      SELECT c.commentId, u.userName,c.userId, c.commentText
-      FROM articlecomments c
-      JOIN users u ON c.userId = u.userId
-      WHERE c.articleId = ?
-      LIMIT ${limit}
-      OFFSET ${offset}
-    `;
+ const query = `
+  SELECT 
+    c.commentId,
+    u.userName,
+    c.commentText,
+    c.userId,
+    r.commentText AS chefReplyText,
+    r.userId AS chefUserId
+  FROM articlecomments c
+  JOIN users u ON c.userId = u.userId
+  LEFT JOIN articleComments r ON r.parentCommentId = c.commentId
+  WHERE c.articleId = ? AND c.parentCommentId IS NULL
+  LIMIT ${limit}
+  OFFSET ${offset}
+`;
 
     const [rows] = await db.execute(query, [articleId]);
     return rows;
@@ -140,9 +147,40 @@ async function getAllChefRecipeComments(chefId, limit, offset) {
       LIMIT ${limit}
       OFFSET ${offset}
     `;
+    const [rows] = await db.execute(query, [chefId]);
+    console.log("Chef recipe comments length:", rows.length);
+    return rows;
 
+  } catch (error) {
+    console.error('Error fetching chef comments:', error);
+    throw error;
+  }
+}
+async function getAllChefArticleComments(chefId, limit, offset) {
+  try {
+    const db = await dbPromise;
+    const query = `
+      SELECT 
+        c.commentId,
+        c.articleId,
+        a.title AS articleTitle,
+        u.userName,
+        u.userId,
+        c.commentText,
+        chefReply.commentId AS chefReplyId,
+        chefReply.commentText AS chefReplyText
+      FROM articlecomments c
+      JOIN articles a ON c.articleId = a.articleId
+      JOIN users u ON c.userId = u.userId
+      LEFT JOIN articlecomments chefReply 
+        ON chefReply.parentCommentId = c.commentId AND chefReply.userId = a.authorId
+      WHERE a.authorId = ? AND c.parentCommentId IS NULL
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `;
 
     const [rows] = await db.execute(query, [chefId]);
+    console.log("Chef article comments length:", rows.length);
     return rows;
 
   } catch (error) {
@@ -172,6 +210,28 @@ async function postChefRecipeComment(userId, recipeId, commentText,parentComment
     throw error;
   }
 }
+async function postChefArticleComment(userId, articleId, commentText,parentCommentId) {
+  try {
+    const db = await dbPromise;
+
+    const insertQuery = `
+      INSERT INTO articlecomments (articleId, userId, commentText,parentCommentId)
+      VALUES (?, ?, ?,?)
+    `;
+    const [insertResult] = await db.execute(insertQuery, [articleId, userId, commentText,parentCommentId]);
+
+    const insertedId = insertResult.insertId;
+
+    if (!insertedId) {
+      throw new Error('Comment insertion failed.');
+    }
+
+    return insertedId;
+  } catch (error) {
+    console.error('Comment insertion failed.', error);
+    throw error;
+  }
+}
 module.exports = {
  getRecipeComments,
  getArticleComments,
@@ -180,5 +240,7 @@ module.exports = {
  deleteRecipeComment,
  deleteArticleComment,
  getAllChefRecipeComments,
- postChefRecipeComment
+ postChefRecipeComment,
+ getAllChefArticleComments,
+  postChefArticleComment
 };
