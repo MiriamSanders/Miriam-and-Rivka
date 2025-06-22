@@ -13,6 +13,7 @@ const transporter = nodemailer.createTransport({
         pass: 'qaerwevjnfrdcdja' // Your Gmail App Password (no spaces)
     }
 });
+
 function calculateTagSimilarity(r1, r2) {
     if (!r1.tags || !r2.tags) return 0;
     const a = new Set(r1.tags.split(',').map(t => t.trim().toLowerCase()));
@@ -55,13 +56,20 @@ function getWeekdayDates() {
         const dayOfWeek = date.getDay();
 
         if (dayOfWeek !== 5 && dayOfWeek !== 6) {
+            // Format as YYYY-MM-DD
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const regularDate = `${year}-${month}-${day}`;
+
             dates.push({
                 date: date,
+                regularDate: regularDate, // YYYY-MM-DD format
                 formatted: date.toLocaleDateString('en-US', {
                     weekday: 'long',
                     month: 'long',
                     day: 'numeric'
-                }),
+                }), // Keep formatted for display purposes only
                 dayNumber: daysAdded + 1
             });
             daysAdded++;
@@ -270,7 +278,7 @@ async function createWeeklyMealPlan(sideIds, mainIds, dessertIds, userId) {
 
     const simplifiedPlan = meals.map(m => ({
         day: m.day,
-        date: dates[m.day - 1]?.formatted || `Day ${m.day}`,
+        date: dates[m.day - 1]?.regularDate || `Day ${m.day}`, // Use regularDate (YYYY-MM-DD) instead of formatted
         side: { recipeId: m.side.recipeId, title: m.side.title },
         main: { recipeId: m.main.recipeId, title: m.main.title },
         dessert: { recipeId: m.dessert.recipeId, title: m.dessert.title }
@@ -278,7 +286,7 @@ async function createWeeklyMealPlan(sideIds, mainIds, dessertIds, userId) {
 
     console.log(`Meal plan successfully created: ${meals.length} meals, ${replacements.length} replacements.`);
     console.log(simplifiedPlan);
-    
+
     await addToDb(simplifiedPlan, userId);
     return {
         success: true,
@@ -298,6 +306,7 @@ async function addToDb(weeklyMenu, userId) {
     console.log(`Persisting weekly menu for user ${userId} to database...`);
     const menus = [];
     for (const m of weeklyMenu) {
+        // Use the regular date format (YYYY-MM-DD) for database insertion
         const menuDay = await genericPost("dailymenus", { userId: userId, menuDate: m.date }, "menuId");
         const side = await genericPost('menurecipes', { menuId: menuDay.menuId, recipeId: m.side.recipeId }, 'menuId');
         const main = await genericPost('menurecipes', { menuId: menuDay.menuId, recipeId: m.main.recipeId }, 'menuId');
@@ -305,71 +314,189 @@ async function addToDb(weeklyMenu, userId) {
         menus.push(menuDay.menuId);
         console.log(`Daily menu entry created for date ${m.date}: ${JSON.stringify(menuDay)}`);
     }
-    generateAndEmailShoppingList(menus, getWeekdayDates(), userId);
+    generateAndEmailShoppingList(menus, getWeekdayDates(), userId, weeklyMenu);
     console.log('Weekly menu persistence complete.');
 }
 
 const ingredientCanonicalMap = {
+    // Eggs - all egg products grouped together
     'large eggs': 'Eggs',
+    'medium eggs': 'Eggs',
+    'small eggs': 'Eggs',
     'egg whites': 'Eggs',
+    'egg yolks': 'Eggs',
+    'whole eggs': 'Eggs',
+
+    // Tomatoes - different forms of tomatoes
     'diced tomatoes': 'Tomatoes',
-    'cherry tomatoes': 'Tomatoes',
-    'canned tomatoes': 'Tomatoes',
-    'fresh basil': 'Basil',
-    'dried basil': 'Basil',
-    'garlic cloves': 'Garlic',
-    'garlic powder': 'Garlic',
-    'onion powder': 'Onion',
-    'red onion': 'Onion',
-    'yellow onion': 'Onion',
+    'cherry tomatoes': 'Cherry Tomatoes',
+    'grape tomatoes': 'Cherry Tomatoes',
+    'canned tomatoes': 'Canned Tomatoes',
+    'crushed tomatoes': 'Canned Tomatoes',
+    'tomato paste': 'Tomato Paste',
+    'tomato sauce': 'Tomato Sauce',
+    'fresh tomatoes': 'Fresh Tomatoes',
+
+    // Herbs - fresh vs dried are different
+    'fresh basil': 'Fresh Basil',
+    'dried basil': 'Dried Basil',
+    'fresh parsley': 'Fresh Parsley',
+    'dried parsley': 'Dried Parsley',
+    'fresh oregano': 'Fresh Oregano',
+    'dried oregano': 'Dried Oregano',
+    'fresh thyme': 'Fresh Thyme',
+    'dried thyme': 'Dried Thyme',
+
+    // Garlic - different forms
+    'garlic cloves': 'Fresh Garlic',
+    'fresh garlic': 'Fresh Garlic',
+    'minced garlic': 'Fresh Garlic',
+    'garlic powder': 'Garlic Powder',
+    'garlic salt': 'Garlic Salt',
+
+    // Onions - keep different types separate as they have different flavors
+    'yellow onion': 'Yellow Onion',
+    'white onion': 'White Onion',
+    'red onion': 'Red Onion',
+    'sweet onion': 'Sweet Onion',
+    'green onions': 'Green Onions',
+    'scallions': 'Green Onions',
+    'onion powder': 'Onion Powder',
+
+    // Sugar - all sugars grouped
     'brown sugar': 'Sugar',
     'white sugar': 'Sugar',
     'granulated sugar': 'Sugar',
-    'all-purpose flour': 'Flour',
-    'whole wheat flour': 'Flour',
+    'powdered sugar': 'Sugar',
+    'confectioners sugar': 'Sugar',
+    'cane sugar': 'Sugar',
+
+    // Flour - different types serve different purposes
+    'all-purpose flour': 'All-Purpose Flour',
+    'whole wheat flour': 'Whole Wheat Flour',
+    'bread flour': 'Bread Flour',
+    'cake flour': 'Cake Flour',
+    'self-rising flour': 'Self-Rising Flour',
+
+    // Salt - all salts grouped
     'kosher salt': 'Salt',
     'sea salt': 'Salt',
-    'black pepper': 'Pepper',
-    'ground black pepper': 'Pepper',
-    'milk': 'Dairy Milk',
-    'almond milk': 'Plant-Based Milk',
-    'soy milk': 'Plant-Based Milk',
-    'chicken breast': 'Chicken',
-    'chicken thighs': 'Chicken',
-    'ground beef': 'Beef',
-    'steak': 'Beef',
-    'parmesan cheese': 'Cheese',
-    'cheddar cheese': 'Cheese',
-    'mozzarella cheese': 'Cheese',
-    'olive oil': 'Cooking Oil',
-    'vegetable oil': 'Cooking Oil',
-    'canola oil': 'Cooking Oil',
+    'table salt': 'Salt',
+    'fine salt': 'Salt',
+
+    // Pepper - different types
+    'black pepper': 'Black Pepper',
+    'ground black pepper': 'Black Pepper',
+    'white pepper': 'White Pepper',
+    'cracked black pepper': 'Black Pepper',
+
+    // Milk - dairy vs non-dairy are very different
+    'whole milk': 'Dairy Milk',
+    '2% milk': 'Dairy Milk',
+    'skim milk': 'Dairy Milk',
+    'low-fat milk': 'Dairy Milk',
+    'almond milk': 'Almond Milk',
+    'soy milk': 'Soy Milk',
+    'oat milk': 'Oat Milk',
+    'coconut milk': 'Coconut Milk',
+
+    // Chicken - different cuts
+    'chicken breast': 'Chicken Breast',
+    'chicken thighs': 'Chicken Thighs',
+    'chicken wings': 'Chicken Wings',
+    'whole chicken': 'Whole Chicken',
+    'chicken drumsticks': 'Chicken Drumsticks',
+
+    // Beef - different cuts
+    'ground beef': 'Ground Beef',
+    'steak': 'Steak',
+    'beef chuck': 'Beef Chuck',
+    'beef brisket': 'Beef Brisket',
+    'ribeye': 'Steak',
+    'sirloin': 'Steak',
+
+    // Cheese - different types have different uses
+    'parmesan cheese': 'Parmesan Cheese',
+    'cheddar cheese': 'Cheddar Cheese',
+    'mozzarella cheese': 'Mozzarella Cheese',
+    'swiss cheese': 'Swiss Cheese',
+    'cream cheese': 'Cream Cheese',
+    'feta cheese': 'Feta Cheese',
+    'goat cheese': 'Goat Cheese',
+
+    // Oils - different types
+    'olive oil': 'Olive Oil',
+    'extra virgin olive oil': 'Olive Oil',
+    'vegetable oil': 'Vegetable Oil',
+    'canola oil': 'Canola Oil',
+    'coconut oil': 'Coconut Oil',
+    'sesame oil': 'Sesame Oil',
+
+    // Butter - all butter types
     'butter': 'Butter',
     'unsalted butter': 'Butter',
     'salted butter': 'Butter',
-    'heavy cream': 'Cream',
-    'whipping cream': 'Cream',
-    'sour cream': 'Cream',
-    'yogurt': 'Yogurt',
-    'greek yogurt': 'Yogurt',
-    'potatoes': 'Potatoes',
-    'sweet potatoes': 'Potatoes',
-    'carrots': 'Carrots',
-    'baby carrots': 'Carrots',
-    'broccoli florets': 'Broccoli',
-    'fresh spinach': 'Spinach',
-    'frozen spinach': 'Spinach',
-    'lemon juice': 'Lemon',
-    'lemons': 'Lemon',
-    'lime juice': 'Lime',
-    'limes': 'Lime',
-    'white rice': 'Rice',
-    'brown rice': 'Rice',
-    'pasta': 'Pasta',
-    'spaghetti': 'Pasta',
-    'penne': 'Pasta'
-};
 
+    // Cream - different types serve different purposes
+    'heavy cream': 'Heavy Cream',
+    'heavy whipping cream': 'Heavy Cream',
+    'whipping cream': 'Whipping Cream',
+    'half and half': 'Half and Half',
+    'sour cream': 'Sour Cream',
+
+    // Yogurt - different types
+    'plain yogurt': 'Plain Yogurt',
+    'greek yogurt': 'Greek Yogurt',
+    'vanilla yogurt': 'Flavored Yogurt',
+    'strawberry yogurt': 'Flavored Yogurt',
+
+    // Potatoes - different types
+    'russet potatoes': 'Russet Potatoes',
+    'red potatoes': 'Red Potatoes',
+    'yukon potatoes': 'Yukon Potatoes',
+    'sweet potatoes': 'Sweet Potatoes',
+    'baby potatoes': 'Baby Potatoes',
+
+    // Carrots - different forms
+    'carrots': 'Carrots',
+    'baby carrots': 'Baby Carrots',
+    'carrot sticks': 'Baby Carrots',
+
+    // Vegetables - keep specific
+    'broccoli florets': 'Broccoli',
+    'broccoli': 'Broccoli',
+    'fresh spinach': 'Fresh Spinach',
+    'frozen spinach': 'Frozen Spinach',
+    'baby spinach': 'Fresh Spinach',
+
+    // Citrus - different forms
+    'lemon juice': 'Lemon Juice',
+    'fresh lemon juice': 'Lemon Juice',
+    'lemons': 'Fresh Lemons',
+    'lemon zest': 'Lemon Zest',
+    'lime juice': 'Lime Juice',
+    'fresh lime juice': 'Lime Juice',
+    'limes': 'Fresh Limes',
+    'lime zest': 'Lime Zest',
+
+    // Rice - different types
+    'white rice': 'White Rice',
+    'brown rice': 'Brown Rice',
+    'jasmine rice': 'Jasmine Rice',
+    'basmati rice': 'Basmati Rice',
+    'wild rice': 'Wild Rice',
+
+    // Pasta - keep different shapes separate as they're used differently
+    'spaghetti': 'Spaghetti',
+    'penne': 'Penne',
+    'fusilli': 'Fusilli',
+    'rigatoni': 'Rigatoni',
+    'linguine': 'Linguine',
+    'fettuccine': 'Fettuccine',
+    'angel hair': 'Angel Hair Pasta',
+    'bow tie pasta': 'Bow Tie Pasta',
+    'macaroni': 'Macaroni'
+};
 
 function getCanonicalIngredientName(ingredientName) {
     const lowerName = ingredientName.toLowerCase().trim();
@@ -388,8 +515,7 @@ function getCanonicalIngredientName(ingredientName) {
     return ingredientName; // Return original if no canonical mapping found
 }
 
-
-async function generateAndEmailShoppingList(menuIds, dates, userId) {
+async function generateAndEmailShoppingList(menuIds, dates, userId, weeklyMenu) {
     console.log(`Generating shopping list for menu IDs: [${menuIds.join(', ')}] for user ${userId}.`);
 
     try {
@@ -427,27 +553,37 @@ async function generateAndEmailShoppingList(menuIds, dates, userId) {
         let emailBodyItems = '';
         shoppingListToDisplay.forEach(item => {
             emailBodyItems += `<li>${item}</li>`; // No quantity
-
         });
-        function parseDateToISOString(dateString, hour = 9, durationInMinutes = 60) {
-            const date = new Date(dateString + " " + hour + ":00:00");
+
+        // Updated parseDateToISOString function to work with regular dates
+        function parseDateToISOString(regularDate, hour = 9, durationInMinutes = 60) {
+            // regularDate is in YYYY-MM-DD format
+            const date = new Date(regularDate + "T" + String(hour).padStart(2, '0') + ":00:00");
             const start = new Date(date);
             const end = new Date(date.getTime() + durationInMinutes * 60000);
+
             const formatDate = d =>
                 d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
             return { start: formatDate(start), end: formatDate(end) };
         }
-        const calendarLinksHtml = dates.map(({ date, formatted }) => {
-            const { start, end } = parseDateToISOString(formatted);
-            const title = encodeURIComponent("Meal Planning Reminder");
-            const details = encodeURIComponent("Don't forget to check your meal plan and prep ingredients!");
-            const location = encodeURIComponent("Your Kitchen");
-            const link = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${date}/${date}`;
-            return `<li><a href="${link}" target="_blank">add ${formatted}'s menu to your calander</a></li>`;
-        }).join('');
 
+        const calendarLinksHtml = dates
+            .filter((_, index) => weeklyMenu[index])  // Only keep dates where dayMenu exists
+            .map(({ regularDate, formatted }, index) => {
+                const dayMenu = weeklyMenu[index];
+                const recipeLinks = `
+            Side: ${dayMenu.side.title}: http://localhost:5173/recipes/${dayMenu.side.recipeId}
+            Main: ${dayMenu.main.title}: http://localhost:5173/recipes/${dayMenu.main.recipeId}
+            Dessert: ${dayMenu.dessert.title}: http://localhost:5173/recipes/${dayMenu.dessert.recipeId}
+        `;
 
-
+                const { start, end } = parseDateToISOString(regularDate);
+                const title = encodeURIComponent("Meal Planning Reminder");
+                const details = encodeURIComponent(`Today's Menu:\n${recipeLinks}\n\nDon't forget to check your meal plan and prep ingredients!`);
+                const location = encodeURIComponent("Your Kitchen");
+                const link = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${start}/${end}`;
+                return `<li><a href="${link}" target="_blank">Add ${formatted}'s menu to your calendar</a></li>`;
+            }).join('');
         const htmlContent = `
             <div style="font-family: Arial, sans-serif; max-width: 600px ; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: #f7f7f7; padding: 20px; text-align: center; border-bottom: 1px solid #eee;">
@@ -461,37 +597,34 @@ async function generateAndEmailShoppingList(menuIds, dates, userId) {
                     </ul>
                     <p style="color: #555; line-height: 1.6;">Don't forget to grab everything you need for a smooth cooking week!</p>
                     <div style="text-align: center; margin-top: 30px;">
-    <p style="color: #555;">Add reminders to your Google Calendar:</p>
-    <ul style="list-style-type: none; padding: 0;">
-        ${calendarLinksHtml}
-    </ul>
-</div>
-                                  </div>
+                        <p style="color: #555;">Add reminders to your Google Calendar:</p>
+                        <ul style="list-style-type: none; padding: 0;">
+                            ${calendarLinksHtml}
+                        </ul>
+                    </div>
+                </div>
                 <div style="background-color: #f7f7f7; padding: 15px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #eee;">
                     <p style="margin: 0;">Happy cooking from the Plan & Plate Team!</p>
                 </div>
             </div>
         `;
-        await transporter.sendMail({
+
+        const emailResult = await transporter.sendMail({
             from: 'plateandplan@gmail.com',
             to: userEmail,
             subject: `Grocery List - Enjoy Planning An Amazing Menu!`,
             html: htmlContent
         });
 
-        if (emailResult.success) {
-            console.log(`Shopping list email sent successfully to ${userEmail}.`);
-            return { success: true, message: "Shopping list email sent successfully.", messageId: emailResult.messageId };
-        } else {
-            console.error(`Failed to send shopping list email to ${userEmail}: ${emailResult.error}`);
-            return { success: false, message: "Failed to send shopping list email.", error: emailResult.error };
-        }
+        console.log(`Shopping list email sent successfully to ${userEmail}.`);
+        return { success: true, message: "Shopping list email sent successfully.", messageId: emailResult.messageId };
 
     } catch (error) {
         console.error("Error generating or emailing shopping list:", error);
         return { success: false, message: "An unexpected error occurred.", error: error.message };
     }
 }
+
 module.exports = {
     createWeeklyMealPlan,
     pairMealsForWeek: createWeeklyMealPlan,

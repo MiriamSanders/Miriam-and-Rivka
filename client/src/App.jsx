@@ -29,6 +29,22 @@ function App() {
     mainIds: [],
     dessertIds: []
   });
+   const [menus, setMenus] = useState([
+    {
+      id: 1,
+      name: "Mediterranean Monday",
+      date: "2025-06-02",
+      items: ["Grilled Salmon", "Quinoa Salad", "Roasted Vegetables"],
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      name: "Taco Tuesday Fiesta",
+      date: "2025-06-03",
+      items: ["Fish Tacos", "Black Bean Rice", "Guacamole"],
+      createdAt: new Date().toISOString()
+    }
+  ]);
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('currentUser')) || null;
     setUserType(user ? user.userType : "guest");
@@ -47,7 +63,7 @@ function App() {
         <Route path="signup" element={<Signup setUserType={setUserType} />} />
 
         {/* Recipes */}
-        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu} />} />
+        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu} setMenus={setMenus}/>} />
         <Route path="chefs/:id/recipes`" element={<Recipes />} />
         <Route path="recipes/:id" element={<RecipePage />} />
 
@@ -61,7 +77,7 @@ function App() {
         <Route path="chefs/:id/articles`" element={<Articles />} />
         {/* Personal Area */}
 
-        {userType != "guest" && <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu} />} />}
+        {userType != "guest" && <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu} menus={menus} setMenus={setMenus}/>} />}
         {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
 
         {/* Chef Area */}

@@ -9,7 +9,7 @@ export default function RecipeFormatGuide() {
 
 Description: [Brief description of the dish]
 
-Image: [Optional image URL]
+Image: [Upload Image]
 
 Prep Time: [Number in minutes]
 
