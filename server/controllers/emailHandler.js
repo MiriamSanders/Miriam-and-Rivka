@@ -21,7 +21,6 @@ const getAdminEmail = async () => {
   console.log(admin.email);
   return admin.email;
 }
-const ADMIN_EMAIL = getAdminEmail();
 // 1. Endpoint to receive chef join requests
 const joinReq = async (info) => {
   try {
