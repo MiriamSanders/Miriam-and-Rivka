@@ -84,14 +84,6 @@ const HomePage = ({ userType }) => {
           <div className="recipe-grid">
             {popularRecipes.map((recipe) => (
               <div key={recipe.recipeId} className="home-recipe-card" style={{ backgroundImage: `url(${recipe.imageURL})` }} onClick={() => { navigate(`/recipes/${recipe.recipeId}`) }}>
-                <div className="recipe-image-container">
-                  <img
-                    src={recipe.imageURL}
-                    alt={recipe.title}
-                    className="recipe-image"
-                  />
-                </div>
-
                 <div className="recipe-content">
                   <h3 className="recipe-title">
                     {recipe.title}
@@ -135,7 +127,7 @@ const HomePage = ({ userType }) => {
                   Build Custom Menus
                 </h3>
                 <p className="menu-creation-description">
-                  Combine your favorite recipes into personalized menus for any occasion. 
+                  Combine your favorite recipes into personalized menus for any occasion.
                   Perfect for meal planning, dinner parties, or weekly meal prep.
                 </p>
                 <ul className="menu-creation-features">
@@ -147,8 +139,8 @@ const HomePage = ({ userType }) => {
               </div>
             </div>
 
-            <button 
-              className="btn btn-primary btn-center" 
+            <button
+              className="btn btn-primary btn-center"
               onClick={() => navigate('/personal-area/menus')}
             >
               Create New Menu
@@ -187,9 +179,9 @@ const HomePage = ({ userType }) => {
             ))}
           </div>
 
-          {/* <button className="btn btn-outline-white btn-center">
+          <button className="btn btn-outline-white btn-center" onClick={() => navigate('/chefs')}>
             View All Chefs
-          </button> */}
+          </button>
         </div>
       </section>
 
