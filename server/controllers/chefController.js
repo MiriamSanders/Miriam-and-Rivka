@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const express = require('express');
 const chefService = require('../services/chefService');
 const genericService = require('../services/genericService');
-const mailManager = require('../middleware/aproveChef');
+const mailManager = require('./emailHandler');
 
 
 

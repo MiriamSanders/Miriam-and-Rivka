@@ -72,6 +72,7 @@ async function getRecipesAdvanced(options = {}) {
     limit = 10,
     offset = 0,
     category,
+    dishType,
     chefName,
     title,
     tags = [],
@@ -79,8 +80,11 @@ async function getRecipesAdvanced(options = {}) {
     sortBy = 'recipeId',
     sortOrder = 'DESC'
   } = options;
-
-  const allowedSortFields = ['title', 'category', 'userName'];
+  
+  console.log(options);
+  
+  // Updated to include 'rating' as a valid sort field
+  const allowedSortFields = ['title', 'category', 'userName', 'dishType', 'rating'];
   const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'recipeId';
   const validSortOrder = ['ASC', 'DESC'].includes(sortOrder.toUpperCase())
     ? sortOrder.toUpperCase()
@@ -91,18 +95,37 @@ async function getRecipesAdvanced(options = {}) {
     let query = `
       SELECT r.recipeId, r.title, r.imageURL, r.category, r.description, r.dishType,
              u.userName, u.userId,
-             GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags
+             GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') AS tags,
+             COALESCE(AVG(rt.rating), 0) AS avgRating,
+             COUNT(DISTINCT rt.userId) AS ratingCount
       FROM recipes r
-      JOIN users u        ON r.chefId   = u.userId
+      JOIN users u ON r.chefId = u.userId
       LEFT JOIN recipetags p ON r.recipeId = p.recipeId
-      LEFT JOIN tags t       ON p.tagId    = t.tagId`;
+      LEFT JOIN tags t ON p.tagId = t.tagId
+      LEFT JOIN recipeRatings rt ON r.recipeId = rt.recipeId`;
 
     const conditions = [];
     const params = [];
 
-    if (category) { conditions.push('r.category = ?'); params.push(category); }
-    if (chefName) { conditions.push('u.userName LIKE ?'); params.push(`%${chefName}%`); }
-    if (title) { conditions.push('r.title LIKE ?'); params.push(`%${title}%`); }
+    if (category) {
+      conditions.push('r.category = ?');
+      params.push(category);
+    }
+        
+    if (dishType) {
+      conditions.push('r.dishType = ?');
+      params.push(dishType);
+    }
+        
+    if (chefName) {
+      conditions.push('u.userName = ?');
+      params.push(`${chefName}`);
+    }
+        
+    if (title) {
+      conditions.push('r.title LIKE ?');
+      params.push(`%${title}%`);
+    }
 
     if (tags.length) {
       const ph = tags.map(() => '?').join(',');
@@ -130,12 +153,20 @@ async function getRecipesAdvanced(options = {}) {
 
     query += `
       GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description,
-               r.dishType, u.userName, u.userId
-      ORDER BY r.${validSortBy} ${validSortOrder}
-      LIMIT ? OFFSET ?`;
-
+               r.dishType, u.userName, u.userId`;
+    
+    // Handle the ORDER BY clause - use avgRating for 'rating' sort
+    const sortField = validSortBy === 'rating' ? 'avgRating' : `r.${validSortBy}`;
+    query += ` ORDER BY ${sortField} ${validSortOrder}`;
+    
+    query += ` LIMIT ? OFFSET ?`;
+    
     params.push(limit, offset);
-    const [rows] = await db.execute(mysql.format(query, params));
+    const formattedQuery = mysql.format(query, params);
+    
+    console.log(formattedQuery);
+            
+    const [rows] = await db.execute(formattedQuery);
 
     return rows.map(r => ({
       recipeId: r.recipeId,
@@ -146,14 +177,15 @@ async function getRecipesAdvanced(options = {}) {
       dishType: r.dishType,
       userName: r.userName,
       userId: r.userId,
-      tags: r.tags ? r.tags.split(',').map(t => t.trim()) : []
+      tags: r.tags ? r.tags.split(',').map(t => t.trim()) : [],
+      avgRating: parseFloat(r.avgRating) || 0,
+      ratingCount: r.ratingCount || 0
     }));
   } catch (error) {
     console.error('getRecipesAdvanced - DB error:', error);
     throw error;
   }
 }
-
 async function getBestRatedRecipes(limit = 4) {
   try {
     const db = await dbPromise;
@@ -162,7 +194,7 @@ async function getBestRatedRecipes(limit = 4) {
        FROM reciperatings
        GROUP BY recipeId
        ORDER BY avgRating DESC
-       LIMIT ?`, [limit]
+       LIMIT 4`, [limit]
     );
 
     const ids = ratingRows.map(r => r.recipeId);

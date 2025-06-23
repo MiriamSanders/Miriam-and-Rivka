@@ -30,21 +30,7 @@ function App() {
     dessertIds: []
   });
    const [menus, setMenus] = useState([
-    {
-      id: 1,
-      name: "Mediterranean Monday",
-      date: "2025-06-02",
-      items: ["Grilled Salmon", "Quinoa Salad", "Roasted Vegetables"],
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 2,
-      name: "Taco Tuesday Fiesta",
-      date: "2025-06-03",
-      items: ["Fish Tacos", "Black Bean Rice", "Guacamole"],
-      createdAt: new Date().toISOString()
-    }
-  ]);
+    ]);
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('currentUser')) || null;
     setUserType(user ? user.userType : "guest");

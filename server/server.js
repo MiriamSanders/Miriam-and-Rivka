@@ -31,7 +31,7 @@ app.use('/ratings',ratingRouter);
 app.use('/', commentsRouter);
 app.use('/', chefRouter);
 app.use('/tags', tagRouter);
-app.use('/menu/meal-plan', menuRouter);
+app.use('/meal-plan', menuRouter);
 app.use('/upload-image',imageRouter);
 app.listen(PORT, () => {
   console.log('http://localhost:3001');

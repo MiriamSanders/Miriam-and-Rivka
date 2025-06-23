@@ -16,6 +16,7 @@ exports.getAllRecipes = async (req, res) => {
       limit: limit,
       offset: offset,
       category: req.query.category,
+      dishType:req.query.dishType,
       chefName: req.query.chefName,
       title: req.query.title,
       userId: req.query.userId,

@@ -1,5 +1,5 @@
 const articlesService = require('../services/articlesService');
-const genericService=require('../services/genericService');
+const genericService = require('../services/genericService');
 
 exports.getAllArticles = async (req, res) => {
   try {
@@ -38,33 +38,34 @@ exports.getArticleById = async (req, res) => {
   }
 };
 
-exports.postArticle= async(req,res)=>{
-   try{ const data=req.body;
-    const articleResult=await genericService.genericPost("articles",data,"articleId");
-     res.status(201).json(articleResult);
+exports.postArticle = async (req, res) => {
+  try {
+    const data = req.body;
+    const articleResult = await genericService.genericPost("articles", data, "articleId");
+    res.status(201).json(articleResult);
   }
-    catch(error){
-      res.status(500).json({error:"internal server error"});
-    }
+  catch (error) {
+    res.status(500).json({ error: "internal server error" });
+  }
 };
-exports.putArticle= async(req,res)=>{
-   try{ 
-     const articleId = parseInt(req.params.id);
+exports.putArticle = async (req, res) => {
+  try {
+    const articleId = parseInt(req.params.id);
     const { title, content } = req.body;
-    const articleResult=await articlesService.updateArticle(articleId,title,content);
-     res.status(201).json(articleResult);
+    const articleResult = await articlesService.updateArticle(articleId, title, content);
+    res.status(201).json(articleResult);
   }
-    catch(error){
-      res.status(500).json({error:"internal server error"});
-    }
+  catch (error) {
+    res.status(500).json({ error: "internal server error" });
+  }
 };
-exports.deleteArticle=async(req,res)=>{
- try {
-   const articleId = parseInt(req.params.id);
-    const result= await articlesService.deleteArticle(articleId);
-     res.json(result);
+exports.deleteArticle = async (req, res) => {
+  try {
+    const articleId = parseInt(req.params.id);
+    const result = await articlesService.deleteArticle(articleId);
+    res.json(result);
   } catch (error) {
-    console.error('Error delet article:', error);
+    console.error('Error delete article:', error);
     res.status(500).json({ error: 'somthing went wrong' });
   }
 }

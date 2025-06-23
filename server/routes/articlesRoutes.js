@@ -7,7 +7,7 @@ router.get('/:id',controller.getArticleById);
 router.post('/',controller.postArticle)
 router.delete('/:id',async (req, res) => {
   if (!req.user) {
-    return res.status(401).json({ error: "Must be logged in to delet article" });
+    return res.status(401).json({ error: "Must be logged in to delete article" });
   }
 controller.deleteArticle(req,res);
 })

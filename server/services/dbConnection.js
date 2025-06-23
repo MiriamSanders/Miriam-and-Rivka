@@ -1,18 +1,34 @@
 const mysql = require("mysql2/promise");
-require("dotenv").config({ path: require('path').resolve(__dirname, '../config/.env') });
+require("dotenv").config({ path: require('path').resolve(__dirname, '../.env') });
 
 async function connect() {
-    
-    const db = await mysql.createConnection({
+    const pool = mysql.createPool({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
         port: process.env.DB_PORT,
+        
+        // Pool configuration
+        connectionLimit: 10,
+        acquireTimeout: 60000,
+        timeout: 60000,
+        reconnect: true,
+        queueLimit: 0
     });
 
-    console.log("Connected to MySQL database");
-    return db;
+    // Test the pool
+    try {
+        const connection = await pool.getConnection();
+        console.log("Connected to MySQL database with connection pool");
+        connection.release();
+    } catch (error) {
+        console.error("Error connecting to MySQL:", error);
+        throw error;
+    }
+
+    // Return the pool (which has the same execute method as a single connection)
+    return pool;
 }
 
 module.exports = connect();

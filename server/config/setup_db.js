@@ -163,7 +163,7 @@ const createTables = async () => {
     `CREATE TABLE IF NOT EXISTS dailymenus (
     menuId INT AUTO_INCREMENT PRIMARY KEY,
     userId INT NOT NULL,
-    menuDate DATE NOT NULL UNIQUE,
+    menuDate DATE NOT NULL,
     FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE CASCADE
   )`,
 

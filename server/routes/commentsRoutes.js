@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/commentsController');
-
+//split this
 router.get('/recipecomments/chef/:chefId', async (req, res) => {
   // if (!req.user) {
   //   return res.status(401).json({ error: "Must be logged in to view comments" });
@@ -42,13 +42,13 @@ controller.postArticleComments(req,res);
 });
 router.delete('/recipecomments/:id',async (req, res) => {
   if (!req.user) {
-    return res.status(401).json({ error: "Must be logged in to delet comment" });
+    return res.status(401).json({ error: "Must be logged in to delete comment" });
   }
 controller.deleteRecipeComment(req,res);
 })
 router.delete('/articlecomments/:id',async (req, res) => {
   if (!req.user) {
-    return res.status(401).json({ error: "Must be logged in to delet comment" });
+    return res.status(401).json({ error: "Must be logged in to delete comment" });
   }
 controller.deleteArticleComment(req,res);
 })
