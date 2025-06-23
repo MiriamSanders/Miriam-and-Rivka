@@ -21,7 +21,7 @@ const ArticleDiscussion = ({ articleId }) => {
   const fetchComments = async (pageNum) => {
     if (loading) return;
     setLoading(true);
-    const requestResult = await getRequest(`articlecomments/${articleId}?page=${pageNum}&limit=5`);
+    const requestResult = await getRequest(`articlecomments?article=${articleId}&page=${pageNum}&limit=5`);
     if (requestResult.succeeded) {
       if (requestResult.data && requestResult.data.length > 0) {
         setComments((prev) => [...prev, ...requestResult.data]);
@@ -52,7 +52,8 @@ const ArticleDiscussion = ({ articleId }) => {
         setComments([...comments, {
           commentId: requestResult.data,
           commentText: newComment,
-          userName: currentUser.userName
+          userName: currentUser.userName,
+          userId: currentUser.id,
         }]);
         setErrorCode(undefined);
       } else {

@@ -44,7 +44,6 @@ catch(error) {
         throw error;
     }
 }
-
 async function genericGetAll(table, limit, offset) {
     try {
         const db = await dbPromise;     
@@ -133,6 +132,4 @@ async function genericDelete(table, id,fieldName ) {
         throw error;
     }
 }
-
-
 module.exports = { genericGet,GenericPut, genericPost,genericGetAll ,genericGetByColumnName,genericDelete};

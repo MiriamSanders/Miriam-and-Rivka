@@ -13,7 +13,6 @@ async function getAllChefs() {
     throw error;
   }
 }
-
 async function getChef(chefId) {
   try {
     const db = await dbPromise;
@@ -32,7 +31,6 @@ async function getChef(chefId) {
     throw error;
   }
 }
-
 async function addChef(chefData) {
   try {
     const db = await dbPromise;
@@ -55,7 +53,6 @@ async function addChef(chefData) {
     throw error;
   }
 }
-
 async function getFeaturedChefs() {
   try {
     const db = await dbPromise;
@@ -76,7 +73,6 @@ async function getFeaturedChefs() {
     throw error;
   }
 }
-
 module.exports = {
   getAllChefs,
   getChef,

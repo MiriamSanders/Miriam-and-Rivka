@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require("./dbConnection"); 
-async function articleGetAll(limit, offset) {
+async function getAllArticles(limit, offset) {
   try {
     const db = await dbPromise;
     let query = `SELECT a.articleId, u.userName,title,a.authorId FROM articles a
@@ -24,32 +24,6 @@ async function articleGetAll(limit, offset) {
     console.error('Error fetching all data:', error);
     throw error;
   }
-}
-
-async function GenericPost(table, data) {
-    try {
-        const db = await dbPromise;
-        const insertQuery = mysql.format(`INSERT INTO ?? SET ?`, [table, data]);
-        const [insertResult] = await db.execute(insertQuery);
-        console.log(data);
-
-        let id = insertResult.insertId;
-        if (id) {
-            const selectQuery = mysql.format(`SELECT * FROM ?? WHERE userId = ?`, [table, id]);
-            const [rows] = await db.execute(selectQuery);
-            return rows[0] || null;
-        } else if (data.userId) {
-            const idQuery = mysql.format(`SELECT * FROM ?? WHERE userId = ?`, [table, data.userId]);
-            const [rows] = await db.execute(idQuery);
-            if (rows.length === 0) throw new Error('No record found for the given userID');
-            return rows[0];
-        } else {
-            throw new Error('Insert did not return an ID, and userID was not provided.');
-        }
-    } catch (error) {
-        console.error('Error inserting data:', error);
-        throw error;
-    }
 }
 async function getArticleById(id) {
     try {
@@ -89,18 +63,6 @@ async function getArticlesByChefId(chefId) {
         throw error;
     }
 }
-async function deleteArticle(articleId) {
-    try{
-       const db = await dbPromise;
-        const query = `DELETE FROM articles WHERE articleId = ?`;
-     
-        const [result] = await db.execute(query, [articleId]);
-        return result.affectedRows > 0;
-      } catch (err) {
-        console.error("Error deleting article:", err);
-        return false;
-      }
-}
 async function updateArticle(id, title, content) {
   try {
     const db = await dbPromise;
@@ -120,9 +82,8 @@ async function updateArticle(id, title, content) {
   }
 }
 module.exports = {
-  articleGetAll,
-  getArticleById,
-  getArticlesByChefId,
-  deleteArticle,
+ getAllArticles,
+ getArticlesByChefId,
+getArticleById,
   updateArticle
 };

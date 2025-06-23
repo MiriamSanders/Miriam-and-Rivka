@@ -19,7 +19,7 @@ const HomePage = ({ userType }) => {
   // Replace these useEffect hooks with your actual API calls
   useEffect(() => {
     const fetchPopularRecipes = async () => {
-      const response = await getRequest('recipes/best-rated');
+      const response = await getRequest('recipes?best-rated=1');
       if (response.succeeded) {
         setPopularRecipes(response.data);
       } else {
@@ -85,11 +85,11 @@ const HomePage = ({ userType }) => {
             {popularRecipes.map((recipe) => (
               <div key={recipe.recipeId} className="home-recipe-card" style={{ backgroundImage: `url(${recipe.imageURL})` }} onClick={() => { navigate(`/recipes/${recipe.recipeId}`) }}>
                 <div className="recipe-image-container">
-                  {/* <img
+                  <img
                     src={recipe.imageURL}
                     alt={recipe.title}
                     className="recipe-image"
-                  /> */}
+                  />
                 </div>
 
                 <div className="recipe-content">
@@ -101,7 +101,7 @@ const HomePage = ({ userType }) => {
 
                   <div className="recipe-chef">
                     <p className="recipe-chef-text">
-                      by <span className="recipe-chef-name">{recipe.chefName}</span>
+                      by <span className="recipe-chef-name">{recipe.userName}</span>
                     </p>
                   </div>
                 </div>

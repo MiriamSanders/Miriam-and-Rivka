@@ -1,59 +1,43 @@
 const e = require('express');
 const genericService = require('../services/genericService');
 const recipeService = require('../services/recipesService');
-exports.getAllRecipes = async (req, res) => {
+exports.getAllRecipes = async (options) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
-    const page = parseInt(req.query.page) || 0;
-    console.log(limit, page);
-    const offset = page * limit - limit;
-    if (Object.keys(req.query).length === 0) {
-      const recipes = await recipeService.getAllRecipes(limit, offset)
-      return res.json(recipes);
+    const limit = parseInt(options.limit) || 10;
+    const page = parseInt(options.page) || 1;
+    const offset = (page - 1) * limit;
+
+    const hasFilters = options.category || options.chefName || options.title || options.userId || options.tags.length > 0 || options.anyTags.length > 0;
+    if (!hasFilters) {
+      return await recipeService.getAllRecipes(limit, offset);
     }
-    //addd dishType 
-    const options = {
-      limit: limit,
-      offset: offset,
-      category: req.query.category,
-      chefName: req.query.chefName,
-      title: req.query.title,
-      userId: req.query.userId,
-      tags: req.query.tags ? req.query.tags.split(',') : [],
-      anyTags: req.query.anyTags ? req.query.anyTags.split(',') : [],
-      sortBy: req.query.sortBy || 'recipeId',
-      sortOrder: req.query.sortOrder || 'DESC'
-    };
     const recipes = await recipeService.getRecipesAdvanced(options);
+
     console.log('Recipes fetched:', recipes);
-    res.json(recipes);
+    return recipes;
   } catch (error) {
-    console.error('Error fetching recipes:', error);
-    res.status(500).json({ error: 'somthing went wrong' });
+    throw new Error('Something went wrong while fetching recipes:', error);
   }
 };
 
-exports.getRecipeById = async (req, res) => {
-  const recipeId = parseInt(req.params.id);
+exports.getRecipeById = async (recipeId) => {
   if (isNaN(recipeId)) {
-    return res.status(400).json({ error: 'Invalid recipe ID' });
+    throw new Error('Invalid recipe ID');
   }
-
   try {
     console.log('Fetching recipe with ID:', recipeId)
     const recipe = await recipeService.getRecipeById(recipeId);
     if (!recipe) {
-      return res.status(404).json({ error: 'Recipe not found' });
+      throw new Error('Recipe not found');
     }
-    res.json(recipe);
+    return recipe;
   } catch (error) {
-    console.error('Error fetching recipe:', error);
-    res.status(500).json({ error: 'somthing went wrong' });
+    throw new Error('Something went wrong while fetching recipe');
   }
 };
 
 //לפרק לפונקיציות קטנות יותר
-exports.createRecipe = async (req, res) => {
+exports.createRecipe = async (newRecipe) => {
   const {
     chefId,
     title,
@@ -66,14 +50,14 @@ exports.createRecipe = async (req, res) => {
     dishType,
     ingredients,
     tags
-  } = req.body;
-  console.log(req.body);
+  } = newRecipe;
+  console.log(newRecipe);
 
   // Validate required fields
   if (!chefId || !title || !imageURL || !category || !description) {
     console.log("error");
 
-    return res.status(400).json({ error: 'chefId, title, imageURL, category, and description are required' });
+    throw new Error('chefId, title, imageURL, category, and description are required');
   }
 
   try {
@@ -180,24 +164,23 @@ exports.createRecipe = async (req, res) => {
       }
     }
 
-    res.status(201).json({
+    return {
       success: true,
       message: 'Recipe created successfully',
       recipe: newRecipe
-    });
+    };
 
   } catch (error) {
-    console.error('Error creating recipe:', error);
-    res.status(500).json({ error: 'Something went wrong while creating the recipe' });
+    throw new Error('Something went wrong while creating the recipe');
   }
 };
-exports.getbestRatedRecipes = async (req, res) => {
+
+exports.getBestRatedRecipes = async () => {
   try {
     const bestRatedRecipes = await recipeService.getBestRatedRecipes();
-    res.json(bestRatedRecipes);
+    return bestRatedRecipes
   } catch (error) {
-    console.error('Error fetching best rated recipes:', error);
-    res.status(500).json({ error: 'Something went wrong while fetching best rated recipes' });
+    throw new Error('Something went wrong while fetching best rated recipes');
   }
 
 }
@@ -235,18 +218,17 @@ function parseIngredientText(ingredientText) {
     ingredientName: ingredientText
   };
 }
-exports.deleteRecipe = async (req, res) => {
+
+exports.deleteRecipe = async (recipeId) => {
   try {
-    const recipeId = parseInt(req.params.id);
     const result = await recipeService.deleteRecipe(recipeId);
-    res.json(result);
+    return result;
   } catch (error) {
-    console.error('Error delete recipe:', error);
-    res.status(500).json({ error: 'somthing went wrong' });
+    throw new Error('Something went wrong while deleting recipe');
   }
 }
-exports.putRecipe = async (req, res) => {
-  const recipeId = parseInt(req.params.id);
+
+exports.putRecipe = async (recipeId, recipeData) => {
   const {
     title,
     description,
@@ -258,14 +240,11 @@ exports.putRecipe = async (req, res) => {
     dishType,
     ingredients,
     tags
-  } = req.body;
-  console.log(req.body);
+  } = recipeData;
 
   // Validate required fields
   if (!title || !imageURL || !category || !description) {
-    console.log("error");
-
-    return res.status(400).json({ error: 'title, imageURL, category, and description are required' });
+    throw new Error('title, imageURL, category, and description are required');
   }
 
   try {
@@ -295,25 +274,23 @@ exports.putRecipe = async (req, res) => {
     // Handle tags if provided
     await syncRecipeTags(recipeId, tags);
 
-    res.status(201).json({
+    return {
       success: true,
       message: 'Recipe created successfully',
       recipe: newRecipe
-    });
+    };
 
   } catch (error) {
-    console.error('Error creating recipe:', error);
-    res.status(500).json({ error: 'Something went wrong while creating the recipe' });
+    throw new Error('Something went wrong while updating the recipe');
+
   }
 };
+
 async function syncRecipeIngredients(recipeId, ingredients) {
   if (!Array.isArray(ingredients) || ingredients.length === 0) {
     return;
   }
-
-  // שלב 1: המרה לרשימת מרכיבים מעובדים עם quantity ו-name
   const parsedIngredients = [];
-
   for (let i = 0; i < ingredients.length; i++) {
     const ingredientText = ingredients[i].trim();
     if (!ingredientText) continue;
@@ -324,11 +301,11 @@ async function syncRecipeIngredients(recipeId, ingredients) {
     let existingIngredient;
 
     try {
-      // בדיקת קיום המרכיב במסד לפי שם (case-insensitive)
       const searchResult = await genericService.genericGet('ingredients', "name", ingredientName);
       existingIngredient = searchResult?.[0];
     } catch (e) {
-      // התעלמות – ניצור אם לא נמצא
+      console.error(`Error fetching ingredient "${ingredientName}":`, e);
+      continue;
     }
 
     if (!existingIngredient) {
@@ -349,8 +326,6 @@ async function syncRecipeIngredients(recipeId, ingredients) {
       orderIndex: i + 1
     });
   }
-
-  // שלב 2: קבלת רשימת מרכיבים קיימים שמקושרים למתכון
   const existingIngredients = await recipeService.getRecipeIngredients(recipeId);
   const existingMap = new Map();
   existingIngredients.forEach(ing => {
@@ -359,10 +334,7 @@ async function syncRecipeIngredients(recipeId, ingredients) {
       orderIndex: ing.orderIndex
     });
   });
-
-  // שלב 3: השוואה והכנסה/עדכון
   const incomingIds = new Set();
-
   for (const ingredient of parsedIngredients) {
     const existing = existingMap.get(ingredient.ingredientId);
     incomingIds.add(ingredient.ingredientId);
@@ -383,8 +355,6 @@ async function syncRecipeIngredients(recipeId, ingredients) {
       });
     }
   }
-
-  // שלב 4: מחיקת מרכיבים שהוסרו
   for (const existingId of existingMap.keys()) {
     if (!incomingIds.has(existingId)) {
       await recipeService.deleteRecipeIngredient(recipeId, existingId);
@@ -392,35 +362,22 @@ async function syncRecipeIngredients(recipeId, ingredients) {
   }
 }
 
-
 async function syncRecipeTags(recipeId, tags) {
-  console.log("tag", tags);
   if (!tags || !Array.isArray(tags)) return;
-
   let existingTagIds = new Set();
-
-  // שליפת תגיות קיימות למתכון
   const existingTagsRows = await genericService.genericGet('recipeTags', 'recipeId', recipeId);
   if (existingTagsRows && existingTagsRows.length > 0) {
     existingTagIds = new Set(existingTagsRows.map(row => row.tagId));
   }
-
-  // שמירה של כל התגיות החדשות שנקבל
   const newTagIds = new Set();
-
   for (let tagName of tags) {
     tagName = tagName.trim();
     if (!tagName) continue;
-
     let tag = (await genericService.genericGet('tags', 'name', tagName))?.[0];
-
     if (!tag) {
       tag = await genericService.genericPost('tags', { name: tagName }, 'tagId');
     }
-
     newTagIds.add(tag.tagId);
-
-    // אם התגית לא מקושרת – צור קישור
     if (!existingTagIds.has(tag.tagId)) {
       await genericService.genericPost('recipeTags', {
         recipeId: recipeId,
@@ -428,8 +385,6 @@ async function syncRecipeTags(recipeId, tags) {
       }, 'recipeId');
     }
   }
-
-  // מחיקת תגיות שכבר לא קיימות
   for (const oldTagId of existingTagIds) {
     if (!newTagIds.has(oldTagId)) {
       await recipeService.deleteRecipeTag(recipeId, oldTagId);

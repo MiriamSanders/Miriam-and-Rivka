@@ -1,10 +1,10 @@
 const genericService = require('../services/genericService');
-exports.getAllTags = async (req, res) => {
+exports.getAllTags = async () => {
   try {
     const tags = await genericService.genericGetAll('tags');
-    res.json(tags);
+    return tags;
   } catch (error) {
     console.error('Error fetching tags:', error);
-    res.status(500).json({ error: 'Something went wrong while fetching tags' });
+    throw new Error('Something went wrong while fetching tags');
   }
-}
+};

@@ -3,11 +3,9 @@ const loginService = require('../services/loginService');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-exports.registerUser = async (req, res) => {
-    const { userName, email, password } = req.body;
-
+exports.registerUser = async (userName, email, password) => {
     if (!userName || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+        throw new Error('Username and password are required');
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -15,7 +13,7 @@ exports.registerUser = async (req, res) => {
 
         const newUser = await genericService.genericPost('users', userData);
         if (!newUser) {
-            return res.status(400).json({ error: 'User registration failed' });
+            throw new Error('User registration failed');
         }
         // Store the hashed password in the database
         await genericService.genericPost('passwords', { userId: newUser.userId, passwordHash: hashedPassword });
@@ -29,38 +27,35 @@ exports.registerUser = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-
-        // שלח אותו בקוקי
-        res.cookie("authToken", token, {
-            httpOnly: true,
-            secure: false, // true בפרודקשן
-            sameSite: "Lax",
-            maxAge: 1000 * 60 * 60
-        });
-        res.status(201).json({ id: newUser.userId, userName: newUser.userName, userType: userType.roleName });
+        return {
+            token,
+            user: {
+                id: newUser.userId,
+                userName: newUser.userName,
+                userType: userType.roleName
+            }
+        };
     } catch (error) {
-        console.error('Error registering user:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        throw new Error('Internal server error');
     }
 }
 
-exports.loginUser = async (req, res) => {
-    const { userName, password } = req.body;
+exports.loginUser = async (userName, password) => {
 
     if (!userName || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+        throw new Error('Username and password are required');
     }
 
     try {
         const user = await loginService.getUserWithPasswordByUserName(userName);
 
         if (!user) {
-            return res.status(400).json({ error: 'Invalid username or password' });
+            throw new Error('Invalid username or password');
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
-            return res.status(400).json({ error: 'Invalid username or password' });
+            throw new Error('Invalid username or password');
         }
         console.log(user);
         const token = jwt.sign(
@@ -69,22 +64,15 @@ exports.loginUser = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.cookie("authToken", token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: "Lax",
-            maxAge: 1000 * 60 * 60 // שעה
-        });
-        res.status(200).json({ id: user.userId, userName: user.userName, userType: user.roleName });
-
-
+        return {
+            token,
+            user: {
+                id: user.userId,
+                userName: user.userName,
+                userType: user.roleName
+            }
+        };
     } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        throw new Error('Internal server error');
     }
 };
-
-exports.logoutUser = (req, res) => {
-    // Invalidate the token on the client side
-    res.json({ message: 'Logged out successfully' });
-}

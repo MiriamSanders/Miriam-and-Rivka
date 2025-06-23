@@ -1,13 +1,17 @@
 export async function getRequest(currentUrl) {
   try {
-    const response = await fetch(`http://localhost:3001/${currentUrl}`);
+    const response = await fetch(`http://localhost:3001/${currentUrl}`,{ credentials: 'include',});
     if (!response.ok) {
       throw new Error(response.status);
     }
     const data = await response.json();
     return { succeeded: true, data };
-  } catch (status) {
-    return { succeeded: false ,status:status };
+  } catch (error) {
+    let status = error;
+    if (error instanceof Error && !isNaN(Number(error.message))) {
+      status = Number(error.message);
+    }
+    return { succeeded: false, status: status };
   }
 }
 export async function deleteRequest(currentUrl) {
@@ -23,7 +27,11 @@ export async function deleteRequest(currentUrl) {
     }
     const data = await response.json();
     return { succeeded: true};
-  } catch (status) {
+  } catch (error) {
+    let status = error;
+    if (error instanceof Error && !isNaN(Number(error.message))) {
+      status = Number(error.message);
+    }
     return { succeeded: false ,status:status };
   }
 }
@@ -43,8 +51,12 @@ export async function postRequest(currentUrl, data) {
     }
     const responseData = await response.json();
     return { succeeded: true, data: responseData };
-  } catch (status) {
-    return { succeeded: false, status:status };
+  } catch (error) {
+    let status = error;
+    if (error instanceof Error && !isNaN(Number(error.message))) {
+      status = Number(error.message);
+    }
+    return { succeeded: false, status: status };
   }
 }
 export async function putRequest(currentUrl, data) {

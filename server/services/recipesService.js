@@ -60,7 +60,11 @@ async function getAllRecipes(limit, offset = 0) {
       LIMIT ${limit}
       OFFSET ${offset}`;
     const [rows] = await db.execute(query);
-    return rows;
+    const recipes = rows.map(row => ({
+      ...row,
+      tags: row.tags ? row.tags.split(',') : []
+    }));
+    return recipes;
   } catch (error) {
     console.error('getAllRecipes - DB error:', error);
     throw error;
@@ -145,7 +149,7 @@ async function getRecipesAdvanced(options = {}) {
       description: r.description,
       dishType: r.dishType,
       userName: r.userName,
-      userId: r.userId,
+      chefId: r.userId,
       tags: r.tags ? r.tags.split(',').map(t => t.trim()) : []
     }));
   } catch (error) {

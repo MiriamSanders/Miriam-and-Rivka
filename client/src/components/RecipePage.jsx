@@ -113,7 +113,7 @@ const RecipePage = () => {
 
   const ingredients = recipeData.ingredients || [];
   const tags = editMode ? editedRecipe.tags || [] : recipeData.tags || [];
-  const isEditable = currentUser?.userType === "admin" || currentUser?.Id === recipeData.recipe.chefID;
+  const isEditable = currentUser?.userType === "admin" || currentUser?.id === recipeData.recipe.chefID;
 
   return (
     <div className="recipe-container">

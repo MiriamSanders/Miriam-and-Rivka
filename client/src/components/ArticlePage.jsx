@@ -42,7 +42,7 @@ function ArticlePage() {
   const formattedDate = new Date(createdAt).toLocaleDateString();
   const canEditOrDelete =
     currentUser &&
-    (currentUser.userType === "admin" || currentUser.userId === authorId);
+    (currentUser.userType === "admin" || currentUser.id === authorId);
 
   const handleSave = async () => {
     const updatedArticle = {

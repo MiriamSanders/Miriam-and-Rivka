@@ -4,39 +4,31 @@ const chefService = require('../services/chefService');
 const genericService = require('../services/genericService');
 const mailManager = require('../middleware/aproveChef');
 
-
-
-exports.getAllChefs = async (req, res) => {
+exports.getAllChefs = async () => {
     const result = await chefService.getAllChefs();
     if (result) {
-        res.status(200).json(result);
+        return result;
     } else {
-        res.status(500).json({ error: 'Failed to retrieve chefs' });
+        throw new Error('Failed to retrieve chefs');
     }
 }
-exports.getChef = async (req, res) => {
-   const chefId = req.params.chefId;
+exports.getChef = async (chefId) => {
     const result = await chefService.getChef(chefId);
     if (result) {
-        res.status(200).json(result);
+        return result;
     } else {
-        res.status(500).json({ error: 'Failed to retrieve chefs' });
+        throw new Error('Failed to retrieve chef');
     }
 }
-
-exports.joinReq = async (req, res) => {
-    const { chefId, imageURL, education, experienceYears, style, additionalInfo } = req.body;
-    console.log(req.body);
-
-    if (!chefId || !education || !experienceYears || !style) {
-        return res.status(400).json({ error: 'Please fill in all required fields' });
-    }
-
-    if (isNaN(experienceYears) || experienceYears < 0) {
-        return res.status(400).json({ error: 'Please enter a valid number of experience years' });
-    }
-
+exports.joinReq = async (chefId, imageURL, education, experienceYears, style, additionalInfo) => {
     try {
+        if (!chefId || !education || !experienceYears || !style) {
+            throw new Error("All fields are required: chefId, education, experienceYears, style");
+        }
+
+        if (isNaN(experienceYears) || experienceYears < 0) {
+            throw new Error('Please enter a valid number of experience years');
+        }
         const userData = await genericService.genericGetByColumnName('users', chefId, 'userId');
         const guid = uuidv4();
         mailManager.joinReq({
@@ -49,7 +41,6 @@ exports.joinReq = async (req, res) => {
             style,
             additionalInfo
         });
-
         const data = {
             guid,
             chef_id: chefId,
@@ -61,20 +52,17 @@ exports.joinReq = async (req, res) => {
             style: style || null
         };
         const result = await genericService.genericPost("pendingChefRequests", data, "chef_id");
-        res.status(200).json({ message: 'Your chef application has been submitted successfully!' });
+        return result;
     } catch (error) {
-        console.error('Error submitting application:', error);
-        res.status(500).json({ error: 'There was an error submitting your application. Please try again.' });
+        throw new Error('There was an error submitting your application. Please try again.');
     }
 }
-exports.approveReq = async (req, res) => {
-    const guid = req.params.guid;
+exports.approveReq = async (guid) => {
     try {
         const request = await genericService.genericGetByColumnName('pendingChefRequests', guid, 'guid');
         if (!request) {
-            return res.status(404).json({ error: 'Request not found' });
+            throw new Error('Request not found');
         }
-
         const chefData = {
             chefId: request.chef_id,
             imageURL: request.imageURL,
@@ -82,7 +70,6 @@ exports.approveReq = async (req, res) => {
             experienceYears: request.experience_years,
             style: request.style
         };
-
         const newChef = await chefService.addChef(chefData);
         if (newChef) {
             mailManager.approveReq({
@@ -90,10 +77,7 @@ exports.approveReq = async (req, res) => {
                 email: request.email
             });
             await genericService.genericDelete('pendingChefRequests', guid, 'guid');
-            // In your routes
-
-
-            res.send(`
+            return (`
     <html>
       <head><title>Chef Approved</title></head>
       <body style="font-family: Arial; text-align: center; padding: 50px;">
@@ -108,20 +92,19 @@ exports.approveReq = async (req, res) => {
     </html>
   `);
         } else {
-            res.status(500).json({ error: 'Failed to approve chef' });
+            throw new Error('Failed to approve chef');
         }
     } catch (error) {
-        console.error('Error approving chef:', error);
-        res.status(500).json({ error: 'There was an error approving the chef. Please try again.' });
+        throw new Error('There was an error approving the chef. Please try again.');
     }
 }
-exports.rejectReq = async (req, res) => {
-    const guid = req.params.guid;
+exports.rejectReq = async (guid) => {
     try {
         const request = await genericService.genericGetByColumnName('pendingChefRequests', guid, 'guid');
         if (!request) {
-            return res.status(404).json({ error: 'Request not found' });
+            throw new Error('Request not found');
         }
+
 
         mailManager.rejectReq({
             name: request.name,
@@ -130,7 +113,7 @@ exports.rejectReq = async (req, res) => {
         });
 
         await genericService.genericDelete('pendingChefRequests', guid, 'guid');
-        res.send(`
+        return (`
     <html>
       <head><title>Chef Rejected</title></head>
       <body style="font-family: Arial; text-align: center; padding: 50px;">
@@ -145,15 +128,14 @@ exports.rejectReq = async (req, res) => {
     </html>
   `);
     } catch (error) {
-        console.error('Error rejecting chef request:', error);
-        res.status(500).json({ error: 'There was an error rejecting the chef request. Please try again.' });
+        throw new Error('There was an error rejecting the chef request. Please try again.');
     }
 }
-exports.getFeaturedChefs=async(req,res)=>{
+exports.getFeaturedChefs = async () => {
     const result = await chefService.getFeaturedChefs();
     if (result) {
-        res.status(200).json(result);
+        return result;
     } else {
-        res.status(500).json({ error: 'Failed to retrieve chefs' });
-    } 
+        throw new Error('Failed to retrieve chefs');
+    }
 }
