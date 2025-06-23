@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Users, Star, Heart, ChefHat, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { getRequest } from '../Requests.js';
 import Footer from './Footer';
 import '../styles/HomePage.css';
