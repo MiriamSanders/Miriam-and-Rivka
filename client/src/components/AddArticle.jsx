@@ -1,7 +1,7 @@
 // AddArticle.jsx
 import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
-import { postRequest } from '../Requests.js'
+import { postRequest } from '../js_files/Requests.js'
 import * as mammoth from 'mammoth';
 import ArticleFormatGuide from './ArticleFormatGuide.jsx';
 

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { deleteRequest, getRequest, postRequest } from '../Requests';
+import { deleteRequest, getRequest, postRequest } from '../js_files/Requests';
 import { Search, Filter, ChevronDown, X, Trash2, Plus, Sparkles } from 'lucide-react';
 import { useErrorMessage } from "./useErrorMessage";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -100,9 +100,9 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
           createdAt: new Date().toISOString()
         });
       });
-
+     setCreateMenu(false);
       setMenus(formattedMenu);
-      //setCreateMenu(false);
+      
       console.log("Formatted menu:", formattedMenu);
 
       // Navigate back to menu page
@@ -170,7 +170,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
     if (searchParams.sort) {
       const sortOption = sortOptions.find(option => option.value === searchParams.sort);
       if (sortOption && sortOption.sortBy) {
-        queryParts.push(`sortBy=${sortOption.sortBy}`);
+        queryParts.push(`sort=${sortOption.sortBy}`);
         queryParts.push(`sortOrder=${sortOption.sortOrder}`);
       }
     }
@@ -550,9 +550,9 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
               <div className="recipe-image" style={{ backgroundImage: `url(${recipe.imageURL})` }}>
                 {createMenu && (
                   <button className="add-to-menu-button" onClick={(e) => {
-                    e.stopPropagation(); addRecipeToMenu(recipe.recipeId, recipe.dishType);setAddedRecipes(prev => new Set(prev).add(recipe.recipeId));
+                    e.stopPropagation(); addRecipeToMenu(recipe.recipeId, recipe.dishType); setAddedRecipes(prev => new Set(prev).add(recipe.recipeId));
                   }}>
-                     {addedRecipes.has(recipe.recipeId) ? '✔ Added to Menu' : 'Add to Menu'}
+                    {addedRecipes.has(recipe.recipeId) ? '✔ Added to Menu' : 'Add to Menu'}
                   </button>
                 )}
                 {(isAdmin || (currentUser && currentUser.id === recipe.chefId)) &&

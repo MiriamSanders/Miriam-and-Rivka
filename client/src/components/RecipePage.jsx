@@ -5,7 +5,7 @@ import RecipeReader from "./RecipeReader";
 import { useErrorMessage } from "./useErrorMessage";
 import RecipeDiscussion from "./RecipeDiscussion";
 import "../styles/RecipePage.css";
-import { getRequest, putRequest } from "../Requests";
+import { getRequest, putRequest } from "../js_files/Requests";
 import { Edit, Printer } from "lucide-react";
 
 const RecipePage = () => {

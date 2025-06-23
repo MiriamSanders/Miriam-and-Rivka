@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Signup.css"; // Assuming you have a CSS file for styling
-import { postRequest } from "../Requests";
+import { postRequest } from "../js_files/Requests";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { useErrorMessage } from "./useErrorMessage";
 function Signup({ setUserType }) {
@@ -20,8 +20,7 @@ function Signup({ setUserType }) {
         e.preventDefault();
         const requestResult = await postRequest("auth/register", form);
         if (requestResult.succeeded) {
-            alert("Account created successfully!");
-             setUserType(requestResult.data.userType);
+              setUserType(requestResult.data.userType);
              localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
             // Assuming the user type is "user" after signup
             navigate("/"); // Redirect to login page after successful signup

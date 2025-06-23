@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu } from 'lucide-react';
-import { getRequest } from '../Requests.js';
+import { getRequest } from '../js_files/Requests.js';
 import Footer from './Footer';
 import '../styles/HomePage.css';
 

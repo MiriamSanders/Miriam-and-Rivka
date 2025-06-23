@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { getRequest, postRequest } from '../Requests';
+import { getRequest, postRequest } from '../js_files/Requests';
 import { useErrorMessage } from "./useErrorMessage";
 import '../styles/ChefCommentsDashboard.css';
 

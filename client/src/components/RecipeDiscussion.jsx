@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "../styles/RecipeDiscussion.css"; // Assuming you have a CSS file for styling
-import { deleteRequest, getRequest, postRequest } from "../Requests";
+import { deleteRequest, getRequest, postRequest } from "../js_files/Requests";
 import { useErrorMessage } from "./useErrorMessage";
 import { Trash2 } from "lucide-react";
 const RecipeDiscussion = ({ recipeId }) => {

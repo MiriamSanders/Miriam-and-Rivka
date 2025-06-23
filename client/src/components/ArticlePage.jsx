@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../styles/ArticlePage.css';
 import ArticleDiscussion from './ArticleDiscussion';
 import { useErrorMessage } from "./useErrorMessage";
-import { getRequest, putRequest } from '../Requests';
+import { getRequest, putRequest } from '../js_files/Requests';
 import { Edit, X } from 'lucide-react';
 
 function ArticlePage() {

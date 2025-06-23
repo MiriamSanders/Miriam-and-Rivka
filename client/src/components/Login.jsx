@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Signup.css"; // Reusing the same CSS as Signup
-import { postRequest } from "../Requests";
+import { postRequest } from "../js_files/Requests";
 import { useErrorMessage } from "./useErrorMessage";
 function Login({ setUserType }) {
       const [errorCode, setErrorCode] = useState(undefined);
@@ -21,8 +21,7 @@ function Login({ setUserType }) {
         const requestResult = await postRequest("auth/login", form);
         
         if (requestResult.succeeded) {
-            alert("login successfull!");
-            console.log("Login successful:", requestResult.data);
+                       console.log("Login successful:", requestResult.data);
             setUserType(requestResult.data.userType);// Assuming the user type is "user" after login
             localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
             navigate("/");

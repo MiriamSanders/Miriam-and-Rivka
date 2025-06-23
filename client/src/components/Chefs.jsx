@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getRequest } from '../Requests';
+import { getRequest } from '../js_files/Requests';
 import { useErrorMessage } from "./useErrorMessage";
 import '../styles/Chefs.css';
 import { useNavigate } from 'react-router-dom';

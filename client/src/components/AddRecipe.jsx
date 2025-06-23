@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { parseRecipeDocument, readRecipeFile } from '../RecipeParser';
-import { Upload, Plus, Minus, Clock, Star, Tag, Image } from 'lucide-react';
-import { postRequest } from "../Requests";
+import { parseRecipeDocument, readRecipeFile } from '../js_files/RecipeParser';
+import { Upload, Plus, Minus, Clock, Star,  Image } from 'lucide-react';
+import { postRequest } from "../js_files/Requests";
 import RecipeFormatGuide from './RecipeFormatGuide';
 import '../styles/AddRecipe.css'
 

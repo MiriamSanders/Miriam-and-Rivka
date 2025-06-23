@@ -49,7 +49,7 @@ function App() {
         <Route path="signup" element={<Signup setUserType={setUserType} />} />
 
         {/* Recipes */}
-        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu} setMenus={setMenus}/>} />
+        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu} setMenus={setMenus} setCreateMenu={setCreateMenu}/>} />
         <Route path="chefs/:id/recipes`" element={<Recipes />} />
         <Route path="recipes/:id" element={<RecipePage />} />
 

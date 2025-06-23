@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useErrorMessage } from "./useErrorMessage";
-import { deleteRequest, postRequest, getRequest } from "../Requests"; // הוספתי גם getRequest שהיה חסר
+import { deleteRequest, postRequest, getRequest } from "../js_files/Requests"; // הוספתי גם getRequest שהיה חסר
 import { Trash2 } from "lucide-react";
 
 const ArticleDiscussion = ({ articleId }) => {

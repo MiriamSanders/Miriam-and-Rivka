@@ -2,7 +2,7 @@
 import React, { useState,useEffect } from 'react';
 import { Plus, Calendar, Clock, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getRequest } from '../Requests';
+import { getRequest } from '../js_files/Requests';
 import '../styles/MenuManager.css'; // Import your CSS styles
 
 

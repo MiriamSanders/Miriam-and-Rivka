@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {postRequest} from "../Requests";
+import { postRequest } from "../js_files/Requests";
 import "../styles/Footer.css";
 
 export default function Footer() {
@@ -23,9 +23,9 @@ export default function Footer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate required fields
-    if ( !formData.education || !formData.experienceYears || !formData.style) {
+    if (!formData.education || !formData.experienceYears || !formData.style) {
       alert('Please fill in all required fields');
       return;
     }
@@ -37,11 +37,11 @@ export default function Footer() {
     }
 
     try {
-      const submitData = {chefId:JSON.parse(localStorage.getItem("currentUser")).id, ...formData};
+      const submitData = { chefId: JSON.parse(localStorage.getItem("currentUser")).id, ...formData };
       await postRequest('chef-application', submitData);
       // Here you would make your API call to submit the chef application
       console.log('Chef application submitted:', formData);
-      
+
       // Reset form after successful submission
       setFormData({
         imageURL: '',
@@ -50,7 +50,7 @@ export default function Footer() {
         style: '',
         additionalInfo: ''
       });
-      
+
       alert('Your chef application has been submitted successfully!');
     } catch (error) {
       console.error('Error submitting chef application:', error);
@@ -67,7 +67,7 @@ export default function Footer() {
             Share your culinary expertise with our community
           </p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="footer-form">
 
 
@@ -132,7 +132,7 @@ export default function Footer() {
             * Required fields. We'll review your application and get back to you within 3-5 business days.
           </p>
         </div>
-        
+
         <p className="footer-copyright">&copy; 2025 All rights reserved.</p>
       </div>
     </footer>

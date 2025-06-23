@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { CookingPot, Newspaper } from "lucide-react";
 import { useErrorMessage } from "./useErrorMessage";
 import "../styles/ChefPage.css";
-import { getRequest } from "../Requests";
+import { getRequest } from "../js_files/Requests";
 
 function ChefPage() {
   const { id } = useParams();

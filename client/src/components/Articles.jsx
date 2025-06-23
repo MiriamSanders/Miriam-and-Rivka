@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { deleteRequest, getRequest } from '../Requests';
+import { deleteRequest, getRequest } from '../js_files/Requests';
 import '../styles/Articles.css';
 import { useErrorMessage } from "./useErrorMessage";
 import { Trash2 } from 'lucide-react';

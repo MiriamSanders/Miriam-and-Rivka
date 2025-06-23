@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from "react";
 import "../styles/RatingCard.css"; // Assuming you have a CSS file for styling
-import { getRequest, postRequest } from "../Requests";
+import { getRequest, postRequest } from "../js_files/Requests";
 import { useErrorMessage } from "./useErrorMessage";
 const RatingCard = ({ recipeId }) => {
     const [errorCode, setErrorCode] = useState(undefined);
