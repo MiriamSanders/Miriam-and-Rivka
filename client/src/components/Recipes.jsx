@@ -166,7 +166,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
       queryParts.push(`anyTags=${searchParams.tags.join(',')}`);
     }
 
-    // Convert sort option to separate sortBy and sortOrder parameters
+   
     if (searchParams.sort) {
       const sortOption = sortOptions.find(option => option.value === searchParams.sort);
       if (sortOption && sortOption.sortBy) {
