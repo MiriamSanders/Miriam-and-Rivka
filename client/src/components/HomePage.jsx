@@ -19,7 +19,7 @@ const HomePage = ({ userType }) => {
   // Replace these useEffect hooks with your actual API calls
   useEffect(() => {
     const fetchPopularRecipes = async () => {
-      const response = await getRequest('recipes?best-rated=1');
+      const response = await getRequest('recipes?sort=rating&limit=4');
       if (response.succeeded) {
         setPopularRecipes(response.data);
       } else {

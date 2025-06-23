@@ -45,31 +45,7 @@ async function getRecipeById(recipeId) {
   }
 }
 
-async function getAllRecipes(limit, offset = 0) {
-  try {
-    const db = await dbPromise;
-    const query = `
-      SELECT r.recipeId, r.title, r.imageURL, r.category, r.description, r.chefId,
-             r.dishType, u.userName,
-             GROUP_CONCAT(t.name) AS tags
-      FROM recipes r
-      JOIN users u ON r.chefId = u.userId
-      LEFT JOIN recipetags p ON r.recipeId = p.recipeId
-      LEFT JOIN tags t       ON p.tagId    = t.tagId
-      GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description, u.userName
-      LIMIT ${limit}
-      OFFSET ${offset}`;
-    const [rows] = await db.execute(query);
-    const recipes = rows.map(row => ({
-      ...row,
-      tags: row.tags ? row.tags.split(',') : []
-    }));
-    return recipes;
-  } catch (error) {
-    console.error('getAllRecipes - DB error:', error);
-    throw error;
-  }
-}
+
 
 async function getRecipesAdvanced(options = {}) {
   const {
@@ -385,8 +361,7 @@ async function createDifficulty(name) {
 
 module.exports = {
   getRecipeById,
-  getAllRecipes,
-  getBestRatedRecipes,
+   getBestRatedRecipes,
   getRecipesByChefId,
   deleteRecipe,
   putRecipe,

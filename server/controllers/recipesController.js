@@ -7,11 +7,8 @@ exports.getAllRecipes = async (options) => {
     const page = parseInt(options.page) || 1;
     const offset = (page - 1) * limit;
 
-    const hasFilters = options.category || options.chefName || options.title || options.userId || options.tags.length > 0 || options.anyTags.length > 0;
-    if (!hasFilters) {
-      return await recipeService.getAllRecipes(limit, offset);
-    }
-    const recipes = await recipeService.getRecipesAdvanced(options);
+    const hasFilters = options.category || options.chefName || options.title || options.dishType || options.userId || options.tags.length > 0 || options.anyTags.length > 0;
+       const recipes = await recipeService.getRecipesAdvanced(options);
 
     console.log('Recipes fetched:', recipes);
     return recipes;

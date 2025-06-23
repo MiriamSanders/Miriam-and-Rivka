@@ -4,25 +4,20 @@ const controller = require('../controllers/recipesController');
 
 router.get('/', async (req, res) => {
   try {
-    const bestRated = parseInt(req.query.bestRated) || 0;
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 1;
-
-    if (bestRated) {
-      const bestRatedRecipes = await controller.getBestRatedRecipes();
-      return res.json(bestRatedRecipes);
-    }
 
     const filterOptions = {
       limit,
       page,
       category: req.query.category,
       chefName: req.query.chefName,
+      dishType: req.query.dishType,
       title: req.query.title,
       userId: req.query.userId,
       tags: req.query.tags ? req.query.tags.split(',') : [],
       anyTags: req.query.anyTags ? req.query.anyTags.split(',') : [],
-      sortBy: req.query.sortBy || 'recipeId',
+      sortBy: req.query.sort || 'recipeId',
       sortOrder: req.query.sortOrder || 'DESC'
     };
 
