@@ -1,29 +1,23 @@
 const ratingsService =require( "../services/ratingsService");
-exports.postRatings = async (req, res) => {
-  const { userId, recipeId, rating } = req.body;
-
+exports.postRatings = async (userId, recipeId, rating ) => {
   if (!recipeId || !rating) {
-    return res.status(400).json({ error: 'Recipe ID and rating are required' });
+    throw new Error('Recipe ID and rating are required');
   }
-
   try {
     await ratingsService.postRatings(recipeId, rating,userId);
-    res.status(201).json({ message: 'Rating added successfully' });
+    return { message: 'Rating added successfully' };
   } catch (error) {
-    console.error('Error adding rating:', error);
-    res.status(500).json({ error: 'Something went wrong' });
+    throw new Error('Something went wrong');
   }
 }
-exports.getRatings = async (req, res) => {
-      const { recipeId } = req.params;
+exports.getRatings = async (recipeId) => {
     if (!recipeId) {
-        return res.status(400).json({ error: "Recipe ID is required" });
+        throw new Error("Recipe ID is required");
     }
     try {
         const rating = await ratingsService.getRatings(recipeId);
-        res.json({ averageRating: rating });
+        return { averageRating: rating };
     } catch (error) {
-        console.error("Error fetching ratings:", error);
-        res.status(500).json({ error: "Something went wrong while fetching ratings" });
+        throw new Error("Something went wrong while fetching ratings");
     }
 }

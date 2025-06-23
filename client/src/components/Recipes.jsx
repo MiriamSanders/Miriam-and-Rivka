@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { deleteRequest, getRequest, postRequest } from '../Requests';
 import { Search, Filter, ChevronDown, X, Trash2, Plus, Sparkles } from 'lucide-react';
@@ -554,7 +555,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
                      {addedRecipes.has(recipe.recipeId) ? '✔ Added to Menu' : 'Add to Menu'}
                   </button>
                 )}
-                {(isAdmin || (currentUser && currentUser.userId === recipe.userId)) &&
+                {(isAdmin || (currentUser && currentUser.id === recipe.chefId)) &&
                   <button
                     onClick={(e) => handleDeleteRecipe(e, recipe.recipeId)}
                     style={{ background: "transparent" }}

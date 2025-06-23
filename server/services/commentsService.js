@@ -1,10 +1,10 @@
 const mysql = require('mysql2/promise');
-const dbPromise = require("./dbConnection"); 
+const dbPromise = require("./dbConnection");
 async function getRecipeComments(recipeId, limit, offset) {
   try {
     const db = await dbPromise;
 
-  const query = `
+    const query = `
   SELECT 
     c.commentId,
     u.userName,
@@ -20,7 +20,7 @@ async function getRecipeComments(recipeId, limit, offset) {
   OFFSET ${offset}
 `;
 
-const [rows] = await db.execute(query, [recipeId]);
+    const [rows] = await db.execute(query, [recipeId]);
 
     return rows;
 
@@ -33,7 +33,7 @@ async function getArticleComments(articleId, limit, offset) {
   try {
     const db = await dbPromise;
 
- const query = `
+    const query = `
   SELECT 
     c.commentId,
     u.userName,
@@ -57,78 +57,54 @@ async function getArticleComments(articleId, limit, offset) {
     throw error;
   }
 }
-async function postRecipeComments(recipeId, userId, commentText) {
-    try {
-        const db = await dbPromise;
+// async function postRecipeComments(recipeId, userId, commentText) {
+//   try {
+//     const db = await dbPromise;
 
-        const insertQuery = `
-            INSERT INTO recipecomments (recipeID, userId, commentText)
-            VALUES (?, ?, ?)
-        `;
-        const [insertResult] = await db.execute(insertQuery, [recipeId, userId, commentText]);
+//     const insertQuery = `
+//             INSERT INTO recipecomments (recipeID, userId, commentText)
+//             VALUES (?, ?, ?)
+//         `;
+//     const [insertResult] = await db.execute(insertQuery, [recipeId, userId, commentText]);
 
-        const insertedId = insertResult.insertId;
+//     const insertedId = insertResult.insertId;
 
-        if (!insertedId) {
-            throw new Error('Comment insertion failed.');
-        }
+//     if (!insertedId) {
+//       throw new Error('Comment insertion failed.');
+//     }
 
 
-        return insertedId;
-    } catch (error) {
-        console.error('Comment insertion failed.', error);
-        throw error;
-    }
-}
-async function postArticleComments(articleId, userId, commentText) {
-    try {
-        const db = await dbPromise;
+//     return insertedId;
+//   } catch (error) {
+//     console.error('Comment insertion failed.', error);
+//     throw error;
+//   }
+// }
+// async function postArticleComments(articleId, userId, commentText) {
+//   try {
+//     const db = await dbPromise;
 
-        const insertQuery = `
-            INSERT INTO articlecomments (articleId, userId, commentText)
-            VALUES (?, ?, ?)
-        `;
-        const [insertResult] = await db.execute(insertQuery, [articleId, userId, commentText]);
+//     const insertQuery = `
+//             INSERT INTO articlecomments (articleId, userId, commentText)
+//             VALUES (?, ?, ?)
+//         `;
+//     const [insertResult] = await db.execute(insertQuery, [articleId, userId, commentText]);
 
-        const insertedId = insertResult.insertId;
+//     const insertedId = insertResult.insertId;
 
-        if (!insertedId) {
-            throw new Error('Comment insertion failed.');
-        }
-        return insertedId;
-    } catch (error) {
-        console.error('Comment insertion failed.', error);
-        throw error;
-    }
-}
-async function deleteRecipeComment(commentId) {
-   try{
-  const db = await dbPromise;
-    const query = `DELETE FROM recipecomments WHERE commentId = ?`;
-
-    const [result] = await db.execute(query, [commentId]);
-    return result.affectedRows > 0;
-  } catch (err) {
-    console.error("Error deleting recipe comment:", err);
-    return false;
-  }
-}
-async function deleteArticleComment(commentId) {
-try{
-   const db = await dbPromise;
-    const query = `DELETE FROM articlecomments WHERE commentId = ?`;
- 
-    const [result] = await db.execute(query, [commentId]);
-    return result.affectedRows > 0;
-  } catch (err) {
-    console.error("Error deleting article comment:", err);
-    return false;
-  }
-}
+//     if (!insertedId) {
+//       throw new Error('Comment insertion failed.');
+//     }
+//     return insertedId;
+//   } catch (error) {
+//     console.error('Comment insertion failed.', error);
+//     throw error;
+//   }
+// }
 async function getAllChefRecipeComments(chefId, limit, offset) {
   try {
     const db = await dbPromise;
-      const query = `
+    const query = `
       SELECT 
         c.commentId,
         c.recipeId,
@@ -188,7 +164,7 @@ async function getAllChefArticleComments(chefId, limit, offset) {
     throw error;
   }
 }
-async function postChefRecipeComment(userId, recipeId, commentText,parentCommentId) {
+async function postRecipeComment(userId, recipeId, commentText, parentCommentId) {
   try {
     const db = await dbPromise;
 
@@ -196,7 +172,7 @@ async function postChefRecipeComment(userId, recipeId, commentText,parentComment
       INSERT INTO recipecomments (recipeId, userId, commentText,parentCommentId)
       VALUES (?, ?, ?,?)
     `;
-    const [insertResult] = await db.execute(insertQuery, [recipeId, userId, commentText,parentCommentId]);
+    const [insertResult] = await db.execute(insertQuery, [recipeId, userId, commentText, parentCommentId]);
 
     const insertedId = insertResult.insertId;
 
@@ -210,7 +186,7 @@ async function postChefRecipeComment(userId, recipeId, commentText,parentComment
     throw error;
   }
 }
-async function postChefArticleComment(userId, articleId, commentText,parentCommentId) {
+async function postArticleComment(userId, articleId, commentText, parentCommentId) {
   try {
     const db = await dbPromise;
 
@@ -218,7 +194,7 @@ async function postChefArticleComment(userId, articleId, commentText,parentComme
       INSERT INTO articlecomments (articleId, userId, commentText,parentCommentId)
       VALUES (?, ?, ?,?)
     `;
-    const [insertResult] = await db.execute(insertQuery, [articleId, userId, commentText,parentCommentId]);
+    const [insertResult] = await db.execute(insertQuery, [articleId, userId, commentText, parentCommentId]);
 
     const insertedId = insertResult.insertId;
 
@@ -233,14 +209,10 @@ async function postChefArticleComment(userId, articleId, commentText,parentComme
   }
 }
 module.exports = {
- getRecipeComments,
- getArticleComments,
- postRecipeComments,
- postArticleComments,
- deleteRecipeComment,
- deleteArticleComment,
- getAllChefRecipeComments,
- postChefRecipeComment,
- getAllChefArticleComments,
-  postChefArticleComment
+  getRecipeComments,
+  getArticleComments,
+  postArticleComment,
+  postRecipeComment,
+  getAllChefArticleComments,
+  getAllChefRecipeComments
 };

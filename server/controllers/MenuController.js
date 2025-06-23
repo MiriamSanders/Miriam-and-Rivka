@@ -1,8 +1,7 @@
 const {pairMealsForWeek}= require('./menuPlaner');
 const mealPlanService= require('../services/mealPlanService')
-exports.createMealPlan = async (req, res) => {
+exports.createMealPlan = async (userId,sideIds,mainIds, dessertIds) => {
   try {
-  const {userId,sideIds,mainIds, dessertIds} = req.body;
 const sidesArray = typeof sideIds === 'string' ? sideIds.split(',').map(id => id.trim()) : Array.isArray(sideIds) ? sideIds : [];
 const mainsArray = typeof mainIds === 'string' ? mainIds.split(',').map(id => id.trim()) : Array.isArray(mainIds) ? mainIds : [];
 const dessertsArray = typeof dessertIds === 'string' ? dessertIds.split(',').map(id => id.trim()) : Array.isArray(dessertIds) ? dessertIds : [];
@@ -11,21 +10,18 @@ console.log('mainsArray:', mainsArray);
 console.log('dessertsArray:', dessertsArray);
 
 const menu = await pairMealsForWeek(sidesArray, mainsArray, dessertsArray,userId);
-    res.status(200).json({ menu });
+    return { menu };
 }
 catch (error) {
-    console.error('Error creating meal plan:', error);
-    res.status(500).json({ error: 'Something went wrong while creating the meal plan' });
+    throw new Error('Something went wrong while creating the meal plan');
   } 
 }
-exports.getMenusByUserId= async(req,res)=>{
-  const userId= req.params.id;
+exports.getMenusByUserId= async(userId)=>{
   try{
     const result =await mealPlanService.getMenuByUserId(userId);
-     res.status(200).json(result);
+    return result;
   }
   catch(error){
-    console.error(error);
-    res.status(500).json({error:"unable to fetch menus"});
+    throw new Error("unable to fetch menus");
   }
 }

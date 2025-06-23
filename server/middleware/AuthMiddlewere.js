@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 
 function AuthMiddlewere(req, res, next) {
     const token = req.cookies.authToken;
+console.log("Token:", token);
 
     if (!token) {
         req.user = null;
@@ -10,6 +11,7 @@ function AuthMiddlewere(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+console.log("Decoded:", decoded);
         req.user = decoded; // מוסיפה את המשתמש לבקשה
         next();
     } catch (err) {

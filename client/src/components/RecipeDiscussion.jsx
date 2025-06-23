@@ -20,7 +20,7 @@ const RecipeDiscussion = ({ recipeId }) => {
   const fetchComments = async (pageNum) => {
     if (loading) return;
     setLoading(true);
-    const requestResult = await getRequest(`recipecomments/${recipeId}?page=${page}&limit=5`);
+    const requestResult = await getRequest(`recipecomments?recipe=${recipeId}&page=${page}&limit=5`);
     if (requestResult.succeeded) {
       if (requestResult.data && requestResult.data.length > 0) {
         setComments((prev) => [...prev, ...requestResult.data]);
