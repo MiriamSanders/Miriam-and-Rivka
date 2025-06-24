@@ -45,5 +45,25 @@ router.post('/logout', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { userName } = req.body;
+        const result = await controller.forgotPasswordByUsername(userName);
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+router.post('/reset-password/:token', async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  try {
+    const result = await controller.resetPassword(token, password);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 module.exports = router;
 

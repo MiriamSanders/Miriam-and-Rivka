@@ -1,7 +1,9 @@
 // AddArticle.jsx
 import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
-import { postRequest } from '../js_files/Requests.js'
+import { postRequest } from '../js_files/Requests.js';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import * as mammoth from 'mammoth';
 import ArticleFormatGuide from './ArticleFormatGuide.jsx';
 
@@ -47,7 +49,7 @@ const AddArticle = () => {
         content: content.trim()
       }));
     } catch (error) {
-      alert('Error reading file: ' + error.message);
+     toast.error('Error reading file: ' + error.message);
     }
   };
 
@@ -89,6 +91,8 @@ const AddArticle = () => {
           Save Article
         </button>
       </div>
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnHover />
+
     </div>
   );
 };

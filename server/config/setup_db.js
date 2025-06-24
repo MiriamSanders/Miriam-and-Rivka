@@ -129,26 +129,7 @@ const createTables = async () => {
     name VARCHAR(50) UNIQUE NOT NULL
   )`,
 
-    // 13. Preferences (references users and tags)
-    `CREATE TABLE IF NOT EXISTS preferences (
-    preferenceId INT AUTO_INCREMENT PRIMARY KEY,
-    userId INT NOT NULL,
-    tagId INT NOT NULL,
-    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
-    FOREIGN KEY (tagId) REFERENCES tags(tagId) ON DELETE CASCADE
-  )`,
-
-    // 14. SavedRecipes (references users and recipes)
-    `CREATE TABLE IF NOT EXISTS savedrecipes (
-    userId INT NOT NULL,
-    recipeId INT NOT NULL,
-    savedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (userId, recipeId),
-    FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
-    FOREIGN KEY (recipeId) REFERENCES recipes(recipeId) ON DELETE CASCADE
-  )`,
-
-    // 15. RecipeRatings (references users and recipes)
+       // 15. RecipeRatings (references users and recipes)
     `CREATE TABLE IF NOT EXISTS recipeRatings (
     userId INT NOT NULL,
     recipeId INT NOT NULL,

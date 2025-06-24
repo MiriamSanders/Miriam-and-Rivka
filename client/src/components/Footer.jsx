@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { postRequest } from "../js_files/Requests";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "../styles/Footer.css";
 
 export default function Footer() {
@@ -26,13 +28,13 @@ export default function Footer() {
 
     // Validate required fields
     if (!formData.education || !formData.experienceYears || !formData.style) {
-      alert('Please fill in all required fields');
+      toast.warning('Please fill in all required fields');
       return;
     }
 
     // Validate experience years is a number
     if (isNaN(formData.experienceYears) || formData.experienceYears < 0) {
-      alert('Please enter a valid number of experience years');
+      toast.warning('Please enter a valid number of experience years');
       return;
     }
 
@@ -51,10 +53,10 @@ export default function Footer() {
         additionalInfo: ''
       });
 
-      alert('Your chef application has been submitted successfully!');
+      toast.success('Your chef application has been submitted successfully!');
     } catch (error) {
       console.error('Error submitting chef application:', error);
-      alert('There was an error submitting your application. Please try again.');
+      toast.error('There was an error submitting your application. Please try again.');
     }
   };
 
@@ -134,6 +136,8 @@ export default function Footer() {
         </div>
 
         <p className="footer-copyright">&copy; 2025 All rights reserved.</p>
+        <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnHover />
+
       </div>
     </footer>
   );

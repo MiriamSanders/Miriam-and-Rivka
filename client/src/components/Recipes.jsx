@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { deleteRequest, getRequest, postRequest } from '../js_files/Requests';
 import { Search, Filter, ChevronDown, X, Trash2, Plus, Sparkles } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useErrorMessage } from "./useErrorMessage";
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
@@ -69,7 +71,8 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
     const totalSelected = menu.sideIds.length + menu.mainIds.length + menu.dessertIds.length;
 
     if (totalSelected === 0) {
-      alert("Please select at least one recipe before creating your menu!");
+      toast.warning("Please select at least one recipe before creating your menu!");
+
       return;
     }
 
@@ -100,16 +103,17 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
           createdAt: new Date().toISOString()
         });
       });
-     setCreateMenu(false);
+      setCreateMenu(false);
       setMenus(formattedMenu);
-      
+
       console.log("Formatted menu:", formattedMenu);
 
       // Navigate back to menu page
       navigate('/personal-area/menus');
     } catch (error) {
       console.error("Error creating menu:", error);
-      alert("There was an error creating your menu. Please try again.");
+      toast.error("There was an error creating your menu. Please try again.");
+
     } finally {
       setIsCreatingMenu(false);
     }
@@ -166,7 +170,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
       queryParts.push(`anyTags=${searchParams.tags.join(',')}`);
     }
 
-   
+
     if (searchParams.sort) {
       const sortOption = sortOptions.find(option => option.value === searchParams.sort);
       if (sortOption && sortOption.sortBy) {
@@ -586,6 +590,8 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
           load more
         </button>
       )}
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnHover />
+
     </div>
   );
 }

@@ -1,45 +1,79 @@
 import React, { useState } from "react";
-import "../styles/Signup.css"; // Assuming you have a CSS file for styling
+import "../styles/Signup.css";
 import { postRequest } from "../js_files/Requests";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom";
 import { useErrorMessage } from "./useErrorMessage";
+
 function Signup({ setUserType }) {
     const [form, setForm] = useState({
         userName: "",
         email: "",
         password: ""
     });
-        const [errorCode, setErrorCode] = useState(undefined);
-  const errorMessage = useErrorMessage(errorCode);
-    const navigate = useNavigate(); // Initialize useNavigate
+
+    const [errorCode, setErrorCode] = useState(undefined);
+    const [validationError, setValidationError] = useState(""); // New state for validation errors
+    const errorMessage = useErrorMessage(errorCode);
+    const navigate = useNavigate();
+
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    const validateEmail = (email) => {
+        // Basic regex for email format
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    };
+
+    const validatePassword = (password) => {
+        // Minimum 8 characters, at least one uppercase, lowercase, number, and special character
+        const re =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return re.test(password);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Custom validation before sending the request
+        if (!validateEmail(form.email)) {
+            setValidationError("Please enter a valid email address.");
+            return;
+        }
+        if (!validatePassword(form.password)) {
+            setValidationError(
+                "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+            );
+            return;
+        }
+
+        setValidationError(""); // Clear validation error
         const requestResult = await postRequest("auth/register", form);
+
         if (requestResult.succeeded) {
-              setUserType(requestResult.data.userType);
-             localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
-            // Assuming the user type is "user" after signup
-            navigate("/"); // Redirect to login page after successful signup
-            // Optionally redirect to login or home page
-                setErrorCode(undefined);
+            setUserType(requestResult.data.userType);
+            localStorage.setItem("currentUser", JSON.stringify(requestResult.data));
+            setErrorCode(undefined);
+            navigate("/");
         } else {
             setErrorCode(requestResult.status);
         }
-        console.log(form);
     };
 
     return (
         <form onSubmit={handleSubmit} className="signup-form">
             <h2>Create Account</h2>
-             {errorMessage && (
-        <div style={{ color: "red", marginBottom: "1rem" }}>
-          ⚠️ {errorMessage}
-        </div>
-      )}
+            {validationError && (
+                <div style={{ color: "red", marginBottom: "1rem" }}>
+                    ⚠️ {validationError}
+                </div>
+            )}
+            {errorMessage && (
+                <div style={{ color: "red", marginBottom: "1rem" }}>
+                    ⚠️ {errorMessage}
+                </div>
+            )}
             <div>
                 <label>User Name</label>
                 <input

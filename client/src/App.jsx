@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import React, { useState } from 'react';
 import Navigation from './components/Navigation';
@@ -11,10 +11,12 @@ import Articles from './components/Articles'
 import ArticlePage from './components/ArticlePage'
 import MenuManager from './components/MenuManager'
 import ChefPage from './components/ChefPage'
-import  ChefCommentsDashboard from './components/ChefCommentsDashboard'
+import ChefCommentsDashboard from './components/ChefCommentsDashboard'
 import Chefs from './components/Chefs'
 import RecipeManager from './components/RecipeManager';
 import ArticleManager from './components/ArticleManager';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import './styles/App.css'
 
 function App() {
@@ -29,8 +31,8 @@ function App() {
     mainIds: [],
     dessertIds: []
   });
-   const [menus, setMenus] = useState([
-    ]);
+  const [menus, setMenus] = useState([
+  ]);
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('currentUser')) || null;
     setUserType(user ? user.userType : "guest");
@@ -47,9 +49,10 @@ function App() {
 
         <Route path="login" element={<Login setUserType={setUserType} />} />
         <Route path="signup" element={<Signup setUserType={setUserType} />} />
-
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         {/* Recipes */}
-        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu} setMenus={setMenus} setCreateMenu={setCreateMenu}/>} />
+        <Route path="recipes" element={<Recipes createMenu={createMenu} addToMenu={setMenu} menu={menu} setMenus={setMenus} setCreateMenu={setCreateMenu} />} />
         <Route path="chefs/:id/recipes`" element={<Recipes />} />
         <Route path="recipes/:id" element={<RecipePage />} />
 
@@ -63,19 +66,19 @@ function App() {
         <Route path="chefs/:id/articles`" element={<Articles />} />
         {/* Personal Area */}
 
-        {userType != "guest" && <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu} menus={menus} setMenus={setMenus}/>} />}
+        {userType != "guest" && <Route path="personal-area/menus" element={<MenuManager createMenu={createMenu} setCreateMenu={setCreateMenu} menu={menu} menus={menus} setMenus={setMenus} />} />}
         {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
 
         {/* Chef Area */}
 
         {(userType === "admin" || userType === "chef") && (
           <>
-            <Route path="/chef-area" element={<ChefCommentsDashboard/>} />
+            <Route path="/chef-area" element={<ChefCommentsDashboard />} />
             <Route path="/chef-area/recipe-manager" element={<RecipeManager />} />
             <Route path="/chef-area/article-manager" element={<ArticleManager />} />
           </>
         )}
-      <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
 
 
       </Routes>

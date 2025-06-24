@@ -19,6 +19,15 @@ async function getUserWithPasswordByUserName(username) {
         throw error;
     }
 }
+async function getUserWithEmailByUserName(userName) {
+    const db = await dbPromise;
+    const [rows] = await db.execute(
+        `SELECT userId, userName, email FROM users WHERE userName = ?`,
+        [userName]
+    );
+    return rows[0];
+};
 module.exports = {
-    getUserWithPasswordByUserName
+    getUserWithPasswordByUserName,
+    getUserWithEmailByUserName
 };

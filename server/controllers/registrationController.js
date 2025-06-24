@@ -1,5 +1,6 @@
 const genericService = require('../services/genericService');
 const loginService = require('../services/loginService');
+const { resetPasswordEmail } = require('./emailHandler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -74,5 +75,42 @@ exports.loginUser = async (userName, password) => {
         };
     } catch (error) {
         throw new Error('Internal server error');
+    }
+};
+
+// Add this function
+exports.forgotPasswordByUsername = async (username) => {
+    const user = await loginService.getUserWithEmailByUserName(username);
+    if (!user) throw new Error("Username not found");
+
+    // Generate a token
+    const resetToken = jwt.sign({ id: user.userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+   // const resetLink = `http://localhost:3001/reset-password/${resetToken}`;
+
+    // Send email
+    await resetPasswordEmail(user.email, resetToken);
+    return { message: "email sent succsesfuly" };
+
+
+};
+exports.resetPassword = async (token, newPassword) => {
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+
+        const user = await genericService.genericGetByColumnName('users', userId, "userId");
+        if (!user) throw new Error('User not found');
+
+       
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password
+        await genericService.genericPut("passwords", userId, { userId: userId, passwordHash: hashedPassword });
+
+        // Optionally: clear/resetToken/resetTokenExp from DB
+
+        return { message: 'Password reset successful' };
+    } catch (err) {
+        throw new Error('Invalid or expired token');
     }
 };

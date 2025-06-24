@@ -345,11 +345,20 @@ async function createAndSendShoppingListEmail({ userEmail, shoppingListItems, da
   }
 }
 
+async function resetPasswordEmail(email, resetToken) {
+  await transporter.sendMail({
+    to: email,
+    subject: 'Reset your password',
+    html: `<p>Click <a href="http://localhost:5173/reset-password/${resetToken}">here</a> to reset your password.</p>`
+  });
 
+  return { message: "Reset email sent" };
+}
 
 module.exports = {
   joinReq,
   approveReq, // Uncomment when implemented
   rejectReq,
-  createAndSendShoppingListEmail // Uncomment when implemented
+  createAndSendShoppingListEmail,// Uncomment when implemented
+  resetPasswordEmail
 };

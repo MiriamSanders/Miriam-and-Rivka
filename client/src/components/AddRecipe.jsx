@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { parseRecipeDocument, readRecipeFile } from '../js_files/RecipeParser';
-import { Upload, Plus, Minus, Clock, Star,  Image } from 'lucide-react';
+import { Upload, Plus, Minus, Clock, Star, Image } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { postRequest } from "../js_files/Requests";
 import RecipeFormatGuide from './RecipeFormatGuide';
 import '../styles/AddRecipe.css'
 
-// Move ArrayInput outside the component to prevent re-creation
 const ArrayInput = ({ field, label, placeholder, recipe, handleArrayChange, addArrayItem, removeArrayItem }) => (
   <div className="array-section">
     <label className="label">{label}:</label>
@@ -77,7 +78,7 @@ const AddRecipe = () => {
         tags: parsedRecipe.tags || ['']
       });
     } catch (error) {
-      alert(error.message);
+      toast.error(error)
       console.error(error);
     } finally {
       event.target.value = null;
@@ -91,14 +92,14 @@ const AddRecipe = () => {
     // Validate type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+      toast.warning('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
       return;
     }
 
     // Validate size (max 5 MB)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert('Image file is too large. Please select a file under 5 MB.');
+      toast.warning('Image file is too large. Please select a file under 5 MB.');
       return;
     }
 
@@ -110,10 +111,7 @@ const AddRecipe = () => {
     reader.readAsDataURL(file);
   };
 
-  /**
-   * Upload the selected image to the server and return the URL that the API returns.
-   * Expects a backend route POST /api/upload-image that responds with { url: string }
-   */
+
   const uploadImageToServer = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
@@ -129,14 +127,14 @@ const AddRecipe = () => {
       return url;
     } catch (err) {
       console.error('Image upload error:', err);
-      alert('Failed to upload image. Please try again.');
+      toast.error('Failed to upload image. Please try again.');
       return null;
     } finally {
       setUploadingImage(false);
     }
   };
 
-  // ---------- Form helpers ---------- //
+
   const handleInputChange = (field, value) => {
     setRecipe((prev) => ({ ...prev, [field]: value }));
   };
@@ -161,14 +159,28 @@ const AddRecipe = () => {
     }
   };
 
-  // ---------- Save ---------- //
   const saveRecipe = async () => {
-    if (!recipe.title.trim()) return alert('Please enter a recipe title');
-    if (!recipe.category) return alert('Please select a category');
-    if (!selectedImage && !recipe.imageURL.trim()) return alert('Please upload an image or enter an image URL');
-    if (!recipe.description.trim()) return alert('Please enter a description');
+    if (!recipe.title.trim()) {
+      toast.warning('Please enter a recipe title');
+      return;
+    }
 
-    // Upload image if a new one was selected
+    if (!recipe.category) {
+      toast.warning('Please select a category');
+      return;
+    }
+
+    if (!selectedImage && !recipe.imageURL.trim()) {
+      toast.warning('Please upload an image or enter an image URL');
+      return;
+    }
+
+    if (!recipe.description.trim()) {
+      toast.warning('Please enter a description');
+      return;
+    }
+
+
     let imagePath = recipe.imageURL;
     if (selectedImage) {
       imagePath = await uploadImageToServer(selectedImage);
@@ -191,7 +203,6 @@ const AddRecipe = () => {
 
     try {
       await postRequest('recipes', cleanRecipe);
-      // Reset form
       setRecipe({
         title: '',
         description: '',
@@ -206,14 +217,14 @@ const AddRecipe = () => {
       });
       setSelectedImage(null);
       setImagePreview(null);
-      alert('Recipe saved successfully!');
+      toast.success('Recipe saved successfully!');
     } catch (err) {
       console.error('Error saving recipe:', err);
-      alert('Failed to save recipe. Please try again.');
+      toast.error('Failed to save recipe. Please try again.');
     }
   };
 
-  // ---------- UI ---------- //
+
   return (
     <div>
       {/* Upload Docx / Txt */}
@@ -331,6 +342,8 @@ const AddRecipe = () => {
           {uploadingImage ? 'Uploading Image...' : 'Save Recipe'}
         </button>
       </div>
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnHover />
+
     </div>
   );
 };

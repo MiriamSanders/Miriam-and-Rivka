@@ -4,6 +4,8 @@ import RatingCard from "./RatingCard";
 import RecipeReader from "./RecipeReader";
 import { useErrorMessage } from "./useErrorMessage";
 import RecipeDiscussion from "./RecipeDiscussion";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "../styles/RecipePage.css";
 import { getRequest, putRequest } from "../js_files/Requests";
 import { Edit, Printer } from "lucide-react";
@@ -87,7 +89,7 @@ const RecipePage = () => {
       }
     }
     else {
-      alert("All fields must be filled in.")
+      toast.warning("All fields must be filled in.");
     }
   };
 
@@ -137,7 +139,7 @@ const RecipePage = () => {
               <button onClick={handleCancel} style={{ marginLeft: '8px' }} className="edit-cancel-button">Cancel</button>
             </>
           ) : (
-            <button onClick={handleEditToggle} className="edit-button"><Edit/></button>
+            <button onClick={handleEditToggle} className="edit-button"><Edit /></button>
           )}
         </div>
       )}{console.log(recipeData)}
@@ -212,7 +214,7 @@ const RecipePage = () => {
             <h2 className="section-title">Description</h2>
             {editMode ? (
               <textarea
-              className="edit-description-textarea"
+                className="edit-description-textarea"
                 value={description}
                 onChange={(e) => setEditedRecipe({ ...editedRecipe, description: e.target.value })}
                 rows={4}
@@ -226,7 +228,7 @@ const RecipePage = () => {
             <h2 className="section-title">Ingredients</h2>
             {editMode ? (
               <textarea
-              className="edit-ingredients-textarea"
+                className="edit-ingredients-textarea"
                 value={ingredientsList?.join("\n") || ""}
                 onChange={(e) =>
                   setEditedRecipe({ ...editedRecipe, ingredientsList: e.target.value.split("\n") })
@@ -252,7 +254,7 @@ const RecipePage = () => {
             <h2 className="section-title">Instructions</h2>
             {editMode ? (
               <textarea
-              className="edit-instructions-textarea"
+                className="edit-instructions-textarea"
                 value={instructions}
                 onChange={(e) => setEditedRecipe({ ...editedRecipe, instructions: e.target.value })}
                 rows={5}
@@ -272,7 +274,7 @@ const RecipePage = () => {
             <h2 className="section-title no-print">Tags</h2>
             {editMode ? (
               <textarea
-              className="edit-tags-textarea "
+                className="edit-tags-textarea "
                 value={tags.join("\n")}
                 onChange={(e) => setEditedRecipe({ ...editedRecipe, tags: e.target.value.split("\n") })}
                 rows={3}
@@ -294,6 +296,8 @@ const RecipePage = () => {
         <RatingCard recipeId={id} />
         <RecipeDiscussion recipeId={id} />
       </div>
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnHover />
+
     </div>
   );
 };
