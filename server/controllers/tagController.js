@@ -1,7 +1,8 @@
-const genericService = require('../services/genericService');
+
+const tagService=require('../services/tagService');
 exports.getAllTags = async () => {
   try {
-    const tags = await genericService.genericGetAll('tags');
+    const tags = await tagService.getAlltags();
     return tags;
   } catch (error) {
     console.error('Error fetching tags:', error);

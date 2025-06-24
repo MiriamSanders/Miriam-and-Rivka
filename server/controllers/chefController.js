@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const express = require('express');
 const chefService = require('../services/chefService');
-const genericService = require('../services/genericService');
+
 const mailManager = require('./emailHandler');
 
 exports.getAllChefs = async () => {
@@ -29,7 +29,7 @@ exports.joinReq = async (chefId, imageURL, education, experienceYears, style, ad
         if (isNaN(experienceYears) || experienceYears < 0) {
             throw new Error('Please enter a valid number of experience years');
         }
-        const userData = await genericService.genericGetByColumnName('users', chefId, 'userId');
+        const userData = await  chefService.getByUserId(chefId);
         const guid = uuidv4();
         mailManager.joinReq({
             guid,
@@ -51,7 +51,7 @@ exports.joinReq = async (chefId, imageURL, education, experienceYears, style, ad
             experience_years: experienceYears || null,
             style: style || null
         };
-        const result = await genericService.genericPost("pendingChefRequests", data, "chef_id");
+        const result = await  chefService.postPendingRequest(data);
         return result;
     } catch (error) {
         throw new Error('There was an error submitting your application. Please try again.');
@@ -59,7 +59,7 @@ exports.joinReq = async (chefId, imageURL, education, experienceYears, style, ad
 }
 exports.approveReq = async (guid) => {
     try {
-        const request = await genericService.genericGetByColumnName('pendingChefRequests', guid, 'guid');
+        const request = await  chefService.getByGuid(guid);
         if (!request) {
             throw new Error('Request not found');
         }
@@ -76,7 +76,7 @@ exports.approveReq = async (guid) => {
                 name: request.name,
                 email: request.email
             });
-            await genericService.genericDelete('pendingChefRequests', guid, 'guid');
+            await chefService.deletePending(giud);
             return (`
     <html>
       <head><title>Chef Approved</title></head>
@@ -100,7 +100,7 @@ exports.approveReq = async (guid) => {
 }
 exports.rejectReq = async (guid, reason = null) => {
     try {
-        const request = await genericService.genericGetByColumnName('pendingChefRequests', guid, 'guid');
+        const request = await chefService.getByGuid(guid);
         console.log(request);
         
         if (!request) {
@@ -119,7 +119,7 @@ exports.rejectReq = async (guid, reason = null) => {
             throw new Error("Failed to process rejection.");
         }
 
-        await genericService.genericDelete('pendingChefRequests', guid, 'guid');
+        await chefService.deletePending(guid);
         return (`
     <html>
       <head><title>Chef Rejected</title></head>

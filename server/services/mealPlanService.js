@@ -1,5 +1,6 @@
 // dbService.js
 const mysql = require('mysql2/promise');
+const genericService =require('./genericService')
 const dbPromise = require('./dbConnection');
 
 async function getRecipeDetailsFromDb(recipeIds = [], userId) {
@@ -117,10 +118,19 @@ async function getMenuByUserId(userId) {
         throw error;
     }
 }
-
+async function postDailyMenu(data) {
+    const { menuId } = await genericService.genericPost('dailymenus', data, 'menuId');
+    return menuId;
+}
+async function postMenuRecipe(data) {
+    const result=await genericService.genericPost('menurecipes', data, 'menuId');
+    return result;
+}
 module.exports = {
     getRecipeDetailsFromDb,
     getBackupRecipesFromDb,
     getIngredientsForMenusFromDb,
-    getMenuByUserId
+    getMenuByUserId,
+    postDailyMenu,
+    postMenuRecipe
 };

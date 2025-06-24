@@ -1,10 +1,11 @@
 const {createAndSendShoppingListEmail}=require('./emailHandler')
-const { genericPost } = require('../services/genericService');
 const dbPromise = require('../services/dbConnection');
 const {
   getRecipeDetailsFromDb,
   getBackupRecipesFromDb,
-  getIngredientsForMenusFromDb
+  getIngredientsForMenusFromDb,
+  postDailyMenu,
+  postMenuRecipe
 } = require('../services/mealPlanService');
 const ingredientCanonicalMap=require('./ingredientCanonicalMap.json');
 
@@ -163,10 +164,10 @@ async function createWeeklyMealPlan(sideIds, mainIds, dessertIds, userId) {
 async function persistPlanToDb(weeklyMenu, userId) {
   const menus = [];
   for (const m of weeklyMenu) {
-    const { menuId } = await genericPost('dailymenus', { userId, menuDate: m.date }, 'menuId');
-    await genericPost('menurecipes', { menuId, recipeId: m.side.recipeId }, 'menuId');
-    await genericPost('menurecipes', { menuId, recipeId: m.main.recipeId }, 'menuId');
-    await genericPost('menurecipes', { menuId, recipeId: m.dessert.recipeId }, 'menuId');
+    const menuId  = await  postDailyMenu( { userId, menuDate: m.date });//genericPost('dailymenus', { userId, menuDate: m.date }, 'menuId');
+    await postMenuRecipe({ menuId, recipeId: m.side.recipeId });//genericPost('menurecipes', { menuId, recipeId: m.side.recipeId }, 'menuId');
+    await postMenuRecipe({ menuId, recipeId: m.main.recipeId });// genericPost('menurecipes', { menuId, recipeId: m.main.recipeId }, 'menuId');
+    await postMenuRecipe({ menuId, recipeId: m.dessert.recipeId });//genericPost('menurecipes', { menuId, recipeId: m.dessert.recipeId }, 'menuId');
     menus.push(menuId);
   }
   await generateAndEmailShoppingList(menus, getWeekdayDates(weeklyMenu.length), userId, weeklyMenu);

@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const genericService=require('./genericService');
 const dbPromise = require("./dbConnection"); 
 async function getAllArticles(limit, offset) {
   try {
@@ -81,9 +82,19 @@ async function updateArticle(id, title, content) {
     throw error;
   }
 }
+async function  postArticle(data) {
+  const articleResult=await genericService.genericPost("articles",data,"articleId");
+      return articleResult;
+}
+async function deleteArticle(articleId) {
+   const result= await genericService.genericDelete('articles', articleId, 'articleId');
+      return result;
+}
 module.exports = {
  getAllArticles,
  getArticlesByChefId,
 getArticleById,
-  updateArticle
+  updateArticle,
+  postArticle,
+  deleteArticle
 };

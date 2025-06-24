@@ -58,6 +58,7 @@ const AddArticle = () => {
     if (newArticle.title.trim() && newArticle.content.trim()) {
       await postRequest("articles", { ...newArticle, authorId: JSON.parse(localStorage.getItem("currentUser")).id });
       setNewArticle({ title: '', content: '' });
+      toast.success('success uploading article');
     }
   };
 

@@ -1,5 +1,4 @@
 const articlesService = require('../services/articlesService');
-const genericService = require('../services/genericService');
 
 exports.getAllArticles = async (limit, page) => {
   try {
@@ -26,7 +25,7 @@ exports.getArticleById = async (articleId) => {
 };
 exports.postArticle= async(data)=>{
    try{
-    const articleResult=await genericService.genericPost("articles",data,"articleId");
+    const articleResult=await articlesService.postArticle(data);
     return articleResult;
   }
     catch(error){
@@ -44,7 +43,7 @@ exports.putArticle= async(articleId,title,content)=>{
 };
 exports.deleteArticle=async(articleId)=>{
  try {
-    const result= await genericService.genericDelete('articles', articleId, 'articleId');
+    const result= await articlesService.deleteArticle(articleId);
     return result;
   } catch (error) {
     throw new Error('something went wrong:', error);

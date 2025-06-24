@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require('./dbConnection');
-
+const genericService = require('./genericService');
 async function getAllChefs() {
   try {
     const db = await dbPromise;
@@ -73,10 +73,30 @@ async function getFeaturedChefs() {
     throw error;
   }
 }
+async function getByUserId(userId) {
+  const userData = await genericService.genericGetByColumnName('users', userId, 'userId');
+  return userData;
+}
+async function postPendingRequest(data) {
+  const result = await genericService.genericPost("pendingChefRequests", data, "chef_id");
+  return result;
+}
+async function getByGuid(guid) {
+  const result = await genericService.genericGetByColumnName('pendingChefRequests', guid, 'guid');
+  return result;
+}
+async function deletePending(guid) {
+  const result=  await genericService.genericDelete('pendingChefRequests', guid, 'guid');
+  return result;
+}
 module.exports = {
   getAllChefs,
   getChef,
   addChef,
   getFeaturedChefs,
+  getByUserId,
+  postPendingRequest,
+  getByGuid,
+  deletePending
 };
 

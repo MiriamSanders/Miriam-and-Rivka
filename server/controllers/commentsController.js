@@ -1,7 +1,6 @@
 
-const e = require('express');
+//const e = require('express');
 const commentsService = require('../services/commentsService');
-const genericService = require('../services/genericService');
 exports.getRecipeComments = async (recipeId, limit, page) => {
   try {
     const offset = page * limit - limit;
@@ -62,7 +61,7 @@ exports.postArticleComment = async (userId, articleId, commentText, parentCommen
 }
 exports.deleteArticleComment = async (commentId) => {
   try {
-    const result = await genericService.genericDelete('articlecomments', commentId, 'commentId');
+    const result = await commentsService.deleteArticleComment(commentId);
     return result;
   } catch (error) {
     throw new Error('Error deleting article comment:', error);
@@ -70,7 +69,7 @@ exports.deleteArticleComment = async (commentId) => {
 }
 exports.deleteRecipeComment = async (commentId) => {
   try {
-    const result = await genericService.genericDelete('recipecomments', commentId, 'commentId');
+    const result = await commentsService.deleteRecipeComment(commentId);
     return result;
   } catch (error) {
     throw new Error('something went wrong:', error);

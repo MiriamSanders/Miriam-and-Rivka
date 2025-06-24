@@ -1,6 +1,7 @@
 const e = require('express');
-const genericService = require('../services/genericService');
 const recipeService = require('../services/recipesService');
+const tagService=require('../services/tagService');
+const ingredientService=require('../services/ingredientService');
 exports.getAllRecipes = async (options) => {
   try {
     const limit = parseInt(options.limit) || 10;
@@ -8,7 +9,7 @@ exports.getAllRecipes = async (options) => {
     const offset = (page - 1) * limit;
 
     const hasFilters = options.category || options.chefName || options.title || options.dishType || options.userId || options.tags.length > 0 || options.anyTags.length > 0;
-       const recipes = await recipeService.getRecipesAdvanced(options);
+    const recipes = await recipeService.getRecipesAdvanced(options);
 
     console.log('Recipes fetched:', recipes);
     return recipes;
@@ -58,9 +59,9 @@ exports.createRecipe = async (newRecipe) => {
   }
 
   try {
-    let difficultyId = await genericService.genericGet("difficulty", "name", difficulty);
+    let difficultyId = await recipeService.getDifficultyByName(difficulty);
     if (!difficultyId) {
-      difficultyId = await genericService.genericPost("difficulty", { name: difficulty }, "difficultyId")
+      difficultyId = await recipeService.createDifficulty(difficulty);
     }
     // First, create the recipe
     const recipeData = {
@@ -76,7 +77,7 @@ exports.createRecipe = async (newRecipe) => {
     };
     console.log(recipeData);
 
-    const newRecipe = await genericService.genericPost('recipes', recipeData, 'recipeId');
+    const newRecipe = await recipeService.postRecipe(recipeData);
     const recipeId = newRecipe.recipeId;
     console.log(newRecipe);
 
@@ -94,7 +95,7 @@ exports.createRecipe = async (newRecipe) => {
               let existingIngredient;
               try {
                 // Try to find existing ingredient by name (case-insensitive)
-                const searchResult = await genericService.genericGet('ingredients', "name", ingredientName);
+                const searchResult = await ingredientService.getIngredientByName(ingredientName);
                 // Assuming GenericGet returns an array
                 existingIngredient = searchResult[0];
                 console.log(existingIngredient);
@@ -109,7 +110,7 @@ exports.createRecipe = async (newRecipe) => {
                   FatPer100g: null,
                   FiberPer100g: null
                 };
-                existingIngredient = await genericService.genericPost('ingredients', newIngredientData, 'ingredientId');
+                existingIngredient = await ingredientService.postIngredient(newIngredientData);
                 console.log(existingIngredient);
               }
               // Link the ingredient to the recipe
@@ -120,7 +121,7 @@ exports.createRecipe = async (newRecipe) => {
                 orderIndex: i + 1
               };
 
-              await genericService.genericPost('recipeIngredients', recipeIngredientData, 'recipeId');
+              await ingredientService.postRecipeIngredients(recipeIngredientData);
             } catch (error) {
               console.error(`Error processing ingredient "${ingredientText}":`, error);
               // Continue with other ingredients even if one fails
@@ -138,16 +139,14 @@ exports.createRecipe = async (newRecipe) => {
           // First, find or create the tag
           let existingTag;
 
-          existingTag = await genericService.genericGet('tags', "name", tagName);
+          existingTag = await tagService.getTagByName(tagName);
           if (existingTag) {
             existingTag = existingTag[0];
           }
           if (!existingTag) {
             // Tag doesn't exist, create it
-            existingTag = await genericService.genericPost('tags', { name: tagName }, 'tagId');
+            existingTag = await tagService.postTag({ name: tagName });
           }
-          // console.log(`Linking recipe ${recipeId} to tag ${existingTag.TagID} (${tagName})`);
-          //existingTag = existingTag[0]; // Assuming GenericGet returns an array
           console.log(existingTag);
 
           // Then link the recipe to the tag
@@ -156,7 +155,7 @@ exports.createRecipe = async (newRecipe) => {
             tagId: existingTag.tagId
           };
 
-          await genericService.genericPost('recipeTags', recipeTagData, 'recipeId');
+          await tagService.postRecipeTags(recipeTagData);
         }
       }
     }
@@ -168,6 +167,7 @@ exports.createRecipe = async (newRecipe) => {
     };
 
   } catch (error) {
+    console.log(error);
     throw new Error('Something went wrong while creating the recipe');
   }
 };
@@ -245,7 +245,7 @@ exports.putRecipe = async (recipeId, recipeData) => {
   }
 
   try {
-    let difficultyId = await genericService.genericGet("difficulty", "name", difficulty);
+    let difficultyId = await recipeService.getDifficultyByName(difficulty);
     if (!difficultyId) {
       difficultyId = await recipeService.createDifficulty(difficulty);
     }
@@ -298,7 +298,7 @@ async function syncRecipeIngredients(recipeId, ingredients) {
     let existingIngredient;
 
     try {
-      const searchResult = await genericService.genericGet('ingredients', "name", ingredientName);
+      const searchResult = await ingredientService.getIngredientByName(ingredientName);
       existingIngredient = searchResult?.[0];
     } catch (e) {
       console.error(`Error fetching ingredient "${ingredientName}":`, e);
@@ -314,7 +314,7 @@ async function syncRecipeIngredients(recipeId, ingredients) {
         FatPer100g: null,
         FiberPer100g: null
       };
-      existingIngredient = await genericService.genericPost('ingredients', newIngredientData, 'ingredientId');
+      existingIngredient = await ingredientService.postIngredient(newIngredientData);
     }
 
     parsedIngredients.push({
@@ -362,7 +362,7 @@ async function syncRecipeIngredients(recipeId, ingredients) {
 async function syncRecipeTags(recipeId, tags) {
   if (!tags || !Array.isArray(tags)) return;
   let existingTagIds = new Set();
-  const existingTagsRows = await genericService.genericGet('recipeTags', 'recipeId', recipeId);
+  const existingTagsRows = await tagService.getRecipeTags(recipeId);
   if (existingTagsRows && existingTagsRows.length > 0) {
     existingTagIds = new Set(existingTagsRows.map(row => row.tagId));
   }
@@ -370,16 +370,15 @@ async function syncRecipeTags(recipeId, tags) {
   for (let tagName of tags) {
     tagName = tagName.trim();
     if (!tagName) continue;
-    let tag = (await genericService.genericGet('tags', 'name', tagName))?.[0];
+    let tag = (await tagService.getTagByName(tagName))?.[0];
     if (!tag) {
-      tag = await genericService.genericPost('tags', { name: tagName }, 'tagId');
-    }
+      tag = await tagService.postTag({ name: tagName });   }
     newTagIds.add(tag.tagId);
     if (!existingTagIds.has(tag.tagId)) {
-      await genericService.genericPost('recipeTags', {
+      await tagService.postRecipeTags({
         recipeId: recipeId,
         tagId: tag.tagId
-      }, 'recipeId');
+      });
     }
   }
   for (const oldTagId of existingTagIds) {

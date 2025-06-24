@@ -1,4 +1,4 @@
-const genericService = require('../services/genericService');
+
 const loginService = require('../services/loginService');
 const { resetPasswordEmail } = require('./emailHandler');
 const bcrypt = require('bcrypt');
@@ -10,18 +10,17 @@ exports.registerUser = async (userName, email, password) => {
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const userData = { userName: userName, email: email, userType: 1 }; // Default userType to 1 (regular user)
+        const userData = { userName: userName, email: email, userType: 1 }; 
 
-        const newUser = await genericService.genericPost('users', userData);
+        const newUser = await loginService.postUser(userData);
         if (!newUser) {
             throw new Error('User registration failed');
         }
         // Store the hashed password in the database
-        await genericService.genericPost('passwords', { userId: newUser.userId, passwordHash: hashedPassword });
+        await loginService.postPassword({ userId: newUser.userId, passwordHash: hashedPassword });
         //need to change- 
-        let userType = await genericService.genericGet('roles', "roleId", newUser.userType);
-        userType = userType[0];
-        console.log(userType);
+        let userType = await loginService.getRole(newUser.userType);
+            console.log(userType);
         // צור טוקן JWT
         const token = jwt.sign(
             { id: newUser.userId, userName: newUser.userName, userType: userType.roleName },
@@ -85,7 +84,6 @@ exports.forgotPasswordByUsername = async (username) => {
 
     // Generate a token
     const resetToken = jwt.sign({ id: user.userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
-   // const resetLink = `http://localhost:3001/reset-password/${resetToken}`;
 
     // Send email
     await resetPasswordEmail(user.email, resetToken);
@@ -98,16 +96,15 @@ exports.resetPassword = async (token, newPassword) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
 
-        const user = await genericService.genericGetByColumnName('users', userId, "userId");
+        const user = await loginService.getUserById(userId);
         if (!user) throw new Error('User not found');
 
-       
+
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         // Update password
-        await genericService.genericPut("passwords", userId, { userId: userId, passwordHash: hashedPassword });
-
-        // Optionally: clear/resetToken/resetTokenExp from DB
+        await loginService.updatePassword(userId,{ userId: userId, passwordHash: hashedPassword });
+      
 
         return { message: 'Password reset successful' };
     } catch (err) {

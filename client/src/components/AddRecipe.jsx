@@ -202,7 +202,7 @@ const AddRecipe = () => {
     };
 
     try {
-      await postRequest('recipes', cleanRecipe);
+      const postRecipe = await postRequest('recipes', cleanRecipe);
       setRecipe({
         title: '',
         description: '',
@@ -217,7 +217,7 @@ const AddRecipe = () => {
       });
       setSelectedImage(null);
       setImagePreview(null);
-      toast.success('Recipe saved successfully!');
+      if (postRecipe.succeeded) { toast.success('Recipe saved successfully!'); }
     } catch (err) {
       console.error('Error saving recipe:', err);
       toast.error('Failed to save recipe. Please try again.');

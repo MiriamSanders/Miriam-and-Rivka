@@ -208,11 +208,21 @@ async function postArticleComment(userId, articleId, commentText, parentCommentI
     throw error;
   }
 }
+async function deleteArticleComment(commentId) {
+   const result = await genericService.genericDelete('articlecomments', commentId, 'commentId');
+    return result;
+}
+async function deleteRecipeComment(commentId) {
+  const result = await genericService.genericDelete('recipecomments', commentId, 'commentId');
+      return result;
+}
 module.exports = {
   getRecipeComments,
   getArticleComments,
   postArticleComment,
   postRecipeComment,
   getAllChefArticleComments,
-  getAllChefRecipeComments
+  getAllChefRecipeComments,
+  deleteArticleComment,
+  deleteRecipeComment
 };

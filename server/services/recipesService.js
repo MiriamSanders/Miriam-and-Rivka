@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require('./dbConnection');
-
+const genericService=require('./genericService');
 async function getRecipeById(recipeId) {
   try {
     const db = await dbPromise;
@@ -348,17 +348,18 @@ async function deleteRecipeTag(recipeId, tagId) {
   }
 }
 
-async function createDifficulty(name) {
-  try {
-    const db = await dbPromise;
-    const [res] = await db.execute('INSERT INTO difficulty (name) VALUES (?)', [name]);
-    return res.insertId;
-  } catch (err) {
-    console.error('createDifficulty - DB error:', err);
-    throw err;
-  }
+async function postRecipe(data) {
+  const newRecipe = await genericService.genericPost('recipes', data, 'recipeId');
+  return newRecipe;
+}
+async function getDifficultyByName(name) {
+  const result = await genericService.genericGet("difficulty", "name", name);
+  return result;
 }
 
+async function createDifficulty(name) {
+  return await genericService.genericPost("difficulty", { name }, "difficultyId");
+}
 module.exports = {
   getRecipeById,
    getBestRatedRecipes,
@@ -372,5 +373,7 @@ module.exports = {
   updateRecipeIngredient,
   deleteRecipeIngredient,
   deleteRecipeTag,
-  createDifficulty
+  createDifficulty,
+  getDifficultyByName,
+  postRecipe
 };
