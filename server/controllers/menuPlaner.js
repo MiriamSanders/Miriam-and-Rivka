@@ -158,16 +158,13 @@ async function createWeeklyMealPlan(sideIds, mainIds, dessertIds, userId) {
   return { success: true, weeklyPlan: plan };
 }
 
-/* ──────────────────────────────────────────────────────────────────────────── */
-/*  DB persistence & shopping list (unchanged)                                */
-/* ──────────────────────────────────────────────────────────────────────────── */
 async function persistPlanToDb(weeklyMenu, userId) {
   const menus = [];
   for (const m of weeklyMenu) {
-    const menuId  = await  postDailyMenu( { userId, menuDate: m.date });//genericPost('dailymenus', { userId, menuDate: m.date }, 'menuId');
-    await postMenuRecipe({ menuId, recipeId: m.side.recipeId });//genericPost('menurecipes', { menuId, recipeId: m.side.recipeId }, 'menuId');
-    await postMenuRecipe({ menuId, recipeId: m.main.recipeId });// genericPost('menurecipes', { menuId, recipeId: m.main.recipeId }, 'menuId');
-    await postMenuRecipe({ menuId, recipeId: m.dessert.recipeId });//genericPost('menurecipes', { menuId, recipeId: m.dessert.recipeId }, 'menuId');
+    const menuId  = await  postDailyMenu( { userId, menuDate: m.date });
+    await postMenuRecipe({ menuId, recipeId: m.side.recipeId });
+    await postMenuRecipe({ menuId, recipeId: m.main.recipeId });
+    await postMenuRecipe({ menuId, recipeId: m.dessert.recipeId });
     menus.push(menuId);
   }
   await generateAndEmailShoppingList(menus, getWeekdayDates(weeklyMenu.length), userId, weeklyMenu);
