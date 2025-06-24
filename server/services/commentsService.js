@@ -1,5 +1,6 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require("./dbConnection");
+const genericService= require('./genericService');
 async function getRecipeComments(recipeId, limit, offset) {
   try {
     const db = await dbPromise;
@@ -57,50 +58,6 @@ async function getArticleComments(articleId, limit, offset) {
     throw error;
   }
 }
-// async function postRecipeComments(recipeId, userId, commentText) {
-//   try {
-//     const db = await dbPromise;
-
-//     const insertQuery = `
-//             INSERT INTO recipecomments (recipeID, userId, commentText)
-//             VALUES (?, ?, ?)
-//         `;
-//     const [insertResult] = await db.execute(insertQuery, [recipeId, userId, commentText]);
-
-//     const insertedId = insertResult.insertId;
-
-//     if (!insertedId) {
-//       throw new Error('Comment insertion failed.');
-//     }
-
-
-//     return insertedId;
-//   } catch (error) {
-//     console.error('Comment insertion failed.', error);
-//     throw error;
-//   }
-// }
-// async function postArticleComments(articleId, userId, commentText) {
-//   try {
-//     const db = await dbPromise;
-
-//     const insertQuery = `
-//             INSERT INTO articlecomments (articleId, userId, commentText)
-//             VALUES (?, ?, ?)
-//         `;
-//     const [insertResult] = await db.execute(insertQuery, [articleId, userId, commentText]);
-
-//     const insertedId = insertResult.insertId;
-
-//     if (!insertedId) {
-//       throw new Error('Comment insertion failed.');
-//     }
-//     return insertedId;
-//   } catch (error) {
-//     console.error('Comment insertion failed.', error);
-//     throw error;
-//   }
-// }
 async function getAllChefRecipeComments(chefId, limit, offset) {
   try {
     const db = await dbPromise;

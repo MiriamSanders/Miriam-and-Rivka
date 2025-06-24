@@ -64,6 +64,8 @@ exports.deleteArticleComment = async (commentId) => {
     const result = await commentsService.deleteArticleComment(commentId);
     return result;
   } catch (error) {
+    console.log(error);
+    
     throw new Error('Error deleting article comment:', error);
   }
 }
