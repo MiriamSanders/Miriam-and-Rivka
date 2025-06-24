@@ -38,8 +38,6 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
     { value: 'side', label: 'Side' },
     { value: 'dessert', label: 'Dessert' }
   ];
-
-  // Updated sort options to separate sortBy and sortOrder
   const sortOptions = [
     { value: '', label: 'Default', sortBy: '', sortOrder: '' },
     { value: 'rating', label: 'Rating', sortBy: 'rating', sortOrder: 'DESC' },
@@ -65,9 +63,8 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
     console.log("Current Menu State:", menu);
   }
 
-  // Function to create menu from selected recipes
+  
   const handleCreateMenuFromSelection = async () => {
-    // Check if user has selected at least one recipe
     const totalSelected = menu.sideIds.length + menu.mainIds.length + menu.dessertIds.length;
 
     if (totalSelected === 0) {

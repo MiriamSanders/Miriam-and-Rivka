@@ -1,13 +1,16 @@
 const mysql = require('mysql2/promise');
 const genericService=require('./genericService');
 const dbPromise = require("./dbConnection"); 
-async function getAllArticles(limit, offset) {
+async function getAllArticles(limit, offset,chefName) {
   try {
     const db = await dbPromise;
     let query = `SELECT a.articleId, u.userName,title,a.authorId FROM articles a
-       JOIN users u ON a.authorId = u.userId`;
+       JOIN users u ON a.authorId = u.userId `;
  const params = [];
-
+    if(chefName){
+      query+=`where u.userName=?`;
+      params.push(chefName);
+    }
     if (limit) {
       query += ` LIMIT ?`;
       params.push(limit);

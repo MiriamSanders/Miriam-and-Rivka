@@ -6,7 +6,8 @@ router.get('/', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 0;
-    const articles = await controller.getAllArticles(limit, page);
+    const chefName = req.query.chefName|| null;
+    const articles = await controller.getAllArticles(limit, page,chefName);
     res.json(articles);
   } catch (error) {
     console.error('Error fetching articles:', error);

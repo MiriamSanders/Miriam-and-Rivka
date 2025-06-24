@@ -170,11 +170,7 @@ const AddRecipe = () => {
       return;
     }
 
-    if (!selectedImage && !recipe.imageURL.trim()) {
-      toast.warning('Please upload an image or enter an image URL');
-      return;
-    }
-
+    
     if (!recipe.description.trim()) {
       toast.warning('Please enter a description');
       return;

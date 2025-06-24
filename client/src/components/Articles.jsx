@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { deleteRequest, getRequest } from '../js_files/Requests';
 import '../styles/Articles.css';
 import { useErrorMessage } from "./useErrorMessage";
@@ -14,9 +14,12 @@ function Articles() {
   const limit = 9;
   const [errorCode, setErrorCode] = useState(undefined);
   const errorMessage = useErrorMessage(errorCode);
-
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const chefName = queryParams.get('chefName');
   const getArticles = async () => {
-    const requestResult = await getRequest(`articles?limit=${limit}&page=${page}`);
+    const chefQuery = chefName ? `&chefName=${chefName}` : '';
+    const requestResult = await getRequest(`articles?limit=${limit}&page=${page}${chefQuery}`);
     if (requestResult.succeeded) {
       const newArticles = requestResult.data;
       if (newArticles.length < limit) {
@@ -80,7 +83,7 @@ function Articles() {
                   style={{
                     color: "black",
                     marginLeft: "5px",
-                    background:"transparent"
+                    background: "transparent"
                   }}
                 >
                   <Trash2 />

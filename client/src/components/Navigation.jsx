@@ -30,40 +30,30 @@ function Navigation({ userType = "guest",setUserType, onLogout }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // In your actual app, replace this with:
-    // const loggedIn = localStorage.getItem('loggedIn');
-    // setIsLoggedIn(!!loggedIn);
-    
-    // For demo purposes, using a mock check
     setIsLoggedIn(userType !== "guest");
   }, [userType]);
-  //listin to local storage change,
+ 
 
   const handleLogout = () => {
-    // In your actual app, add:
-    // localStorage.removeItem('loggedIn');
-    // localStorage.removeItem('userToken'); // or whatever you store
     
     setIsLoggedIn(false);
     localStorage.removeItem('currentUser');
-    setUserType('guest');// Clear user data from localStorage
+    setUserType('guest');
     if (onLogout) {
       onLogout();
     }
   };
 
-  // Build the hierarchy
+  
   let links = [...navOptions.guest];
   
-  // Add user-specific links if logged in
   if (isLoggedIn && (userType === "regular" || userType === "chef"|| userType === "admin")) {
     links = links.concat(navOptions.regular);
   }
   if (isLoggedIn && (userType === "chef"||userType === "admin")) {
     links = links.concat(navOptions.chef);
   }
-  
-  // Add auth links at the end based on login status
+
   if (isLoggedIn) {
     links = links.concat(navOptions.loggedIn);
   } else {

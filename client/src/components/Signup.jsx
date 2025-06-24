@@ -12,7 +12,7 @@ function Signup({ setUserType }) {
     });
 
     const [errorCode, setErrorCode] = useState(undefined);
-    const [validationError, setValidationError] = useState(""); // New state for validation errors
+    const [validationError, setValidationError] = useState(""); 
     const errorMessage = useErrorMessage(errorCode);
     const navigate = useNavigate();
 
@@ -21,13 +21,11 @@ function Signup({ setUserType }) {
     };
 
     const validateEmail = (email) => {
-        // Basic regex for email format
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
     };
 
     const validatePassword = (password) => {
-        // Minimum 8 characters, at least one uppercase, lowercase, number, and special character
         const re =
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
         return re.test(password);
@@ -36,7 +34,6 @@ function Signup({ setUserType }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Custom validation before sending the request
         if (!validateEmail(form.email)) {
             setValidationError("Please enter a valid email address.");
             return;
@@ -48,7 +45,7 @@ function Signup({ setUserType }) {
             return;
         }
 
-        setValidationError(""); // Clear validation error
+        setValidationError(""); 
         const requestResult = await postRequest("auth/register", form);
 
         if (requestResult.succeeded) {

@@ -25,14 +25,10 @@ export default function Footer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate required fields
     if (!formData.education || !formData.experienceYears || !formData.style) {
       toast.warning('Please fill in all required fields');
       return;
     }
-
-    // Validate experience years is a number
     if (isNaN(formData.experienceYears) || formData.experienceYears < 0) {
       toast.warning('Please enter a valid number of experience years');
       return;
@@ -41,10 +37,6 @@ export default function Footer() {
     try {
       const submitData = { chefId: JSON.parse(localStorage.getItem("currentUser")).id, ...formData };
       await postRequest('chef-application', submitData);
-      // Here you would make your API call to submit the chef application
-      console.log('Chef application submitted:', formData);
-
-      // Reset form after successful submission
       setFormData({
         imageURL: '',
         education: '',
