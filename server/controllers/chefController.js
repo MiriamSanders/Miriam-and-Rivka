@@ -98,19 +98,26 @@ exports.approveReq = async (guid) => {
         throw new Error('There was an error approving the chef. Please try again.');
     }
 }
-exports.rejectReq = async (guid) => {
+exports.rejectReq = async (guid, reason = null) => {
     try {
         const request = await genericService.genericGetByColumnName('pendingChefRequests', guid, 'guid');
+        console.log(request);
+        
         if (!request) {
             throw new Error('Request not found');
         }
 
 
-        mailManager.rejectReq({
-            name: request.name,
-            email: request.email,
-            reason: req.body.reason || 'No specific reason provided'
-        });
+        try {
+            await mailManager.rejectReq({
+                name: request.name,
+                email: request.email,
+                reason: reason || 'No specific reason provided'
+            });
+        } catch (mailErr) {
+            console.error("✉️ Failed to send rejection email:", mailErr);
+            throw new Error("Failed to process rejection.");
+        }
 
         await genericService.genericDelete('pendingChefRequests', guid, 'guid');
         return (`
@@ -128,6 +135,7 @@ exports.rejectReq = async (guid) => {
     </html>
   `);
     } catch (error) {
+        console.log(error);
         throw new Error('There was an error rejecting the chef request. Please try again.');
     }
 }

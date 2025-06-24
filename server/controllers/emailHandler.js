@@ -2,6 +2,7 @@
 
 const nodemailer = require('nodemailer');
 const genericService = require('../services/genericService');
+const { log } = require('console');
 require("dotenv").config({ path: require('path').resolve(__dirname, '../.env') });
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -148,23 +149,24 @@ const approveReq = async (info) => {
 };
 
 // // 3. Rejection endpoint
-const rejectReq = async (req, res) => {
+const rejectReq = async ({name, email, reason}) => {
   try {
-    const { name, email, reason } = req.body;
-
     if (!name || !email) {
-      return res.status(400).json({ error: 'Name and email are required.' });
+      console.log(email,name);
+      
+      throw new Error("unable to create email");
     }
 
     await sendChefRejectionEmail({ name, email, reason });
 
-    res.json({ message: 'Chef rejection processed successfully.' });
+    return true;
 
   } catch (error) {
     console.error('Error rejecting chef:', error);
-    res.status(500).json({ error: 'Failed to process rejection.' });
+    throw new Error('Failed to process rejection.');
   }
 };
+
 
 
 // Helper: Approval email

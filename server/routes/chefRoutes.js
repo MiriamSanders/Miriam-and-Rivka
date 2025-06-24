@@ -22,10 +22,10 @@ router.get('/chef/approve/:guid', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-router.get('/chef/reject/guid', async (req, res) => {
+router.get('/chef/reject/:guid', async (req, res) => {
     try {
         const guid = req.params.guid;
-        const result = await controller.rejectReq(req, res);
+        const result = await controller.rejectReq(guid);
         res.send(result);
     } catch (error) {
         console.error('Error rejecting chef request:', error);
