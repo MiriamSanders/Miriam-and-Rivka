@@ -23,7 +23,6 @@ function Login({ setUserType }) {
             setUserType(requestResult.data.userType);// Assuming the user type is "user" after login
             localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
             navigate("/");
-            // Optionally redirect to login or home page
         } else {
             setErrorCode(requestResult.status);
         }

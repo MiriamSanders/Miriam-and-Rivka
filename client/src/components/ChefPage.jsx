@@ -51,8 +51,8 @@ function ChefPage() {
           <div className="error-icon">👨‍🍳</div>
           <h2>Chef Not Found</h2>
           <p>The chef you're looking for doesn't exist or has been removed.</p>
-          <button 
-            className="btn btn-primary" 
+          <button
+            className="btn btn-primary"
             onClick={() => navigate('/chefs')}
           >
             Browse All Chefs
@@ -78,8 +78,8 @@ function ChefPage() {
         <div className="chef-header">
           <div className="chef-image-container">
             {imageURL ? (
-              <img 
-                src={imageURL} 
+              <img
+                src={imageURL}
                 alt={`${userName}'s profile`}
                 className="chef-image"
                 onError={(e) => {
@@ -92,7 +92,7 @@ function ChefPage() {
               <div className="placeholder-icon">👨‍🍳</div>
             </div>
           </div>
-          
+
           <div className="chef-info">
             <h1 className="chef-name">{userName || 'Unknown Chef'}</h1>
             <div className="chef-details">
@@ -120,25 +120,25 @@ function ChefPage() {
 
         {/* Navigation Buttons */}
         <div className="chef-actions">
-          <button 
+          <button
             className="btn btn-primary"
             onClick={() => navigate(`/recipes?chefName=${userName}`)}
           >
-            <span className="btn-icon"><CookingPot/></span>
+            <span className="btn-icon"><CookingPot /></span>
             View Recipes
           </button>
-          <button 
+          <button
             className="btn btn-secondary"
-            onClick={() => navigate(`/chefs/${id}/articles`)}
+            onClick={() => navigate(`/articles?chefName=${userName}`)}
           >
-            <span className="btn-icon"><Newspaper/></span>
+            <span className="btn-icon"><Newspaper /></span>
             View Articles
           </button>
         </div>
 
         {/* Back Button */}
         <div className="back-navigation">
-          <button 
+          <button
             className="btn btn-ghost"
             onClick={() => navigate('/chefs')}
           >

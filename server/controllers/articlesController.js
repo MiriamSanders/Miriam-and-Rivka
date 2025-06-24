@@ -1,9 +1,9 @@
 const articlesService = require('../services/articlesService');
 
-exports.getAllArticles = async (limit, page) => {
+exports.getAllArticles = async (limit, page,chefName) => {
   try {
     const offset = page * limit - limit;
-    const articles = await articlesService.getAllArticles(limit, offset);
+    const articles = await articlesService.getAllArticles(limit, offset,chefName);
     if (!articles || articles.length === 0) {
       return [];
     }

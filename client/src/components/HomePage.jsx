@@ -6,17 +6,11 @@ import Footer from './Footer';
 import '../styles/HomePage.css';
 
 const HomePage = ({ userType }) => {
-  // State for popular recipes - replace with your API data
   const navigate = useNavigate();
-  const [popularRecipes, setPopularRecipes] = useState([
-  ]);
+  const [popularRecipes, setPopularRecipes] = useState([]);
 
-  // State for featured chefs - replace with your API data
-  const [featuredChefs, setFeaturedChefs] = useState([
+  const [featuredChefs, setFeaturedChefs] = useState([]);
 
-  ]);
-
-  // Replace these useEffect hooks with your actual API calls
   useEffect(() => {
     const fetchPopularRecipes = async () => {
       const response = await getRequest('recipes?sort=rating&limit=4');

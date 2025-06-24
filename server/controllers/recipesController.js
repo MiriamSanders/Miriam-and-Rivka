@@ -1,19 +1,43 @@
-const e = require('express');
 const recipeService = require('../services/recipesService');
-const tagService=require('../services/tagService');
-const ingredientService=require('../services/ingredientService');
-
+const tagService = require('../services/tagService');
+const ingredientService = require('../services/ingredientService');
 exports.getAllRecipes = async (options) => {
   try {
     const limit = parseInt(options.limit) || 10;
     const page = parseInt(options.page) || 1;
     const offset = (page - 1) * limit;
 
-    const hasFilters = options.category || options.chefName || options.title || options.dishType || options.userId || options.tags.length > 0 || options.anyTags.length > 0;
-    const recipes = await recipeService.getRecipesAdvanced(options);
+    const {
+      category,
+      chefName,
+      dishType,
+      title,
+      userId,
+      tags = [],
+      anyTags = [],
+      sortBy = 'recipeId',
+      sortOrder = 'DESC',
+    } = options;
+
+    const formattedOptions = {
+      limit,
+      offset,
+      category,
+      chefName,
+      dishType,
+      title,
+      userId,
+      tags,
+      anyTags,
+      sortBy,
+      sortOrder
+    };
+
+    const recipes = await recipeService.getRecipesAdvanced(formattedOptions);
     return recipes;
   } catch (error) {
-    throw new Error('Something went wrong while fetching recipes:', error);
+    console.error('Error in getAllRecipes:', error);
+    throw new Error('Something went wrong while fetching recipes');
   }
 }
 exports.getRecipeById = async (recipeId) => {
@@ -348,7 +372,8 @@ async function syncRecipeTags(recipeId, tags) {
     if (!tagName) continue;
     let tag = (await tagService.getTagByName(tagName))?.[0];
     if (!tag) {
-      tag = await tagService.postTag({ name: tagName });   }
+      tag = await tagService.postTag({ name: tagName });
+    }
     newTagIds.add(tag.tagId);
     if (!existingTagIds.has(tag.tagId)) {
       await tagService.postRecipeTags({

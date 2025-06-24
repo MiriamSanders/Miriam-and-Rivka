@@ -1,5 +1,3 @@
-
-
 const nodemailer = require('nodemailer');
 const userService = require('../services/userService');
 const { log } = require('console');

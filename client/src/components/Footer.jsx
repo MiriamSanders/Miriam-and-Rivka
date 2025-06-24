@@ -25,14 +25,10 @@ export default function Footer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate required fields
     if (!formData.education || !formData.experienceYears || !formData.style) {
       toast.warning('Please fill in all required fields');
       return;
     }
-
-    // Validate experience years is a number
     if (isNaN(formData.experienceYears) || formData.experienceYears < 0) {
       toast.warning('Please enter a valid number of experience years');
       return;

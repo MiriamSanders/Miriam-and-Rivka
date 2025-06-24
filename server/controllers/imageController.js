@@ -1,17 +1,19 @@
-const multer = require('multer');
+// controllers/imageController.js
 const path = require('path');
-const crypto = require('crypto');
 const fs = require('fs');
+const crypto = require('crypto');
+const multer = require('multer');
 
-// Point to the client/public/images folder
+// Make sure client/public/images exists
 const clientImagesDir = path.join(__dirname, '../../client/public/images');
 if (!fs.existsSync(clientImagesDir)) {
   fs.mkdirSync(clientImagesDir, { recursive: true });
 }
 
+// --- Multer Setup ---
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, clientImagesDir); // Save in React's public/images folder
+    cb(null, clientImagesDir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -28,18 +30,15 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
-const uploadImage = (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-  // Return public path (what the browser will use to access it)
-  const publicUrl = `/images/${req.file.filename}`;
-  res.json({ url: publicUrl });
-};
+// --- Business Logic (no req/res here) ---
+function getPublicImageUrl(filename) {
+  return `/images/${filename}`;
+}
 
 module.exports = {
   upload,
-  uploadImage
+  getPublicImageUrl
 };
