@@ -17,12 +17,10 @@ function Login({ setUserType }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(form);
         const requestResult = await postRequest("auth/login", form);
 
         if (requestResult.succeeded) {
-            console.log("Login successful:", requestResult.data);
-            setUserType(requestResult.data.userType);
+            setUserType(requestResult.data.userType);// Assuming the user type is "user" after login
             localStorage.setItem("currentUser", JSON.stringify(requestResult.data))
             navigate("/");
         } else {

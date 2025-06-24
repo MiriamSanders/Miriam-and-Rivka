@@ -15,7 +15,6 @@ const transporter = nodemailer.createTransport({
 const BASE_URL = 'http://localhost:3001';
 const getAdminEmail = async () => {
   const admin = await userService.getAdmin();
-  console.log(admin.email);
   return admin.email;
 }
 // 1. Endpoint to receive chef join requests
@@ -130,8 +129,7 @@ const joinReq = async (info) => {
     console.error('Error processing chef join request:', error);
     return false;
   }
-};
-
+}
 // 2. Approval endpoint
 const approveReq = async (info) => {
   try {
@@ -140,16 +138,12 @@ const approveReq = async (info) => {
 
   } catch (error) {
     console.error('Error approving chef:', error);
-
   }
-};
-
+}
 // // 3. Rejection endpoint
-const rejectReq = async ({name, email, reason}) => {
+const rejectReq = async ({ name, email, reason }) => {
   try {
     if (!name || !email) {
-      console.log(email,name);
-      
       throw new Error("unable to create email");
     }
 
@@ -161,10 +155,7 @@ const rejectReq = async ({name, email, reason}) => {
     console.error('Error rejecting chef:', error);
     throw new Error('Failed to process rejection.');
   }
-};
-
-
-
+}
 // Helper: Approval email
 async function sendChefApprovalEmail({ name, email }) {
   const emailHTML = `
@@ -182,7 +173,6 @@ async function sendChefApprovalEmail({ name, email }) {
     html: emailHTML
   });
 }
-
 // // Helper: Rejection email
 async function sendChefRejectionEmail({ name, email, reason }) {
   const emailHTML = `
@@ -200,7 +190,6 @@ async function sendChefRejectionEmail({ name, email, reason }) {
     html: emailHTML
   });
 }
-
 async function createAndSendShoppingListEmail({ userEmail, shoppingListItems, dates, weeklyMenu, userId }) {
   try {
     // Generate shopping list HTML
@@ -325,8 +314,6 @@ async function createAndSendShoppingListEmail({ userEmail, shoppingListItems, da
       subject: `Grocery List - Enjoy Planning An Amazing Menu!`,
       html: htmlContent
     });
-
-    console.log(`Shopping list email sent successfully to ${userEmail}.`);
     return {
       success: true,
       message: "Shopping list email sent successfully.",
@@ -342,7 +329,6 @@ async function createAndSendShoppingListEmail({ userEmail, shoppingListItems, da
     };
   }
 }
-
 async function resetPasswordEmail(email, resetToken) {
   await transporter.sendMail({
     to: email,
@@ -352,7 +338,6 @@ async function resetPasswordEmail(email, resetToken) {
 
   return { message: "Reset email sent" };
 }
-
 module.exports = {
   joinReq,
   approveReq, // Uncomment when implemented

@@ -29,24 +29,23 @@ async function genericGet(table, fieldName, fieldValue, limit, offset) {
     }
 }
 async function genericGetByColumnName(table, id, column) {
-    try { 
+    try {
         const db = await dbPromise;
-        const query = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [ table,column,id,]);
-        console.log(query);
+        const query = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [table, column, id,]);
         const [rows] = await db.execute(query);
         if (rows.length === 0) {
             return null;
         }
         return rows[0];
-      }
-catch(error) {
+    }
+    catch (error) {
         console.error('Error fetching data by ID:', error);
         throw error;
     }
 }
 async function genericGetAll(table, limit, offset) {
     try {
-        const db = await dbPromise;     
+        const db = await dbPromise;
         let query = `SELECT * FROM ??`;
         const params = [table];
 
@@ -59,25 +58,18 @@ async function genericGetAll(table, limit, offset) {
             query += ` OFFSET ?`;
             params.push(offset);
         }
-        console.log(query, params);
-
         const [rows] = await db.execute(mysql.format(query, params));
-
         return rows;
     } catch (error) {
         console.error('Error fetching all data:', error);
         throw error;
     }
 }
-
 async function genericPost(table, data, returnId = "userId") {
     try {
         const db = await dbPromise;
         const insertQuery = mysql.format(`INSERT INTO ?? SET ?`, [table, data]);
-        console.log(insertQuery);
-
         const [insertResult] = await db.execute(insertQuery);
-        console.log(data);
 
         let id = insertResult.insertId;
         if (id) {
@@ -87,7 +79,6 @@ async function genericPost(table, data, returnId = "userId") {
         } else if (data[returnId]) {
 
             const idQuery = mysql.format(`SELECT * FROM ?? WHERE ?? = ?`, [table, returnId, data[returnId]]);
-            console.log(idQuery)
             const [rows] = await db.execute(idQuery);
             if (rows.length === 0) throw new Error('No record found for the given ID');
             return rows[0];
@@ -98,8 +89,7 @@ async function genericPost(table, data, returnId = "userId") {
         console.error('Error inserting data:', error);
         throw error;
     }
-};
-
+}
 async function genericPut(table, userId, data) {
     try {
         const db = await dbPromise;
@@ -117,14 +107,13 @@ async function genericPut(table, userId, data) {
         throw error;
     }
 }
-
-async function genericDelete(table, id,fieldName ) {
+async function genericDelete(table, id, fieldName) {
     try {
         const db = await dbPromise;
         const query = mysql.format(` 
             DELETE FROM ??
             WHERE ?? = ?
-        `, [table,fieldName, id]);
+        `, [table, fieldName, id]);
         const [result] = await db.execute(query, [table, id]);
         return result.affectedRows;
     } catch (error) {
@@ -132,4 +121,11 @@ async function genericDelete(table, id,fieldName ) {
         throw error;
     }
 }
-module.exports = { genericGet,genericPut, genericPost,genericGetAll ,genericGetByColumnName,genericDelete};
+module.exports = {
+     genericGet, 
+     genericPut, 
+     genericPost, 
+     genericGetAll, 
+     genericGetByColumnName, 
+     genericDelete 
+};

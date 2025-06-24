@@ -76,7 +76,6 @@ function Articles() {
                 <h2>{article.title}</h2>
                 <p>Written by:{article.userName}</p>
               </div>
-              {console.log(article.userId)}
               {(isAdmin || (currentUser && currentUser.id === article.authorId)) &&
                 <button
                   onClick={(e) => handleDeleteArticle(e, article.articleId)}

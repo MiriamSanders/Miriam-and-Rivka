@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require('./dbConnection');
-const genericService=require('./genericService');
+const genericService = require('./genericService');
+
 async function getRecipeById(recipeId) {
   try {
     const db = await dbPromise;
@@ -44,9 +45,6 @@ async function getRecipeById(recipeId) {
     throw err;
   }
 }
-
-
-
 async function getRecipesAdvanced(options = {}) {
   const {
     limit = 10,
@@ -60,9 +58,7 @@ async function getRecipesAdvanced(options = {}) {
     sortBy = 'recipeId',
     sortOrder = 'DESC'
   } = options;
-  
-  console.log(options);
-  
+
   // Updated to include 'rating' as a valid sort field
   const allowedSortFields = ['title', 'category', 'userName', 'dishType', 'rating'];
   const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'recipeId';
@@ -91,17 +87,17 @@ async function getRecipesAdvanced(options = {}) {
       conditions.push('r.category = ?');
       params.push(category);
     }
-        
+
     if (dishType) {
       conditions.push('r.dishType = ?');
       params.push(dishType);
     }
-        
+
     if (chefName) {
       conditions.push('u.userName = ?');
       params.push(`${chefName}`);
     }
-        
+
     if (title) {
       conditions.push('r.title LIKE ?');
       params.push(`%${title}%`);
@@ -134,18 +130,16 @@ async function getRecipesAdvanced(options = {}) {
     query += `
       GROUP BY r.recipeId, r.title, r.imageURL, r.category, r.description,
                r.dishType, u.userName, u.userId`;
-    
+
     // Handle the ORDER BY clause - use avgRating for 'rating' sort
     const sortField = validSortBy === 'rating' ? 'avgRating' : `r.${validSortBy}`;
     query += ` ORDER BY ${sortField} ${validSortOrder}`;
-    
+
     query += ` LIMIT ? OFFSET ?`;
-    
+
     params.push(limit, offset);
     const formattedQuery = mysql.format(query, params);
-    
-    console.log(formattedQuery);
-            
+
     const [rows] = await db.execute(formattedQuery);
 
     return rows.map(r => ({
@@ -196,7 +190,6 @@ async function getBestRatedRecipes(limit = 4) {
     throw error;
   }
 }
-
 async function getRecipesByChefId(chefId) {
   try {
     const db = await dbPromise;
@@ -213,7 +206,6 @@ async function getRecipesByChefId(chefId) {
     throw error;
   }
 }
-
 async function deleteRecipe(recipeId) {
   try {
     const db = await dbPromise;
@@ -224,7 +216,6 @@ async function deleteRecipe(recipeId) {
     return false;
   }
 }
-
 async function putRecipe(recipeId, updated) {
   try {
     const db = await dbPromise;
@@ -258,7 +249,6 @@ async function putRecipe(recipeId, updated) {
     return { succeeded: false, error: err.message };
   }
 }
-
 async function updateRecipeById(id, data) {
   try {
     const db = await dbPromise;
@@ -278,7 +268,6 @@ async function updateRecipeById(id, data) {
     throw err;
   }
 }
-
 async function getRecipeIngredients(recipeId) {
   try {
     const db = await dbPromise;
@@ -292,7 +281,6 @@ async function getRecipeIngredients(recipeId) {
     throw err;
   }
 }
-
 async function insertRecipeIngredient(recipeId, ing) {
   try {
     const db = await dbPromise;
@@ -306,7 +294,6 @@ async function insertRecipeIngredient(recipeId, ing) {
     throw err;
   }
 }
-
 async function updateRecipeIngredient(recipeId, ing) {
   try {
     const db = await dbPromise;
@@ -320,7 +307,6 @@ async function updateRecipeIngredient(recipeId, ing) {
     throw err;
   }
 }
-
 async function deleteRecipeIngredient(recipeId, ingredientId) {
   try {
     const db = await dbPromise;
@@ -333,7 +319,6 @@ async function deleteRecipeIngredient(recipeId, ingredientId) {
     throw err;
   }
 }
-
 async function deleteRecipeTag(recipeId, tagId) {
   try {
     const db = await dbPromise;
@@ -347,7 +332,6 @@ async function deleteRecipeTag(recipeId, tagId) {
     throw err;
   }
 }
-
 async function postRecipe(data) {
   const newRecipe = await genericService.genericPost('recipes', data, 'recipeId');
   return newRecipe;
@@ -356,13 +340,12 @@ async function getDifficultyByName(name) {
   const result = await genericService.genericGet("difficulty", "name", name);
   return result;
 }
-
 async function createDifficulty(name) {
   return await genericService.genericPost("difficulty", { name }, "difficultyId");
 }
 module.exports = {
   getRecipeById,
-   getBestRatedRecipes,
+  getBestRatedRecipes,
   getRecipesByChefId,
   deleteRecipe,
   putRecipe,

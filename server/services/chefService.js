@@ -1,12 +1,12 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require('./dbConnection');
 const genericService = require('./genericService');
+
 async function getAllChefs() {
   try {
     const db = await dbPromise;
     const query = `SELECT c.*, u.userName FROM chefs c JOIN users u ON c.chefId = u.userId`;
     const [rows] = await db.execute(mysql.format(query));
-    console.log('Chefs fetched:', rows);
     return rows.length ? rows : null;
   } catch (error) {
     console.error('getAllChefs - DB error:', error);
@@ -24,7 +24,6 @@ async function getChef(chefId) {
     `;
     const formattedQuery = mysql.format(query, [chefId]);
     const [rows] = await db.execute(formattedQuery);
-    console.log('Chef fetched:', rows);
     return rows;
   } catch (error) {
     console.error('getChef - DB error:', error);
@@ -46,7 +45,6 @@ async function addChef(chefData) {
       chefData.style,
     ];
     const [result] = await db.execute(mysql.format(insertQuery, params));
-    console.log('Chef added:', result);
     return result;
   } catch (error) {
     console.error('addChef - DB error:', error);
@@ -66,7 +64,6 @@ async function getFeaturedChefs() {
       LIMIT 6
     `;
     const [rows] = await db.execute(mysql.format(query));
-    console.log('Featured chefs fetched:', rows);
     return rows.length ? rows : null;
   } catch (error) {
     console.error('getFeaturedChefs - DB error:', error);
@@ -86,7 +83,7 @@ async function getByGuid(guid) {
   return result;
 }
 async function deletePending(guid) {
-  const result=  await genericService.genericDelete('pendingChefRequests', guid, 'guid');
+  const result = await genericService.genericDelete('pendingChefRequests', guid, 'guid');
   return result;
 }
 module.exports = {

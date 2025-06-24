@@ -132,7 +132,6 @@ const ArticleDiscussion = ({ articleId }) => {
         {comments.map((comment) => (
           <div key={comment.commentId} className="comment">
             <strong>{comment.userName}:</strong> <span>{comment.commentText}</span>
-            {console.log(comment.userId)}
             {(isAdmin || (currentUser && currentUser.id === comment.userId)) &&
               <button
                 onClick={() => handleDeleteComment(comment.commentId)}

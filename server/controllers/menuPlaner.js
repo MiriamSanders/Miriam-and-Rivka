@@ -8,20 +8,17 @@ const {
   postMenuRecipe
 } = require('../services/mealPlanService');
 const ingredientCanonicalMap=require('./ingredientCanonicalMap.json');
-
 const calculateTagSimilarity = (r1 = {}, r2 = {}) => {
   if (!r1.tags || !r2.tags) return 0;
   const a = new Set(r1.tags.split(',').map(t => t.trim().toLowerCase()));
   const b = new Set(r2.tags.split(',').map(t => t.trim().toLowerCase()));
   const inter = [...a].filter(t => b.has(t)).length;
   return inter / new Set([...a, ...b]).size || 0;
-};
-
+}
 const isKosherCombination = (side = {}, main = {}, dessert = {}) => {
   const cats = [side.category, main.category, dessert.category];
   return !(cats.includes('Meat') && cats.includes('Dairy'));
-};
-
+}
 const rating = r => (r?.userRating > 0 ? r.userRating : r?.avgRating || 0);
 const calculateMealScore = (s, m, d) => {
   let score = (rating(s) + rating(m) + rating(d)) * 10;
@@ -30,11 +27,7 @@ const calculateMealScore = (s, m, d) => {
   if (m?.userRating > 3) score += 30;
   if (d?.userRating > 3) score += 20;
   return score;
-};
-
-/* ──────────────────────────────────────────────────────────────────────────── */
-/*  Weekday generator (Sun‑Thu)                                               */
-/* ──────────────────────────────────────────────────────────────────────────── */
+}
 function getWeekdayDates(count = 5) {
   const dates = [];
   const today = new Date();
@@ -52,10 +45,6 @@ function getWeekdayDates(count = 5) {
   }
   return dates;
 }
-
-/* ──────────────────────────────────────────────────────────────────────────── */
-/*  1️⃣  Choose top kosher triples from user recipes                           */
-/* ──────────────────────────────────────────────────────────────────────────── */
 function pickKosherTriples(sides, mains, desserts, limit = 5) {
   const triples = [];
   for (const s of sides)
@@ -74,10 +63,6 @@ function pickKosherTriples(sides, mains, desserts, limit = 5) {
   }
   return { chosen, usedIds };
 }
-
-/* ──────────────────────────────────────────────────────────────────────────── */
-/*  2️⃣  Build up to five meals (back‑ups can be Meat/Dairy/Parve)            */
-/* ──────────────────────────────────────────────────────────────────────────── */
 async function buildUpToFiveMeals(chosen, leftovers, usedIds, userId, limit = 5) {
   const meals = [...chosen];
 
@@ -118,10 +103,6 @@ async function buildUpToFiveMeals(chosen, leftovers, usedIds, userId, limit = 5)
 
   return meals;
 }
-
-/* ──────────────────────────────────────────────────────────────────────────── */
-/*  3️⃣  Orchestrator                                                         */
-/* ──────────────────────────────────────────────────────────────────────────── */
 async function createWeeklyMealPlan(sideIds, mainIds, dessertIds, userId) {
   if (!sideIds.length && !mainIds.length && !dessertIds.length) throw new Error('Need at least one recipe ID');
 
@@ -157,7 +138,6 @@ async function createWeeklyMealPlan(sideIds, mainIds, dessertIds, userId) {
   await persistPlanToDb(plan, userId);
   return { success: true, weeklyPlan: plan };
 }
-
 async function persistPlanToDb(weeklyMenu, userId) {
   const menus = [];
   for (const m of weeklyMenu) {
@@ -169,7 +149,6 @@ async function persistPlanToDb(weeklyMenu, userId) {
   }
   await generateAndEmailShoppingList(menus, getWeekdayDates(weeklyMenu.length), userId, weeklyMenu);
 }
-
 function getCanonicalIngredientName(ingredientName) {
     const lowerName = ingredientName.toLowerCase().trim();
     // Check for exact match in map first
@@ -186,10 +165,7 @@ function getCanonicalIngredientName(ingredientName) {
 
     return ingredientName; // Return original if no canonical mapping found
 }
-
 async function generateShoppingListData(menuIds, dates, userId, weeklyMenu) {
-    console.log(`Generating shopping list for menu IDs: [${menuIds.join(', ')}] for user ${userId}.`);
-
     try {
         // Get user email
         let userEmail;
@@ -219,7 +195,6 @@ async function generateShoppingListData(menuIds, dates, userId, weeklyMenu) {
         const shoppingListToDisplay = Array.from(canonicalShoppingList).sort();
 
         if (shoppingListToDisplay.length === 0) {
-            console.log("No ingredients found for the selected menus. Skipping email.");
             return { success: true, message: "No ingredients found, no email sent." };
         }
 
@@ -240,7 +215,6 @@ async function generateShoppingListData(menuIds, dates, userId, weeklyMenu) {
         return { success: false, message: "An unexpected error occurred.", error: error.message };
     }
 }
-
 // Updated main function that calls both parts
 async function generateAndEmailShoppingList(menuIds, dates, userId, weeklyMenu) {
     try {
@@ -265,7 +239,4 @@ async function generateAndEmailShoppingList(menuIds, dates, userId, weeklyMenu) 
         return { success: false, message: "An unexpected error occurred.", error: error.message };
     }
 }
-/* ──────────────────────────────────────────────────────────────────────────── */
-/*  Exports                                                                   */
-/* ──────────────────────────────────────────────────────────────────────────── */
 module.exports = { createWeeklyMealPlan, pairMealsForWeek: createWeeklyMealPlan };

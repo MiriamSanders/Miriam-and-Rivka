@@ -1,6 +1,6 @@
 // dbService.js
 const mysql = require('mysql2/promise');
-const genericService =require('./genericService')
+const genericService = require('./genericService')
 const dbPromise = require('./dbConnection');
 
 async function getRecipeDetailsFromDb(recipeIds = [], userId) {
@@ -31,7 +31,6 @@ async function getRecipeDetailsFromDb(recipeIds = [], userId) {
         throw error;
     }
 }
-
 async function getBackupRecipesFromDb(preferredCategory, dishType, userId, excludeIds = []) {
     try {
         const db = await dbPromise;
@@ -65,14 +64,12 @@ async function getBackupRecipesFromDb(preferredCategory, dishType, userId, exclu
         if (excludeIds.length) params.push(...excludeIds);
 
         const [rows] = await db.execute(mysql.format(sql, params));
-        console.log(`Found ${rows.length} backups for category="${preferredCategory}", dishType="${dishType}".`);
         return rows.map(r => ({ ...r, recipeId: String(r.recipeId) }));
     } catch (error) {
         console.error('getBackupRecipesFromDb - DB error:', error);
         throw error;
     }
 }
-
 async function getIngredientsForMenusFromDb(menuIds) {
     try {
         if (!menuIds || menuIds.length === 0) return [];
@@ -94,7 +91,6 @@ async function getIngredientsForMenusFromDb(menuIds) {
         throw error;
     }
 }
-
 async function getMenuByUserId(userId) {
     try {
         const db = await dbPromise;
@@ -110,8 +106,6 @@ async function getMenuByUserId(userId) {
       ORDER BY dm.menuDate ASC, dm.menuId ASC`;
 
         const [result] = await db.execute(mysql.format(sql, [userId]));
-        console.log('UserId:', userId);
-        console.log('Query result:', result);
         return result;
     } catch (error) {
         console.error('getMenuByUserId - DB error:', error);
@@ -123,7 +117,7 @@ async function postDailyMenu(data) {
     return menuId;
 }
 async function postMenuRecipe(data) {
-    const result=await genericService.genericPost('menurecipes', data, 'menuId');
+    const result = await genericService.genericPost('menurecipes', data, 'menuId');
     return result;
 }
 module.exports = {

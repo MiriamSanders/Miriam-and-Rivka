@@ -18,7 +18,6 @@ async function connect() {
     // Test the pool
     try {
         const connection = await pool.getConnection();
-        console.log("Connected to MySQL database with connection pool");
         connection.release();
     } catch (error) {
         console.error("Error connecting to MySQL:", error);
@@ -28,5 +27,4 @@ async function connect() {
     // Return the pool (which has the same execute method as a single connection)
     return pool;
 }
-
 module.exports = connect();

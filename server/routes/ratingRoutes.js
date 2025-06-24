@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/ratingController');
+
 router.get('/:recipeId', async (req, res) => {
   try {
     const recipeId = parseInt(req.params.recipeId);

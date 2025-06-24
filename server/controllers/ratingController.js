@@ -1,4 +1,5 @@
 const ratingsService =require( "../services/ratingsService");
+
 exports.postRatings = async (userId, recipeId, rating ) => {
   if (!recipeId || !rating) {
     throw new Error('Recipe ID and rating are required');

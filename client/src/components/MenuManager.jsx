@@ -35,10 +35,7 @@ const MenuManager = ({ createMenu, setCreateMenu, menu ,menus,setMenus}) => {
           };
         })
       }));
-      
-      console.log(parsedMenus);
-      setMenus(parsedMenus); // if you have a state setter
-      
+      setMenus(parsedMenus); 
     } else {
       console.error('Error fetching menus:', result.status);
     }

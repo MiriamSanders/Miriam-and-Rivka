@@ -37,6 +37,7 @@ export default function Footer() {
     try {
       const submitData = { chefId: JSON.parse(localStorage.getItem("currentUser")).id, ...formData };
       await postRequest('chef-application', submitData);
+      // Reset form after successful submission
       setFormData({
         imageURL: '',
         education: '',

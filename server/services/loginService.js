@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require("./dbConnection");
 const genericService = require('./genericService');
+
 async function getUserWithPasswordByUserName(username) {
     try {
         const db = await dbPromise;
@@ -27,7 +28,7 @@ async function getUserWithEmailByUserName(userName) {
         [userName]
     );
     return rows[0];
-};
+}
 async function postUser(data) {
     const newUser = await genericService.genericPost('users', data);
     return newUser;
@@ -39,13 +40,12 @@ async function postPassword(data) {
 async function getRole(userType) {
     let userTypeName = await genericService.genericGet('roles', "roleId", userType);
     return userTypeName[0];
-
 }
 async function getUserById(userId) {
     const user = await genericService.genericGetByColumnName('users', userId, "userId");
     return user;
 }
-async function updatePassword(userId,data) {
+async function updatePassword(userId, data) {
     const update = await genericService.genericPut("passwords", userId, data);
     return update;
 }

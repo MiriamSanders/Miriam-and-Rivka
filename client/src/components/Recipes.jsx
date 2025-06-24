@@ -58,8 +58,6 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
         return updatedMenu;
       });
     }
-    console.log("Recipe added to menu:", recipeId, "Dish Type:", dishType);
-    console.log("Current Menu State:", menu);
   }
 
 
@@ -96,11 +94,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
         dessertIds: Array.isArray(trimmedMenu.dessertIds) ? unique(trimmedMenu.dessertIds).join(',') : trimmedMenu.dessertIds,
       };
 
-      console.log("Creating menu with data:", data);
-
       const createdMenu = await postRequest('meal-plan', data);
-      console.log("Created menu:", createdMenu);
-
       const weeklyMenu = await createdMenu.data.menu.weeklyPlan;
       const formattedMenu = [];
       weeklyMenu.forEach((menu) => {
@@ -113,9 +107,6 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
       });
       setCreateMenu(false);
       setMenus(formattedMenu);
-
-      console.log("Formatted menu:", formattedMenu);
-
       // Navigate back to menu page
       navigate('/personal-area/menus');
     } catch (error) {
@@ -199,8 +190,6 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
       const requestResult = await getRequest(apiQuery);
       if (requestResult.succeeded) {
         const newRecipes = requestResult.data;
-        console.log(newRecipes);
-
         if (newRecipes.length < limit) {
           setHasMore(false);
         } else {
@@ -366,9 +355,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
             Select recipes and we'll create your personalized weekly menu
           </p>
         </div>
-
       )}
-
       {/* Search Filter Bar */}
       <div className="search-container">
         <div className="searchContainer">

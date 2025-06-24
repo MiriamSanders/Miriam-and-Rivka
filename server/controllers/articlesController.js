@@ -23,27 +23,27 @@ exports.getArticleById = async (articleId) => {
     throw new Error('something went wrong:', error);
   }
 };
-exports.postArticle= async(data)=>{
-   try{
-    const articleResult=await articlesService.postArticle(data);
+exports.postArticle = async (data) => {
+  try {
+    const articleResult = await articlesService.postArticle(data);
     return articleResult;
   }
-    catch(error){
-      throw new Error('internal server error:', error);
-    }
-};
-exports.putArticle= async(articleId,title,content)=>{
-   try{ 
-    const articleResult=await articlesService.updateArticle(articleId,title,content);
-     return articleResult;
+  catch (error) {
+    throw new Error('internal server error:', error);
   }
-    catch(error){
-    throw new Error('something went wrong:', error);
-    }
 };
-exports.deleteArticle=async(articleId)=>{
- try {
-    const result= await articlesService.deleteArticle(articleId);
+exports.putArticle = async (articleId, title, content) => {
+  try {
+    const articleResult = await articlesService.updateArticle(articleId, title, content);
+    return articleResult;
+  }
+  catch (error) {
+    throw new Error('something went wrong:', error);
+  }
+};
+exports.deleteArticle = async (articleId) => {
+  try {
+    const result = await articlesService.deleteArticle(articleId);
     return result;
   } catch (error) {
     throw new Error('something went wrong:', error);

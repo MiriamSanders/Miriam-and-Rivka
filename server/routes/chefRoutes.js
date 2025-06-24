@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/chefController');
+
 router.post('/chef-application',
     async (req, res) => {
         try {

@@ -18,7 +18,6 @@ function Chefs(){
       } else {
         setErrorCode(requestResult.status);
       }
-      console.log(chefs);
   };
   const openChefPage = (e) => {
     const chefId = e.currentTarget.getAttribute('name');
