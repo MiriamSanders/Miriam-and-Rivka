@@ -65,7 +65,6 @@ function ArticlePage() {
           ⚠️ {errorMessage}
         </div>
       )}
-      {console.log(articleData)}
       {canEditOrDelete && (
         <div className="article-edit-controls">
           {isEditing ? (

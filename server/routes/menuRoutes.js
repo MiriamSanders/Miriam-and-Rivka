@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const menuController = require('../controllers/MenuController');
+
 router.post('/', async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized' });

@@ -16,7 +16,6 @@ async function getRatings(recipeId) {
         throw error;
     }
 }
-
 async function postRatings(recipeId, rating, userId) {
     try {
         const db = await dbPromise;
@@ -41,7 +40,6 @@ async function postRatings(recipeId, rating, userId) {
         throw error;
     }
 }
-
 module.exports = {
     getRatings,
     postRatings

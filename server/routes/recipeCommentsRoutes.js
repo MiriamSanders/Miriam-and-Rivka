@@ -23,7 +23,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'something went wrong' });
   }
 });
-
 router.post('/', async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: "Must be logged in to comment" });
@@ -41,7 +40,6 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'something went wrong' });
   }
 });
-
 router.delete('/:id', async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: "Must be logged in to delet comment" });

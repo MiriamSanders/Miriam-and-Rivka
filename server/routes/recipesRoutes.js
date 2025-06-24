@@ -28,6 +28,16 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+router.get('/:id', async (req, res) => {
+  try {
+    const recipeId = req.params.id;
+    const recipe = await controller.getRecipeById(recipeId);
+    res.json(recipe);
+  } catch (error) {
+    console.error('Error fetching recipe:', error);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+});
 router.post('/', async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: "Must be logged in to create recipe" });
@@ -37,16 +47,6 @@ router.post('/', async (req, res) => {
     res.status(201).json(newRecipe);
   } catch (error) {
     console.error('Error creating recipe:', error);
-    res.status(500).json({ error: 'something went wrong' });
-  }
-});
-router.get('/:id', async (req, res) => {
-  try {
-    const recipeId = req.params.id;
-    const recipe = await controller.getRecipeById(recipeId);
-    res.json(recipe);
-  } catch (error) {
-    console.error('Error fetching recipe:', error);
     res.status(500).json({ error: 'something went wrong' });
   }
 });

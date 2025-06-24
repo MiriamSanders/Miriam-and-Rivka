@@ -41,9 +41,6 @@ export default function Footer() {
     try {
       const submitData = { chefId: JSON.parse(localStorage.getItem("currentUser")).id, ...formData };
       await postRequest('chef-application', submitData);
-      // Here you would make your API call to submit the chef application
-      console.log('Chef application submitted:', formData);
-
       // Reset form after successful submission
       setFormData({
         imageURL: '',

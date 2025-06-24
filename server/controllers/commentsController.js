@@ -1,6 +1,7 @@
 
 //const e = require('express');
 const commentsService = require('../services/commentsService');
+
 exports.getRecipeComments = async (recipeId, limit, page) => {
   try {
     const offset = page * limit - limit;
@@ -9,7 +10,7 @@ exports.getRecipeComments = async (recipeId, limit, page) => {
   } catch (error) {
     throw new Error('somthing went wrong:', error);
   }
-};
+}
 exports.getArticleComments = async (articleId, limit, page) => {
   try {
     const offset = page * limit - limit;
@@ -18,7 +19,7 @@ exports.getArticleComments = async (articleId, limit, page) => {
   } catch (error) {
     throw new Error('somthing went wrong:', error);
   }
-};
+}
 exports.getAllChefRecipeComments = async (chefId, limit, page) => {
   try {
     const offset = page * limit;
@@ -64,8 +65,6 @@ exports.deleteArticleComment = async (commentId) => {
     const result = await commentsService.deleteArticleComment(commentId);
     return result;
   } catch (error) {
-    console.log(error);
-    
     throw new Error('Error deleting article comment:', error);
   }
 }

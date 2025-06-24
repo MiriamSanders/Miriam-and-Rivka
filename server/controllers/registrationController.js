@@ -10,7 +10,7 @@ exports.registerUser = async (userName, email, password) => {
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const userData = { userName: userName, email: email, userType: 1 }; 
+        const userData = { userName: userName, email: email, userType: 1 };
 
         const newUser = await loginService.postUser(userData);
         if (!newUser) {
@@ -20,8 +20,7 @@ exports.registerUser = async (userName, email, password) => {
         await loginService.postPassword({ userId: newUser.userId, passwordHash: hashedPassword });
         //need to change- 
         let userType = await loginService.getRole(newUser.userType);
-            console.log(userType);
-        // צור טוקן JWT
+
         const token = jwt.sign(
             { id: newUser.userId, userName: newUser.userName, userType: userType.roleName },
             process.env.JWT_SECRET,
@@ -39,7 +38,6 @@ exports.registerUser = async (userName, email, password) => {
         throw new Error('Internal server error');
     }
 }
-
 exports.loginUser = async (userName, password) => {
 
     if (!userName || !password) {
@@ -57,7 +55,6 @@ exports.loginUser = async (userName, password) => {
         if (!isPasswordValid) {
             throw new Error('Invalid username or password');
         }
-        console.log(user);
         const token = jwt.sign(
             { id: user.userId, userName: user.userName, userType: user.roleName },
             process.env.JWT_SECRET,
@@ -75,9 +72,7 @@ exports.loginUser = async (userName, password) => {
     } catch (error) {
         throw new Error('Internal server error');
     }
-};
-
-// Add this function
+}
 exports.forgotPasswordByUsername = async (username) => {
     const user = await loginService.getUserWithEmailByUserName(username);
     if (!user) throw new Error("Username not found");
@@ -90,7 +85,7 @@ exports.forgotPasswordByUsername = async (username) => {
     return { message: "email sent succsesfuly" };
 
 
-};
+}
 exports.resetPassword = async (token, newPassword) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -103,11 +98,11 @@ exports.resetPassword = async (token, newPassword) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         // Update password
-        await loginService.updatePassword(userId,{ userId: userId, passwordHash: hashedPassword });
-      
+        await loginService.updatePassword(userId, { userId: userId, passwordHash: hashedPassword });
+
 
         return { message: 'Password reset successful' };
     } catch (err) {
         throw new Error('Invalid or expired token');
     }
-};
+}

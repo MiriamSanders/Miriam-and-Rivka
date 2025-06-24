@@ -2,6 +2,7 @@ const e = require('express');
 const recipeService = require('../services/recipesService');
 const tagService=require('../services/tagService');
 const ingredientService=require('../services/ingredientService');
+
 exports.getAllRecipes = async (options) => {
   try {
     const limit = parseInt(options.limit) || 10;
@@ -10,20 +11,16 @@ exports.getAllRecipes = async (options) => {
 
     const hasFilters = options.category || options.chefName || options.title || options.dishType || options.userId || options.tags.length > 0 || options.anyTags.length > 0;
     const recipes = await recipeService.getRecipesAdvanced(options);
-
-    console.log('Recipes fetched:', recipes);
     return recipes;
   } catch (error) {
     throw new Error('Something went wrong while fetching recipes:', error);
   }
-};
-
+}
 exports.getRecipeById = async (recipeId) => {
   if (isNaN(recipeId)) {
     throw new Error('Invalid recipe ID');
   }
   try {
-    console.log('Fetching recipe with ID:', recipeId)
     const recipe = await recipeService.getRecipeById(recipeId);
     if (!recipe) {
       throw new Error('Recipe not found');
@@ -32,9 +29,7 @@ exports.getRecipeById = async (recipeId) => {
   } catch (error) {
     throw new Error('Something went wrong while fetching recipe');
   }
-};
-
-//לפרק לפונקיציות קטנות יותר
+}
 exports.createRecipe = async (newRecipe) => {
   const {
     chefId,
@@ -49,12 +44,9 @@ exports.createRecipe = async (newRecipe) => {
     ingredients,
     tags
   } = newRecipe;
-  console.log(newRecipe);
 
   // Validate required fields
   if (!chefId || !title || !imageURL || !category || !description) {
-    console.log("error");
-
     throw new Error('chefId, title, imageURL, category, and description are required');
   }
 
@@ -75,12 +67,8 @@ exports.createRecipe = async (newRecipe) => {
       category,
       dishType
     };
-    console.log(recipeData);
-
     const newRecipe = await recipeService.postRecipe(recipeData);
     const recipeId = newRecipe.recipeId;
-    console.log(newRecipe);
-
     // Handle ingredients if provided
     if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
       for (let i = 0; i < ingredients.length; i++) {
@@ -98,7 +86,6 @@ exports.createRecipe = async (newRecipe) => {
                 const searchResult = await ingredientService.getIngredientByName(ingredientName);
                 // Assuming GenericGet returns an array
                 existingIngredient = searchResult[0];
-                console.log(existingIngredient);
 
               } catch (error) {
                 // Ingredient doesn't exist, create it
@@ -111,7 +98,6 @@ exports.createRecipe = async (newRecipe) => {
                   FiberPer100g: null
                 };
                 existingIngredient = await ingredientService.postIngredient(newIngredientData);
-                console.log(existingIngredient);
               }
               // Link the ingredient to the recipe
               const recipeIngredientData = {
@@ -147,7 +133,6 @@ exports.createRecipe = async (newRecipe) => {
             // Tag doesn't exist, create it
             existingTag = await tagService.postTag({ name: tagName });
           }
-          console.log(existingTag);
 
           // Then link the recipe to the tag
           const recipeTagData = {
@@ -167,11 +152,9 @@ exports.createRecipe = async (newRecipe) => {
     };
 
   } catch (error) {
-    console.log(error);
     throw new Error('Something went wrong while creating the recipe');
   }
-};
-
+}
 exports.getBestRatedRecipes = async () => {
   try {
     const bestRatedRecipes = await recipeService.getBestRatedRecipes();
@@ -215,7 +198,6 @@ function parseIngredientText(ingredientText) {
     ingredientName: ingredientText
   };
 }
-
 exports.deleteRecipe = async (recipeId) => {
   try {
     const result = await recipeService.deleteRecipe(recipeId);
@@ -224,7 +206,6 @@ exports.deleteRecipe = async (recipeId) => {
     throw new Error('Something went wrong while deleting recipe');
   }
 }
-
 exports.putRecipe = async (recipeId, recipeData) => {
   const {
     title,
@@ -260,10 +241,7 @@ exports.putRecipe = async (recipeId, recipeData) => {
       category,
       dishType,
     };
-    console.log(recipeData);
-
     const newRecipe = await recipeService.updateRecipeById(recipeId, recipeData);
-    console.log(newRecipe);
 
     // Handle ingredients if provided
     await syncRecipeIngredients(recipeId, ingredients);
@@ -281,8 +259,7 @@ exports.putRecipe = async (recipeId, recipeData) => {
     throw new Error('Something went wrong while updating the recipe');
 
   }
-};
-
+}
 async function syncRecipeIngredients(recipeId, ingredients) {
   if (!Array.isArray(ingredients) || ingredients.length === 0) {
     return;
@@ -358,7 +335,6 @@ async function syncRecipeIngredients(recipeId, ingredients) {
     }
   }
 }
-
 async function syncRecipeTags(recipeId, tags) {
   if (!tags || !Array.isArray(tags)) return;
   let existingTagIds = new Set();

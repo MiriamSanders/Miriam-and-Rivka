@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tagController = require('../controllers/tagController');
+
 router.get('/', async (req, res) => {
     try {
         const tags = await tagController.getAllTags();

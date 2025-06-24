@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const dbPromise = require("./dbConnection");
-const genericService= require('./genericService');
+const genericService = require('./genericService');
+
 async function getRecipeComments(recipeId, limit, offset) {
   try {
     const db = await dbPromise;
@@ -81,7 +82,6 @@ async function getAllChefRecipeComments(chefId, limit, offset) {
       OFFSET ${offset}
     `;
     const [rows] = await db.execute(query, [chefId]);
-    console.log("Chef recipe comments length:", rows.length);
     return rows;
 
   } catch (error) {
@@ -113,7 +113,6 @@ async function getAllChefArticleComments(chefId, limit, offset) {
     `;
 
     const [rows] = await db.execute(query, [chefId]);
-    console.log("Chef article comments length:", rows.length);
     return rows;
 
   } catch (error) {
@@ -166,12 +165,12 @@ async function postArticleComment(userId, articleId, commentText, parentCommentI
   }
 }
 async function deleteArticleComment(commentId) {
-   const result = await genericService.genericDelete('articlecomments', commentId, 'commentId');
-    return result;
+  const result = await genericService.genericDelete('articlecomments', commentId, 'commentId');
+  return result;
 }
 async function deleteRecipeComment(commentId) {
   const result = await genericService.genericDelete('recipecomments', commentId, 'commentId');
-      return result;
+  return result;
 }
 module.exports = {
   getRecipeComments,

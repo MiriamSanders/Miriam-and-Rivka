@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/registrationController');
 
-
 // Route to handle user registration
 router.post('/register', async (req, res) => {
     try {

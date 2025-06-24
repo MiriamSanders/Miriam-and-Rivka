@@ -142,7 +142,7 @@ const RecipePage = () => {
             <button onClick={handleEditToggle} className="edit-button"><Edit /></button>
           )}
         </div>
-      )}{console.log(recipeData)}
+      )}
 
       <div className="printable-content">
         <h1 className="recipe-title">

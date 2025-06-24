@@ -25,7 +25,6 @@ setErrorCode(requestResult.status);
   const handleClick =async (newRating) => {
     const currentUser= JSON.parse(localStorage.getItem("currentUser"));
     const postData= { userId:currentUser.id ,recipeId:recipeId, rating: newRating }// Assuming userId is stored in localStorage
-    console.log("Post Data:", postData); // Debugging line to check the data being sent
     const result=await postRequest(`ratings`,postData);
     setRating(newRating);
     setShowModal(false);

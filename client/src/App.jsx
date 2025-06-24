@@ -70,7 +70,6 @@ function App() {
         {/* <Route path="menus/:id" element={<MenuDetail />} /> */}
 
         {/* Chef Area */}
-
         {(userType === "admin" || userType === "chef") && (
           <>
             <Route path="/chef-area" element={<ChefCommentsDashboard />} />

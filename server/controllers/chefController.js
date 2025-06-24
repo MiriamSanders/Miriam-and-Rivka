@@ -95,21 +95,15 @@ exports.approveReq = async (guid) => {
             throw new Error('Failed to approve chef');
         }
     } catch (error) {
-        console.log(error);
-
         throw new Error('There was an error approving the chef. Please try again.');
     }
 }
 exports.rejectReq = async (guid, reason = null) => {
     try {
         const request = await chefService.getByGuid(guid);
-        console.log(request);
-
         if (!request) {
             throw new Error('Request not found');
         }
-
-
         try {
             await mailManager.rejectReq({
                 name: request.name,
@@ -137,7 +131,6 @@ exports.rejectReq = async (guid, reason = null) => {
     </html>
   `);
     } catch (error) {
-        console.log(error);
         throw new Error('There was an error rejecting the chef request. Please try again.');
     }
 }
