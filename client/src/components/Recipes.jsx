@@ -62,7 +62,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
     console.log("Current Menu State:", menu);
   }
 
-  
+
   const handleCreateMenuFromSelection = async () => {
     const totalSelected = menu.sideIds.length + menu.mainIds.length + menu.dessertIds.length;
 
@@ -71,7 +71,19 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
 
       return;
     }
+    const trimmedMenu = {
+      sideIds: menu.sideIds.slice(0, 5),
+      mainIds: menu.mainIds.slice(0, 5),
+      dessertIds: menu.dessertIds.slice(0, 5),
+    };
 
+    if (
+      menu.sideIds.length > 5 ||
+      menu.mainIds.length > 5 ||
+      menu.dessertIds.length > 5
+    ) {
+      toast.info("Only the first 5 items from each category will be saved.");
+    }
     setIsCreatingMenu(true);
 
     try {
@@ -79,9 +91,9 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
       const unique = arr => [...new Set(arr)];
       const data = {
         userId: currentUser.id,
-        sideIds: Array.isArray(menu.sideIds) ? unique(menu.sideIds).join(',') : menu.sideIds,
-        mainIds: Array.isArray(menu.mainIds) ? unique(menu.mainIds).join(',') : menu.mainIds,
-        dessertIds: Array.isArray(menu.dessertIds) ? unique(menu.dessertIds).join(',') : menu.dessertIds,
+        sideIds: Array.isArray(trimmedMenu.sideIds) ? unique(trimmedMenu.sideIds).join(',') : trimmedMenu.sideIds,
+        mainIds: Array.isArray(trimmedMenu.mainIds) ? unique(trimmedMenu.mainIds).join(',') : trimmedMenu.mainIds,
+        dessertIds: Array.isArray(trimmedMenu.dessertIds) ? unique(trimmedMenu.dessertIds).join(',') : trimmedMenu.dessertIds,
       };
 
       console.log("Creating menu with data:", data);
@@ -108,7 +120,7 @@ function Recipes({ createMenu, addToMenu, menu, setCreateMenu, setMenus }) {
       navigate('/personal-area/menus');
     } catch (error) {
       console.error("Error creating menu:", error);
-      toast.error("There was an error creating your menu. Please try again.");
+      toast.error("There was an error creating your menu. Please try logging in.");
 
     } finally {
       setIsCreatingMenu(false);

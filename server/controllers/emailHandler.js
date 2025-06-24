@@ -12,8 +12,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-
-
 const BASE_URL = 'http://localhost:3001';
 const getAdminEmail = async () => {
   const admin = await userService.getAdmin();
