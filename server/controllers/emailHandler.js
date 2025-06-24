@@ -1,7 +1,7 @@
 
 
 const nodemailer = require('nodemailer');
-const genericService = require('../services/genericService');
+const userService = require('../services/userService');
 const { log } = require('console');
 require("dotenv").config({ path: require('path').resolve(__dirname, '../.env') });
 const transporter = nodemailer.createTransport({
@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   secure: false, // true for 465, false for 587
   auth: {
     user: process.env.EMAIL_ADRESS,
-    pass: process.env.EMAIL_API_PASSWORD // Your Gmail App Password (no spaces)
+    pass: process.env.EMAIL_API_PASSWORD
   }
 });
 
@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 
 const BASE_URL = 'http://localhost:3001';
 const getAdminEmail = async () => {
-  const admin = await genericService.genericGetByColumnName("users", 3, "userType");
+  const admin = await userService.getAdmin();
   console.log(admin.email);
   return admin.email;
 }

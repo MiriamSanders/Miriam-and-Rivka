@@ -29,7 +29,7 @@ exports.joinReq = async (chefId, imageURL, education, experienceYears, style, ad
         if (isNaN(experienceYears) || experienceYears < 0) {
             throw new Error('Please enter a valid number of experience years');
         }
-        const userData = await  chefService.getByUserId(chefId);
+        const userData = await chefService.getByUserId(chefId);
         const guid = uuidv4();
         mailManager.joinReq({
             guid,
@@ -51,7 +51,7 @@ exports.joinReq = async (chefId, imageURL, education, experienceYears, style, ad
             experience_years: experienceYears || null,
             style: style || null
         };
-        const result = await  chefService.postPendingRequest(data);
+        const result = await chefService.postPendingRequest(data);
         return result;
     } catch (error) {
         throw new Error('There was an error submitting your application. Please try again.');
@@ -59,7 +59,7 @@ exports.joinReq = async (chefId, imageURL, education, experienceYears, style, ad
 }
 exports.approveReq = async (guid) => {
     try {
-        const request = await  chefService.getByGuid(guid);
+        const request = await chefService.getByGuid(guid);
         if (!request) {
             throw new Error('Request not found');
         }
@@ -76,7 +76,7 @@ exports.approveReq = async (guid) => {
                 name: request.name,
                 email: request.email
             });
-            await chefService.deletePending(giud);
+            await chefService.deletePending(guid);
             return (`
     <html>
       <head><title>Chef Approved</title></head>
@@ -95,6 +95,8 @@ exports.approveReq = async (guid) => {
             throw new Error('Failed to approve chef');
         }
     } catch (error) {
+        console.log(error);
+
         throw new Error('There was an error approving the chef. Please try again.');
     }
 }
@@ -102,7 +104,7 @@ exports.rejectReq = async (guid, reason = null) => {
     try {
         const request = await chefService.getByGuid(guid);
         console.log(request);
-        
+
         if (!request) {
             throw new Error('Request not found');
         }
